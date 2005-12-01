@@ -4,7 +4,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: 0.21
-Release: 0.24svn.1
+Release: 0.24svn.2%{?dist}
 License: GPL
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -19,6 +19,11 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires: gcc-gnat >= 4.0.0-0.40, texinfo
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
+# gcc-gnat missing on ppc: Bug 174720
+# mock does not install glibc-devel.i386 on x86_64, therefore
+# gcc -m32 fails, therefore the package does not build under
+# mock/plague on x86_64: Bug 174731
+ExcludeArch: ppc x86_64
 
 # Make sure we don't use clashing namespaces
 %define _vendor fedora_ghdl
@@ -170,6 +175,10 @@ popd
 %{_libexecdir}/gcc/
 
 %changelog
+* Thu Dec  1 2005 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.21-0.24svn.2
+- Exclude ppc because gcc-gnat is missing
+- Exclude x86_64 because of mock build issues
+
 * Fri Nov 25 2005 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.21-0.24svn.1
 - update to SVN rev 24
 - remove additional files to fix x86_64 build
