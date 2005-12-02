@@ -4,7 +4,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: 0.21
-Release: 0.24svn.2%{?dist}
+Release: 0.24svn.3%{?dist}
 License: GPL
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -21,9 +21,7 @@ Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
 # gcc-gnat missing on ppc: Bug 174720
 # mock does not install glibc-devel.i386 on x86_64, therefore
-# gcc -m32 fails, therefore the package does not build under
-# mock/plague on x86_64: Bug 174731
-ExcludeArch: ppc x86_64
+ExcludeArch: ppc
 
 # Make sure we don't use clashing namespaces
 %define _vendor fedora_ghdl
@@ -74,6 +72,9 @@ OPT_FLAGS=$(echo $OPT_FLAGS | %{__sed} \
 	-e 's/-fstack-protector//g ' \
 	-e 's/--param=ssp-buffer-size=[0-9]*//g')
 
+# gcc -m32 fails, so we disable multilibbing.
+# so far multilib isn't very valuable, as the VHDL libraries aren't multilibbed
+# either; Bug 174731
 export CFLAGS="$OPT_FLAGS"
 export XCFLAGS="$OPT_FLAGS"
 export TCFLAGS="$OPT_FLAGS"
@@ -94,6 +95,7 @@ export TCFLAGS="$OPT_FLAGS"
 	--mandir=%{_mandir} \
 	--infodir=%{_infodir} \
 	--enable-languages=vhdl \
+	--disable-multilib \
 %ifarch sparc
 	--host=%{gcc_target_platform} \
 	--build=%{gcc_target_platform} \
