@@ -1,10 +1,10 @@
 %define gccver 4.0.2
-%define versuffix dev
+%define ghdlver 0.20
 
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: 0.21
-Release: 0.24svn.3%{?dist}
+Release: 0.35svn.1%{?dist}
 License: GPL
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -12,15 +12,17 @@ URL: http://ghdl.free.fr/
 # check out the SVN repo
 # cd translate/gcc/
 # ./dist.sh sources
-Source0: http://ghdl.free.fr/ghdl-%{version}%{versuffix}.tar.bz2
+Source0: http://ghdl.free.fr/ghdl-%{ghdlver}.tar.bz2
 Source1: ftp://gcc.gnu.org/pub/gcc/releases/gcc-%{gccver}/gcc-core-%{gccver}.tar.bz2
-Patch0: ghdl-0.21-infodirentry.patch
+Patch0: ghdl-0.20-svn35.patch
+Patch1: ghdl-0.21-infodirentry.patch
+Patch2: ghdl-imagef64fix.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires: gcc-gnat >= 4.0.0-0.40, texinfo
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
+Requires: gcc
 # gcc-gnat missing on ppc: Bug 174720
-# mock does not install glibc-devel.i386 on x86_64, therefore
 ExcludeArch: ppc
 
 # Make sure we don't use clashing namespaces
@@ -51,8 +53,12 @@ Ada95.
 
 %prep
 %setup -q -n gcc-%{gccver} -T -b 1 -a 0
-%{__mv} ghdl-%{version}%{versuffix}/vhdl gcc/
-%patch0 -p0
+pushd ghdl-%{ghdlver}
+%patch0 -p1
+%patch2 -p0 -b .imgf64
+%{__mv} vhdl ../gcc/
+popd
+%patch1 -p0
 
 %build
 %{__mkdir} obj-%{gcc_target_platform}
@@ -95,7 +101,7 @@ export TCFLAGS="$OPT_FLAGS"
 	--mandir=%{_mandir} \
 	--infodir=%{_infodir} \
 	--enable-languages=vhdl \
-	--disable-multilib \
+	%{!?_without_mock:--disable-multilib} \
 %ifarch sparc
 	--host=%{gcc_target_platform} \
 	--build=%{gcc_target_platform} \
@@ -112,6 +118,8 @@ export TCFLAGS="$OPT_FLAGS"
 	--host=%{gcc_target_platform}
 %endif
 
+%{__mkdir} -p gcc/vhdl
+%{__cp} ../gcc/vhdl/grt/grt.ver gcc/vhdl
 # Parallel make doesn't work, so not using %{?_smp_mflags}
 %{__make}
 
@@ -120,6 +128,37 @@ popd
 %install
 %{__rm} -rf %{buildroot}
 %{__make} -C obj-%{gcc_target_platform} DESTDIR=%{buildroot} install
+
+%ifarch x86_64
+pushd obj-%{gcc_target_platform}/gcc/vhdl
+P32=%{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/vhdl/lib/32/
+%{__install} -d -o 0 -g 0 ${P32}
+make ghdllibs-clean
+%if %{!?_without_mock:0}%{?_without_mock:1}
+make grt-clean
+make GRT_FLAGS=-m32 GRT_TARGET_OBJS="i386.o linux.o times.o" ghdllib
+make grt.lst
+%{__install} -m 644 libgrt.a ${P32}/libgrt.a
+%{__install} -m 644 grt.lst ${P32}/grt.lst
+%{__install} -m 644 grt.ver ${P32}/grt.ver
+%endif
+PDIR=`pwd`
+pushd ${P32}/../..
+%{__install} -d -o 0 -g 0 lib/32/v93
+%{__install} -d -o 0 -g 0 lib/32/v87
+%{__make} -f ${PDIR}/Makefile REL_DIR=../../../.. \
+         LIBSRC_DIR="src" LIB93_DIR=lib/32/v93 LIB87_DIR=lib/32/v87 \
+         ANALYZE="${PDIR}/../ghdl -a -m32 --GHDL1=${PDIR}/../ghdl1 --ieee=none" \
+         std.v93 std.v87 ieee.v93 ieee.v87 synopsys.v93 synopsys.v87 mentor.v93
+popd
+../ghdl1 -m32 --std=87 -quiet -o std_standard.s --compile-standard
+../xgcc -m32 -c -o std_standard.o std_standard.s
+%{__mv} std_standard.o ${P32}/v87/std/std_standard.o
+../ghdl1 -m32 --std=93 -quiet -o std_standard.s --compile-standard
+../xgcc -m32 -c -o std_standard.o std_standard.s
+%{__mv} std_standard.o ${P32}/v93/std/std_standard.o
+popd
+%endif
 
 # Add additional libraries to link
 (
@@ -145,6 +184,11 @@ pushd %{buildroot}
 	.%{_exec_prefix}/lib/libmudflap.* \
 	.%{_exec_prefix}/lib/libmudflapth.* \
 	.%{_libdir}/32/libiberty.a
+# Remove crt/libgcc, as ghdl invokes the native gcc to perform the linking
+%{__rm} -f \
+	.%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/crt* \
+	.%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/libgc* \
+	.%{_libexecdir}/gcc/%{gcc_target_platform}/%{gccver}/{cc1,collect2}
 
 # Remove directory hierarchies not to be packaged
 %{__rm} -rf \
@@ -166,7 +210,7 @@ popd
 
 %files
 %defattr(-,root,root,-)
-%doc ghdl-%{version}%{versuffix}/COPYING
+%doc ghdl-%{ghdlver}/COPYING
 %{_bindir}/ghdl
 %{_infodir}/ghdl.info.gz
 # Need to own directory %{_libdir}/gcc even though we only want the
@@ -177,6 +221,18 @@ popd
 %{_libexecdir}/gcc/
 
 %changelog
+* Thu Dec 15 2005 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.21-0.35svn.1
+- update to svn35 for more x86_64 "Ada cannot portably call C vararg functions"
+  fixes
+- first stab at -m32 library building
+
+* Sat Dec 10 2005 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.21-0.33svn.1
+- update to svn33, to fix x86_64 issues (real'image, -m32)
+- rpmbuild option --without mock enables multilib builds
+
+* Mon Dec  5 2005 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.21-0.24svn.3
+- disable multilib and remove exclude of x86_64
+
 * Thu Dec  1 2005 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.21-0.24svn.2
 - Exclude ppc because gcc-gnat is missing
 - Exclude x86_64 because of mock build issues
