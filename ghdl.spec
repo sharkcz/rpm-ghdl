@@ -1,10 +1,10 @@
 %define gccver 4.0.2
-%define ghdlver 0.20
+%define ghdlver 0.21
 
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: 0.21
-Release: 0.35svn.1%{?dist}
+Release: 1%{?dist}
 License: GPL
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -14,9 +14,7 @@ URL: http://ghdl.free.fr/
 # ./dist.sh sources
 Source0: http://ghdl.free.fr/ghdl-%{ghdlver}.tar.bz2
 Source1: ftp://gcc.gnu.org/pub/gcc/releases/gcc-%{gccver}/gcc-core-%{gccver}.tar.bz2
-Patch0: ghdl-0.20-svn35.patch
-Patch1: ghdl-0.21-infodirentry.patch
-Patch2: ghdl-imagef64fix.patch
+Patch0: ghdl-0.21-infodirentry.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires: gcc-gnat >= 4.0.0-0.40, texinfo
 Requires(post): /sbin/install-info
@@ -54,11 +52,9 @@ Ada95.
 %prep
 %setup -q -n gcc-%{gccver} -T -b 1 -a 0
 pushd ghdl-%{ghdlver}
-%patch0 -p1
-%patch2 -p0 -b .imgf64
 %{__mv} vhdl ../gcc/
 popd
-%patch1 -p0
+%patch0 -p0
 
 %build
 %{__mkdir} obj-%{gcc_target_platform}
@@ -118,8 +114,8 @@ export TCFLAGS="$OPT_FLAGS"
 	--host=%{gcc_target_platform}
 %endif
 
-%{__mkdir} -p gcc/vhdl
-%{__cp} ../gcc/vhdl/grt/grt.ver gcc/vhdl
+#{__mkdir} -p gcc/vhdl
+#{__cp} ../gcc/vhdl/grt/grt.ver gcc/vhdl
 # Parallel make doesn't work, so not using %{?_smp_mflags}
 %{__make}
 
@@ -221,6 +217,9 @@ popd
 %{_libexecdir}/gcc/
 
 %changelog
+* Sun Dec 18 2005 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.21-1
+- update to 0.21
+
 * Thu Dec 15 2005 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.21-0.35svn.1
 - update to svn35 for more x86_64 "Ada cannot portably call C vararg functions"
   fixes
