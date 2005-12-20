@@ -3,8 +3,8 @@
 
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
-Version: 0.21
-Release: 1%{?dist}
+Version: 0.22
+Release: 0.svn38.0%{?dist}
 License: GPL
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -14,7 +14,7 @@ URL: http://ghdl.free.fr/
 # ./dist.sh sources
 Source0: http://ghdl.free.fr/ghdl-%{ghdlver}.tar.bz2
 Source1: ftp://gcc.gnu.org/pub/gcc/releases/gcc-%{gccver}/gcc-core-%{gccver}.tar.bz2
-Patch0: ghdl-0.21-infodirentry.patch
+Patch0: ghdl-svn38.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires: gcc-gnat >= 4.0.0-0.40, texinfo
 Requires(post): /sbin/install-info
@@ -52,9 +52,9 @@ Ada95.
 %prep
 %setup -q -n gcc-%{gccver} -T -b 1 -a 0
 pushd ghdl-%{ghdlver}
+%patch0 -p1
 %{__mv} vhdl ../gcc/
 popd
-%patch0 -p0
 
 %build
 %{__mkdir} obj-%{gcc_target_platform}
@@ -114,8 +114,6 @@ export TCFLAGS="$OPT_FLAGS"
 	--host=%{gcc_target_platform}
 %endif
 
-#{__mkdir} -p gcc/vhdl
-#{__cp} ../gcc/vhdl/grt/grt.ver gcc/vhdl
 # Parallel make doesn't work, so not using %{?_smp_mflags}
 %{__make}
 
