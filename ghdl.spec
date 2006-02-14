@@ -4,7 +4,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: 0.22
-Release: 0.38svn.0%{?dist}
+Release: 0.38svn.1%{?dist}
 License: GPL
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -115,13 +115,13 @@ export TCFLAGS="$OPT_FLAGS"
 %endif
 
 # Parallel make doesn't work, so not using %{?_smp_mflags}
-%{__make}
+%{__make} all-host
 
 popd
 
 %install
 %{__rm} -rf %{buildroot}
-%{__make} -C obj-%{gcc_target_platform} DESTDIR=%{buildroot} install
+%{__make} -C obj-%{gcc_target_platform} DESTDIR=%{buildroot} install-host
 
 %ifarch x86_64
 pushd obj-%{gcc_target_platform}/gcc/vhdl
@@ -215,6 +215,12 @@ popd
 %{_libexecdir}/gcc/
 
 %changelog
+* Wed Feb 14 2006 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.22-0.38svn.1
+- rebuild with new compiler for FC5
+
+* Wed Dec 21 2005 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.22-0.38svn.0
+- update to svn38, to fix a ghw output bug
+
 * Sun Dec 18 2005 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.21-1
 - update to 0.21
 
