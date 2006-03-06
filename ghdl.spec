@@ -4,7 +4,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: 0.22
-Release: 0.39svn.0%{?dist}
+Release: 0.40svn.0%{?dist}
 License: GPL
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -14,7 +14,7 @@ URL: http://ghdl.free.fr/
 # ./dist.sh sources
 Source0: http://ghdl.free.fr/ghdl-%{ghdlver}.tar.bz2
 Source1: ftp://gcc.gnu.org/pub/gcc/releases/gcc-%{gccver}/gcc-core-%{gccver}.tar.bz2
-Patch0: ghdl-svn39.patch
+Patch0: ghdl-svn40.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires: gcc-gnat >= 4.0.0-0.40, texinfo
 Requires(post): /sbin/install-info
@@ -215,6 +215,10 @@ popd
 %{_libexecdir}/gcc/
 
 %changelog
+* Mon Mar  6 2006 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.22-0.40svn.0
+- update to svn40, to fix an array bounds checking bug apparently
+  introduced in svn39
+
 * Thu Feb 16 2006 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.22-0.39svn.0
 - update to svn39, to fix some constant bugs
 
