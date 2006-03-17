@@ -71,6 +71,12 @@ OPT_FLAGS=$(echo %{optflags} | %{__sed} \
 
 # These compiler flags in rawhide seem to break the build, so get rid of them
 OPT_FLAGS=$(echo $OPT_FLAGS | %{__sed} \
+%ifarch i386 i486 i586 i686
+	-e 's/-mtune=generic/-mtune=pentium4/g' \
+%endif
+%ifarch x86_64
+	-e 's/-mtune=generic/-mtune=nocona/g' \
+%endif
 	-e 's/-fstack-protector//g ' \
 	-e 's/--param=ssp-buffer-size=[0-9]*//g')
 
