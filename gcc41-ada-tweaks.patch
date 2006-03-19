@@ -1,0 +1,67 @@
+2004-10-04  Jakub Jelinek  <jakub@redhat.com>
+
+	* gnat_ugn.texi: Add : and . to direntry.
+	* gnat-style.texi: Change dircategory to GNU Ada tools.
+
+2005-02-08  Jakub Jelinek  <jakub@redhat.com>
+
+	* Makefile.in (gnatlib-shared-default): Disallow dlopening of
+	libgnat.so.
+
+--- gcc/ada/gnat-style.texi	(.../gcc-4_0-branch)	(revision 107266)
++++ gcc/ada/gnat-style.texi	(.../redhat/gcc-4_0-branch)	(revision 107414)
+@@ -28,7 +28,7 @@
+ @setchapternewpage odd
+ 
+ 
+-@dircategory Programming
++@dircategory GNU Ada tools
+ @direntry
+ * gnat-style: (gnat-style).      GNAT Coding Style
+ @end direntry
+--- gcc/ada/Makefile.in	(.../gcc-4_0-branch)	(revision 107266)
++++ gcc/ada/Makefile.in	(.../redhat/gcc-4_0-branch)	(revision 107414)
+@@ -1316,7 +1316,7 @@
+   LIBRARY_VERSION := $(LIB_VERSION)
+ endif
+ 
+-ifeq ($(strip $(filter-out powerpc% linux%,$(arch) $(osys))),)
++ifeq ($(strip $(filter-out powerpc% ppc% linux%,$(arch) $(osys))),)
+   LIBGNAT_TARGET_PAIRS = \
+   a-intnam.ads<a-intnam-linux.ads \
+   s-inmaop.adb<s-inmaop-posix.adb \
+@@ -1862,7 +1862,7 @@
+ 	     THREAD_KIND="$(THREAD_KIND)" \
+              gnatlib
+ 	$(RM) rts/libgna*$(soext)
+-	cd rts; ../../xgcc -B../../ -shared $(TARGET_LIBGCC2_CFLAGS) \
++	cd rts; ../../xgcc -B../../ -shared -Wl,-z,nodlopen $(TARGET_LIBGCC2_CFLAGS) \
+ 		-o libgnat$(hyphen)$(LIBRARY_VERSION)$(soext) \
+ 		$(GNATRTL_NONTASKING_OBJS) $(LIBGNAT_OBJS) \
+ 		$(SO_OPTS)libgnat$(hyphen)$(LIBRARY_VERSION)$(soext) \
+--- gcc/ada/gnat_ugn.texi	(.../gcc-4_0-branch)	(revision 107266)
++++ gcc/ada/gnat_ugn.texi	(.../redhat/gcc-4_0-branch)	(revision 107414)
+@@ -101,7 +101,7 @@
+ @settitle @value{EDITION} User's Guide @value{PLATFORM}
+ @dircategory GNU Ada tools
+ @direntry
+-* @value{EDITION} User's Guide (@value{FILE}) @value{PLATFORM}
++* @value{EDITION} User's Guide: (@value{FILE}). User's Guide for GNU Ada Tools.
+ @end direntry
+ 
+ @include gcc-common.texi
+--- gcc/ada/link.c	(.../gcc-4_0-branch)	(revision 107266)
++++ gcc/ada/link.c	(.../redhat/gcc-4_0-branch)	(revision 107414)
+@@ -164,9 +164,9 @@
+ 
+ #elif defined (linux)
+ const char *__gnat_object_file_option = "";
+-const char *__gnat_run_path_option = "-Wl,-rpath,";
+-char __gnat_shared_libgnat_default = STATIC;
+-int __gnat_link_max = 8192;
++const char *__gnat_run_path_option = "";
++char __gnat_shared_libgnat_default = SHARED;
++int __gnat_link_max = 131072;
+ unsigned char __gnat_objlist_file_supported = 1;
+ unsigned char __gnat_using_gnu_linker = 1;
+ const char *__gnat_object_library_extension = ".a";

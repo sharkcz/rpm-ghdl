@@ -1,0 +1,75 @@
+gcc/ada/
+2004-11-28  James A. Morrison  <ja2morri@csclub.uwaterloo.ca>
+
+	PR ada/18302
+	* Make-lang.in (check-gnat): Set EXPECT environment variable.
+
+testsuite/
+2005-05-18  Jakub Jelinek  <jakub@redhat.com>
+
+	* ada/acats/run_all.sh: Filter out spawn line from target_bit.
+
+2004-11-28  James A. Morrison  <ja2morri@csclub.uwaterloo.ca>
+
+	PR ada/18302
+	* ada/acats/run_all.sh (target_run): Run test through run_test.expect.
+	* ada/acats/run_test.expect: Expect script for ACATS tests.
+
+--- gcc/testsuite/ada/acats/run_all.sh	(.../gcc-4_0-branch)	(revision 107266)
++++ gcc/testsuite/ada/acats/run_all.sh	(.../redhat/gcc-4_0-branch)	(revision 107414)
+@@ -13,7 +13,8 @@
+ gnatflags="-gnatws"
+ 
+ target_run () {
+-$*
++  LD_LIBRARY_PATH=$ADA_INCLUDE_PATH${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH} \
++    $EXPECT -f $testdir/run_test.exp $1 > $2
+ }
+ 
+ # End of customization section.
+@@ -92,8 +93,8 @@
+ 
+ # Find out the size in bit of an address on the target
+ target_gnatmake $testdir/support/impbit.adb >> $dir/acats.log 2>&1
+-target_run $dir/support/impbit > $dir/support/impbit.out 2>&1
+-target_bit=`cat $dir/support/impbit.out`
++target_run $dir/support/impbit $dir/support/impbit.out 2>/dev/null
++target_bit=`egrep -v -e ^spawn $dir/support/impbit.out`
+ echo target_bit="$target_bit" >> $dir/acats.log
+ 
+ # Find out a suitable asm statement
+@@ -259,7 +260,7 @@
+       if [ ! -x $dir/tests/$chapter/$i/$binmain ]; then
+          sync
+       fi
+-      target_run $dir/tests/$chapter/$i/$binmain > $dir/tests/$chapter/$i/${i}.log 2>&1
++      target_run $dir/tests/$chapter/$i/$binmain $dir/tests/$chapter/$i/${i}.log 2>&1
+       cd $dir/tests/$chapter/$i
+       cat ${i}.log >> $dir/acats.log
+       egrep -e '(==== |\+\+\+\+ |\!\!\!\! )' ${i}.log > /dev/null 2>&1
+--- gcc/testsuite/ada/acats/run_test.exp	(.../gcc-4_0-branch)	(revision 0)
++++ gcc/testsuite/ada/acats/run_test.exp	(.../redhat/gcc-4_0-branch)	(revision 107414)
+@@ -0,0 +1,13 @@
++#!/usr/bin/expect -f
++
++if {[info exists env(DEJAGNU_TIMEOUT)]} {
++  set timeout $env(DEJAGNU_TIMEOUT)
++} else {
++  set timeout 300
++}
++
++spawn $argv
++expect timeout {
++	send_user "Program timed out.\n"
++	exit 1
++}
+--- gcc/ada/Make-lang.in	(.../gcc-4_0-branch)	(revision 107266)
++++ gcc/ada/Make-lang.in	(.../redhat/gcc-4_0-branch)	(revision 107414)
+@@ -809,6 +809,7 @@
+ check-gnat:
+ 	test -d $(ACATSDIR) || mkdir -p $(ACATSDIR)
+ 	testdir=`cd ${srcdir}/${ACATSDIR}; ${PWD_COMMAND}`; \
++	EXPECT=${EXPECT} ; export EXPECT ; \
+ 	export testdir; cd $(ACATSDIR); $(SHELL) $${testdir}/run_acats $(CHAPTERS)
+ 
+ .PHONY: check-gnat

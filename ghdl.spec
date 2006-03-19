@@ -1,10 +1,11 @@
 %define gccver 4.1.0
 %define ghdlver 0.21
+%define DATE 20060304
 
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: 0.22
-Release: 0.49svn.0%{?dist}
+Release: 0.49svn.1%{?dist}
 License: GPL
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -12,16 +13,76 @@ URL: http://ghdl.free.fr/
 # check out the SVN repo
 # cd translate/gcc/
 # ./dist.sh sources
-Source0: http://ghdl.free.fr/ghdl-%{ghdlver}.tar.bz2
-Source1: ftp://gcc.gnu.org/pub/gcc/releases/gcc-%{gccver}/gcc-core-%{gccver}.tar.bz2
-Patch0: ghdl-svn49.patch
+Source0: gcc-%{gccver}-%{DATE}.tar.bz2
+Source100: http://ghdl.free.fr/ghdl-%{ghdlver}.tar.bz2
+Patch1: gcc41-ice-hack.patch
+Patch2: gcc41-ppc64-m32-m64-multilib-only.patch
+Patch3: gcc41-ia64-libunwind.patch
+Patch4: gcc41-gnuc-rh-release.patch
+Patch5: gcc41-java-nomulti.patch
+Patch6: gcc41-ada-pr18302.patch
+Patch7: gcc41-ada-tweaks.patch
+Patch8: gcc41-java-slow_pthread_self.patch
+Patch9: gcc41-ppc32-retaddr.patch
+Patch10: gcc41-x86_64-sse3.patch
+Patch11: gcc41-mni.patch
+Patch12: gcc41-cfaval.patch
+Patch13: gcc41-rh184446.patch
+Patch100: ghdl-svn49.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-BuildRequires: gcc-gnat >= 4.0.0-0.40, texinfo
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
 Requires: gcc
 # gcc-gnat missing on ppc: Bug 174720
 ExcludeArch: ppc
+# (Build)Requires from fc gcc41 package
+%define multilib_64_archs sparc64 ppc64 s390x x86_64
+%ifarch s390x
+%define multilib_32_arch s390
+%endif
+%ifarch sparc64
+%define multilib_32_arch sparc
+%endif
+%ifarch ppc64
+%define multilib_32_arch ppc
+%endif
+%ifarch x86_64
+%define multilib_32_arch i386
+%endif
+# Need binutils with -pie support >= 2.14.90.0.4-4
+# Need binutils which can omit dot symbols and overlap .opd on ppc64 >= 2.15.91.0.2-4
+# Need binutils which handle -msecure-plt on ppc >= 2.16.91.0.2-2
+# Need binutils which support .weakref >= 2.16.91.0.3-1
+BuildRequires: binutils >= 2.16.91.0.3-1
+BuildRequires: zlib-devel, gettext, bison, flex, texinfo
+# Make sure pthread.h doesn't contain __thread tokens
+# Make sure glibc supports stack protector
+BuildRequires: glibc-devel >= 2.3.90-2
+%ifarch ppc ppc64 s390 s390x sparc sparcv9 alpha
+# Make sure glibc supports TFmode long double
+BuildRequires: glibc >= 2.3.90-35
+%endif
+%ifarch %{multilib_64_archs} sparc ppc
+# Ensure glibc{,-devel} is installed for both multilib arches
+BuildRequires: /lib/libc.so.6 /usr/lib/libc.so /lib64/libc.so.6 /usr/lib64/libc.so
+%endif
+# Ada requires Ada to build
+BuildRequires: gcc-gnat >= 3.1, libgnat >= 3.1
+# Need .eh_frame ld optimizations
+# Need proper visibility support
+# Need -pie support
+# Need --as-needed/--no-as-needed support
+# On ppc64, need omit dot symbols support and --non-overlapping-opd
+# Need binutils that owns /usr/bin/c++filt
+# Need binutils that support .weakref
+Requires: binutils >= 2.16.91.0.3-1
+# Make sure gdb will understand DW_FORM_strp
+Conflicts: gdb < 5.1-2
+Requires: glibc-devel >= 2.2.90-12
+%ifarch ppc ppc64 s390 s390x sparc sparcv9 alpha
+# Make sure glibc supports TFmode long double
+Requires: glibc >= 2.3.90-35
+%endif
 
 # Make sure we don't use clashing namespaces
 %define _vendor fedora_ghdl
@@ -50,13 +111,29 @@ functions or procedures written in a foreign language, such as C, C++, or
 Ada95.
 
 %prep
-%setup -q -n gcc-%{gccver} -T -b 1 -a 0
+%setup -q -n gcc-%{gccver}-%{DATE} -T -b 0 -a 100
+%patch1 -p0 -b .ice-hack~
+%patch2 -p0 -b .ppc64-m32-m64-multilib-only~
+%patch3 -p0 -b .ia64-libunwind~
+#patch4 -p0 -b .gnuc-rh-release~
+%patch5 -p0 -b .java-nomulti~
+%patch6 -p0 -b .ada-pr18302~
+%patch7 -p0 -b .ada-tweaks~
+%patch8 -p0 -b .java-slow_pthread_self~
+%patch9 -p0 -b .ppc32-retaddr~
+%patch10 -p0 -b .x86_64-sse3~
+%patch11 -p0 -b .mni~
+%patch12 -p0 -b .cfaval~
+%patch13 -p0 -b .rh184446~
+sed -i -e 's/4\.1\.1/4.1.0/' gcc/BASE-VER gcc/version.c
+sed -i -e 's/" (Red Hat[^)]*)"/" (Red Hat %{version}-%{gccver})"/' gcc/version.c
 pushd ghdl-%{ghdlver}
-%patch0 -p1
+%patch100 -p1
 %{__mv} vhdl ../gcc/
 popd
 
 %build
+%{__rm} -fr obj-%{gcc_target_platform}
 %{__mkdir} obj-%{gcc_target_platform}
 pushd obj-%{gcc_target_platform}
 
@@ -104,6 +181,13 @@ export TCFLAGS="$OPT_FLAGS"
 	--infodir=%{_infodir} \
 	--enable-languages=vhdl \
 	%{!?_without_mock:--disable-multilib} \
+	--enable-shared \
+	--enable-threads=posix \
+	--enable-checking=release \
+	--with-system-zlib \
+	--enable-__cxa_atexit \
+	--disable-libunwind-exceptions \
+	--disable-libgcj \
 %ifarch sparc
 	--host=%{gcc_target_platform} \
 	--build=%{gcc_target_platform} \
@@ -221,6 +305,9 @@ popd
 %{_libexecdir}/gcc/
 
 %changelog
+* Sun Mar 19 2006 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.22-0.49svn.1
+- use core gcc as base compiler sources
+
 * Thu Mar 16 2006 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.22-0.49svn.0
 - update to svn49, using gcc 4.1.0
 

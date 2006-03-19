@@ -1,0 +1,20 @@
+for gcc/ChangeLog
+from  Richard Henderson  <rth@redhat.com>, Alexandre Oliva  <aoliva@redhat.com>
+
+	* config/rs6000/rs6000.c (rs6000_legitimize_tls_address): Use
+	secure-plt-compatible load sequence to compute the GOT address
+	for -fPIC -msecure-plt.
+
+Index: gcc/config/rs6000/rs6000.c
+===================================================================
+--- gcc/config/rs6000/rs6000.c.orig	2006-03-09 20:02:13.000000000 -0300
++++ gcc/config/rs6000/rs6000.c	2006-03-09 22:00:43.000000000 -0300
+@@ -3081,7 +3081,7 @@ rs6000_legitimize_tls_address (rtx addr,
+ 	    {
+ 	      rtx gsym = rs6000_got_sym ();
+ 	      got = gen_reg_rtx (Pmode);
+-	      if (flag_pic == 0)
++	      if (flag_pic == 0 || (flag_pic && TARGET_SECURE_PLT))
+ 		rs6000_emit_move (got, gsym, Pmode);
+ 	      else
+ 		{

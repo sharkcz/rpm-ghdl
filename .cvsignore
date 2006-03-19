@@ -4,4 +4,5 @@ ghdl-0.20-svn35.patch
 ghdl-imagef64fix.patch
 ghdl-0.20.tar.bz2
 ghdl-0.21.tar.bz2
+gcc-4.1.0-20060304.tar.bz2
 gcc-core-4.1.0.tar.bz2
