@@ -1,11 +1,12 @@
 %define gccver 4.1.0
 %define ghdlver 0.21
+%define ghdlsvnver 50
 %define DATE 20060304
 
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: 0.22
-Release: 0.49svn.1%{?dist}
+Release: 0.%{ghdlsvnver}svn.1%{?dist}
 License: GPL
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -28,7 +29,7 @@ Patch10: gcc41-x86_64-sse3.patch
 Patch11: gcc41-mni.patch
 Patch12: gcc41-cfaval.patch
 Patch13: gcc41-rh184446.patch
-Patch100: ghdl-svn49.patch
+Patch100: ghdl-svn%{ghdlsvnver}.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -84,6 +85,8 @@ Requires: glibc-devel >= 2.2.90-12
 Requires: glibc >= 2.3.90-35
 %endif
 
+Requires: ghdl-grt = %{version}-%{release}
+
 # Make sure we don't use clashing namespaces
 %define _vendor fedora_ghdl
 
@@ -109,6 +112,15 @@ design into a netlist.
 Since GHDL is a compiler (i.e., it generates object files), you can call
 functions or procedures written in a foreign language, such as C, C++, or
 Ada95.
+
+%package grt
+Summary: GHDL runtime libraries
+Group: System Environment/Libraries
+
+%description grt
+This package contains the runtime libraries needed to link ghdl-compiled
+object files into simulator executables. grt contains the simulator kernel
+that tracks signal updates and schedules processes.
 
 %prep
 %setup -q -n gcc-%{gccver}-%{DATE} -T -b 0 -a 100
@@ -297,14 +309,22 @@ popd
 %doc ghdl-%{ghdlver}/COPYING
 %{_bindir}/ghdl
 %{_infodir}/ghdl.info.gz
-# Need to own directory %{_libdir}/gcc even though we only want the
-# %{gcc_target_platform}/%{gccver} subdirectory
-%{_libdir}/gcc/
 # Need to own directory %{_libexecdir}/gcc even though we only want the
 # %{gcc_target_platform}/%{gccver} subdirectory
 %{_libexecdir}/gcc/
 
+%files grt
+# Need to own directory %{_libdir}/gcc even though we only want the
+# %{gcc_target_platform}/%{gccver} subdirectory
+%{_libdir}/gcc/
+
+
 %changelog
+* Wed Mar 22 2006 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.22-0.50svn.0
+- update to svn50, to fix x86_64 breakage
+- move grt (ghdl runtime library) into separate package, to allow parallel
+  install of i386 and x86_64 grt on x86_64 machines, thus making -m32 work
+
 * Sun Mar 19 2006 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.22-0.49svn.1
 - use core gcc as base compiler sources
 

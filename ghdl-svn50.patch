@@ -1,6 +1,6 @@
 diff -urN ghdl-0.21/README ghdl-0.22dev/README
 --- ghdl-0.21/README	2005-12-18 14:49:00.000000000 +0100
-+++ ghdl-0.22dev/README	2006-03-16 20:52:11.000000000 +0100
++++ ghdl-0.22dev/README	2006-03-22 11:15:27.000000000 +0100
 @@ -27,19 +27,33 @@
  ***************************
  
@@ -37,55 +37,6 @@ diff -urN ghdl-0.21/README ghdl-0.22dev/README
  * configure gcc with the --enable-languages=vhdl option.  You may of course
    add other languages.
    Refer to the gcc installation documentation.
-diff -urN ghdl-0.21/vhdl/Make-lang.in ghdl-0.22dev/vhdl/Make-lang.in
---- ghdl-0.21/vhdl/Make-lang.in	2005-12-18 14:48:59.000000000 +0100
-+++ ghdl-0.22dev/vhdl/Make-lang.in	2006-03-16 20:52:10.000000000 +0100
-@@ -96,22 +96,21 @@
- AGCC_INC_FLAGS=-I$(AGCC_GCCOBJ_DIR)/gcc -I$(AGCC_GCCSRC_DIR)/include \
-  -I$(AGCC_GCCSRC_DIR)/gcc -I$(AGCC_GCCSRC_DIR)/gcc/config \
-  -I$(AGCC_GCCSRC_DIR)/libcpp/include
--AGCC_CFLAGS=-g -DIN_GCC $(AGCC_INC_FLAGS)
-+AGCC_CFLAGS=-g -Wall -DIN_GCC $(AGCC_INC_FLAGS)
- 
- AGCC_LOCAL_OBJS=ortho-lang.o gcc-version.o
- 
- AGCC_DEPS := $(AGCC_LOCAL_OBJS)
- AGCC_OBJS := $(AGCC_LOCAL_OBJS) \
- 	$(AGCC_GCCOBJ_DIR)/gcc/toplev.o \
--	$(AGCC_GCCOBJ_DIR)/gcc/c-convert.o \
- 	$(AGCC_GCCOBJ_DIR)/gcc/libbackend.a \
- 	$(AGCC_GCCOBJ_DIR)/libcpp/libcpp.a \
- 	$(AGCC_GCCOBJ_DIR)/libiberty/libiberty.a
- 
--gcc-version.c: $(AGCC_GCCSRC_DIR)/gcc/version.c
-+gcc-version.c: $(AGCC_GCCSRC_DIR)/gcc/BASE-VER
- 	-$(RM) -f $@
- 	echo '#include "version.h"' > $@
--	sed  -n -e '/version_string/ s/";/ (ghdl)";/p' < $< >> $@
-+	echo "const char version_string[] = \""`cat $<` "(ghdl)\";" >> $@
- 	echo 'const char bug_report_url[] = "<URL:http://gna.org/projects/ghdl>";' >> $@
- 
- gcc-version.o: gcc-version.c
-diff -urN ghdl-0.21/vhdl/Makefile.in ghdl-0.22dev/vhdl/Makefile.in
---- ghdl-0.21/vhdl/Makefile.in	2005-12-18 14:48:59.000000000 +0100
-+++ ghdl-0.22dev/vhdl/Makefile.in	2006-03-16 20:52:10.000000000 +0100
-@@ -480,6 +480,7 @@
- 
- #GRT_USE_PTHREADS=y
- ifeq ($(GRT_USE_PTHREADS),y)
-+ GRT_CFLAGS+=-DUSE_THREADS
-  GRT_ADD_OBJS+=grt-cthreads.o
-  GRT_EXTRA_LIB+=-lpthread
- endif
-@@ -527,7 +528,7 @@
- 	$(CC) -c $(GRT_FLAGS) -o $@ $<
- 
- linux.o: $(GRTSRCDIR)/config/linux.c
--	$(CC) -c $(GRT_FLAGS) -o $@ $<
-+	$(CC) -c $(GRT_FLAGS) $(GRT_CFLAGS) -o $@ $<
- 
- win32.o: $(GRTSRCDIR)/config/win32.c
- 	$(CC) -c $(GRT_FLAGS) -o $@ $<
 diff -urN ghdl-0.21/vhdl/configuration.adb ghdl-0.22dev/vhdl/configuration.adb
 --- ghdl-0.21/vhdl/configuration.adb	2005-09-22 23:26:43.000000000 +0200
 +++ ghdl-0.22dev/vhdl/configuration.adb	2006-03-16 20:51:10.000000000 +0100
@@ -302,6 +253,25 @@ diff -urN ghdl-0.21/vhdl/evaluation.adb ghdl-0.22dev/vhdl/evaluation.adb
             | Iir_Predefined_Array_Less_Equal
             | Iir_Predefined_Array_Greater
             | Iir_Predefined_Array_Greater_Equal
+diff -urN ghdl-0.21/vhdl/ghdldrv/ghdlmain.adb ghdl-0.22dev/vhdl/ghdldrv/ghdlmain.adb
+--- ghdl-0.21/vhdl/ghdldrv/ghdlmain.adb	2005-12-04 04:51:33.000000000 +0100
++++ ghdl-0.22dev/vhdl/ghdldrv/ghdlmain.adb	2006-03-16 20:51:04.000000000 +0100
+@@ -1,5 +1,5 @@
+ --  GHDL driver - main part.
+---  Copyright (C) 2002, 2003, 2004, 2005 Tristan Gingold
++--  Copyright (C) 2002, 2003, 2004, 2005, 2006 Tristan Gingold
+ --
+ --  GHDL is free software; you can redistribute it and/or modify it under
+ --  the terms of the GNU General Public License as published by the Free
+@@ -225,7 +225,7 @@
+       Put_Line ("Written by Tristan Gingold.");
+       New_Line;
+       --  Display copyright.  Assume 80 cols terminal.
+-      Put_Line ("Copyright (C) 2003, 2004, 2005 Tristan Gingold.");
++      Put_Line ("Copyright (C) 2003, 2004, 2005, 2006 Tristan Gingold.");
+       Put_Line ("GHDL is free software, covered by the "
+                 & "GNU General Public License.  There is NO");
+       Put_Line ("warranty; not even for MERCHANTABILITY or"
 diff -urN ghdl-0.21/vhdl/ghdl.texi ghdl-0.22dev/vhdl/ghdl.texi
 --- ghdl-0.21/vhdl/ghdl.texi	2005-12-12 03:21:55.000000000 +0100
 +++ ghdl-0.22dev/vhdl/ghdl.texi	2006-03-16 20:51:01.000000000 +0100
@@ -435,25 +405,6 @@ diff -urN ghdl-0.21/vhdl/ghdl.texi ghdl-0.22dev/vhdl/ghdl.texi
  @comment  node-name,  next,  previous,  up
  @subsection Using GRT from Ada
  @quotation Warning
-diff -urN ghdl-0.21/vhdl/ghdldrv/ghdlmain.adb ghdl-0.22dev/vhdl/ghdldrv/ghdlmain.adb
---- ghdl-0.21/vhdl/ghdldrv/ghdlmain.adb	2005-12-04 04:51:33.000000000 +0100
-+++ ghdl-0.22dev/vhdl/ghdldrv/ghdlmain.adb	2006-03-16 20:51:04.000000000 +0100
-@@ -1,5 +1,5 @@
- --  GHDL driver - main part.
----  Copyright (C) 2002, 2003, 2004, 2005 Tristan Gingold
-+--  Copyright (C) 2002, 2003, 2004, 2005, 2006 Tristan Gingold
- --
- --  GHDL is free software; you can redistribute it and/or modify it under
- --  the terms of the GNU General Public License as published by the Free
-@@ -225,7 +225,7 @@
-       Put_Line ("Written by Tristan Gingold.");
-       New_Line;
-       --  Display copyright.  Assume 80 cols terminal.
--      Put_Line ("Copyright (C) 2003, 2004, 2005 Tristan Gingold.");
-+      Put_Line ("Copyright (C) 2003, 2004, 2005, 2006 Tristan Gingold.");
-       Put_Line ("GHDL is free software, covered by the "
-                 & "GNU General Public License.  There is NO");
-       Put_Line ("warranty; not even for MERCHANTABILITY or"
 diff -urN ghdl-0.21/vhdl/grt/config/linux.c ghdl-0.22dev/vhdl/grt/config/linux.c
 --- ghdl-0.21/vhdl/grt/config/linux.c	2005-12-12 03:29:26.000000000 +0100
 +++ ghdl-0.22dev/vhdl/grt/config/linux.c	2006-03-16 20:51:05.000000000 +0100
@@ -1108,19 +1059,78 @@ diff -urN ghdl-0.21/vhdl/grt/grt-waves.adb ghdl-0.22dev/vhdl/grt/grt-waves.adb
        end loop;
     end Write_Hierarchy;
  
+diff -urN ghdl-0.21/vhdl/Makefile.in ghdl-0.22dev/vhdl/Makefile.in
+--- ghdl-0.21/vhdl/Makefile.in	2005-12-18 14:48:59.000000000 +0100
++++ ghdl-0.22dev/vhdl/Makefile.in	2006-03-22 11:15:27.000000000 +0100
+@@ -480,6 +480,7 @@
+ 
+ #GRT_USE_PTHREADS=y
+ ifeq ($(GRT_USE_PTHREADS),y)
++ GRT_CFLAGS+=-DUSE_THREADS
+  GRT_ADD_OBJS+=grt-cthreads.o
+  GRT_EXTRA_LIB+=-lpthread
+ endif
+@@ -527,7 +528,7 @@
+ 	$(CC) -c $(GRT_FLAGS) -o $@ $<
+ 
+ linux.o: $(GRTSRCDIR)/config/linux.c
+-	$(CC) -c $(GRT_FLAGS) -o $@ $<
++	$(CC) -c $(GRT_FLAGS) $(GRT_CFLAGS) -o $@ $<
+ 
+ win32.o: $(GRTSRCDIR)/config/win32.c
+ 	$(CC) -c $(GRT_FLAGS) -o $@ $<
+diff -urN ghdl-0.21/vhdl/Make-lang.in ghdl-0.22dev/vhdl/Make-lang.in
+--- ghdl-0.21/vhdl/Make-lang.in	2005-12-18 14:48:59.000000000 +0100
++++ ghdl-0.22dev/vhdl/Make-lang.in	2006-03-22 11:15:27.000000000 +0100
+@@ -96,22 +96,21 @@
+ AGCC_INC_FLAGS=-I$(AGCC_GCCOBJ_DIR)/gcc -I$(AGCC_GCCSRC_DIR)/include \
+  -I$(AGCC_GCCSRC_DIR)/gcc -I$(AGCC_GCCSRC_DIR)/gcc/config \
+  -I$(AGCC_GCCSRC_DIR)/libcpp/include
+-AGCC_CFLAGS=-g -DIN_GCC $(AGCC_INC_FLAGS)
++AGCC_CFLAGS=-g -Wall -DIN_GCC $(AGCC_INC_FLAGS)
+ 
+ AGCC_LOCAL_OBJS=ortho-lang.o gcc-version.o
+ 
+ AGCC_DEPS := $(AGCC_LOCAL_OBJS)
+ AGCC_OBJS := $(AGCC_LOCAL_OBJS) \
+ 	$(AGCC_GCCOBJ_DIR)/gcc/toplev.o \
+-	$(AGCC_GCCOBJ_DIR)/gcc/c-convert.o \
+ 	$(AGCC_GCCOBJ_DIR)/gcc/libbackend.a \
+ 	$(AGCC_GCCOBJ_DIR)/libcpp/libcpp.a \
+ 	$(AGCC_GCCOBJ_DIR)/libiberty/libiberty.a
+ 
+-gcc-version.c: $(AGCC_GCCSRC_DIR)/gcc/version.c
++gcc-version.c: $(AGCC_GCCSRC_DIR)/gcc/BASE-VER
+ 	-$(RM) -f $@
+ 	echo '#include "version.h"' > $@
+-	sed  -n -e '/version_string/ s/";/ (ghdl)";/p' < $< >> $@
++	echo "const char version_string[] = \""`cat $<` "(ghdl)\";" >> $@
+ 	echo 'const char bug_report_url[] = "<URL:http://gna.org/projects/ghdl>";' >> $@
+ 
+ gcc-version.o: gcc-version.c
 diff -urN ghdl-0.21/vhdl/ortho-lang.c ghdl-0.22dev/vhdl/ortho-lang.c
 --- ghdl-0.21/vhdl/ortho-lang.c	2005-12-10 12:04:40.000000000 +0100
-+++ ghdl-0.22dev/vhdl/ortho-lang.c	2006-03-16 20:51:08.000000000 +0100
-@@ -18,6 +18,8 @@
++++ ghdl-0.22dev/vhdl/ortho-lang.c	2006-03-22 11:15:00.000000000 +0100
+@@ -18,6 +18,10 @@
  #include "tree-gimple.h"
  #include "function.h"
  #include "cgraph.h"
 +#include "target.h"
 +#include "convert.h"
++#include "tree-pass.h"
++#include "tree-dump.h"
  
  const int tree_identifier_size = sizeof (struct tree_identifier);
  
-@@ -494,6 +496,89 @@
+@@ -431,6 +435,7 @@
+ 
+       case COMPONENT_REF:
+       case ARRAY_REF:
++      case ARRAY_RANGE_REF:
+ 	n = TREE_OPERAND (n, 0);
+ 	break;
+ 
+@@ -494,6 +499,89 @@
      }
  }
  
@@ -1210,7 +1220,7 @@ diff -urN ghdl-0.21/vhdl/ortho-lang.c ghdl-0.22dev/vhdl/ortho-lang.c
  /* Return a definition for a builtin function named NAME and whose data type
     is TYPE.  TYPE should be a function type with argument types.
     FUNCTION_CODE tells later passes how to compile calls to this function.
-@@ -603,8 +688,6 @@
+@@ -603,8 +691,6 @@
  #define LANG_HOOKS_POST_OPTIONS ortho_post_options
  #undef LANG_HOOKS_HONOR_READONLY
  #define LANG_HOOKS_HONOR_READONLY true
@@ -1219,7 +1229,7 @@ diff -urN ghdl-0.21/vhdl/ortho-lang.c ghdl-0.22dev/vhdl/ortho-lang.c
  #undef LANG_HOOKS_MARK_ADDRESSABLE
  #define LANG_HOOKS_MARK_ADDRESSABLE ortho_mark_addressable
  #undef LANG_HOOKS_CALLGRAPH_EXPAND_FUNCTION
-@@ -1234,7 +1317,7 @@
+@@ -1234,7 +1320,7 @@
  void
  finish_record_aggr (struct o_record_aggr_list *list, tree *res)
  {
@@ -1228,7 +1238,7 @@ diff -urN ghdl-0.21/vhdl/ortho-lang.c ghdl-0.22dev/vhdl/ortho-lang.c
  }
   
  
-@@ -1260,18 +1343,16 @@
+@@ -1260,18 +1346,16 @@
  void
  finish_array_aggr (struct o_array_aggr_list *list, tree *res)
  {
@@ -1249,6 +1259,179 @@ diff -urN ghdl-0.21/vhdl/ortho-lang.c ghdl-0.22dev/vhdl/ortho-lang.c
    TREE_CONSTANT (res) = 1;
    return res;
  }
+@@ -1298,6 +1382,7 @@
+     abort ();
+ 
+   ortho_mark_addressable (arr);
++  return build4 (ARRAY_RANGE_REF, res_type, arr, index, NULL_TREE, NULL_TREE);
+   el_type = TREE_TYPE (TREE_TYPE (arr));
+   el_ptr_type = build_pointer_type (el_type);
+ 
+@@ -1371,78 +1456,117 @@
+  return fold (build1 (NOP_EXPR, rtype, size));
+ }
+ 
+-#if 0
+-static tree
+-ortho_build_addr (tree operand, tree atype)
+-{
+-  tree base = exp;
++/* Convert the array expression EXP to a pointer.  */
++static tree array_to_pointer_conversion (tree exp);
+ 
+-  while (handled_component_p (base))
+-    base = TREE_OPERAND (base, 0);
+-
+-  if (DECL_P (base))
+-    TREE_ADDRESSABLE (base) = 1;
+-
+-  return build1 (ADDR_EXPR, atype, exp);
+-}
+-#endif
+-
+-tree
+-new_unchecked_address (tree lvalue, tree atype)
++static tree
++ortho_build_addr (tree lvalue, tree atype)
+ {
+   tree res;
+ 
+   if (TREE_CODE (lvalue) == INDIRECT_REF)
+     {
++      /* ADDR_REF(INDIRECT_REF(x)) -> x.  */
+       res = TREE_OPERAND (lvalue, 0);
+     }
+   else
+     {
+-      ortho_mark_addressable (lvalue);
+-
+-      if (TREE_TYPE (lvalue) != TREE_TYPE (atype))
++      /* &base[off] -> base+off.  */
++      if (TREE_CODE (lvalue) == ARRAY_REF
++	  || TREE_CODE (lvalue) == ARRAY_RANGE_REF)
+ 	{
+-	  tree ptr;
+-	  ptr = build_pointer_type (TREE_TYPE (lvalue));
+-	  res = build1 (ADDR_EXPR, ptr, lvalue);
++	  tree base = TREE_OPERAND (lvalue, 0);
++	  tree idx = TREE_OPERAND (lvalue, 1);
++	  tree offset;
++	  tree base_type;
++
++	  ortho_mark_addressable (base);
++
++	  offset = fold_build2 (MULT_EXPR, TREE_TYPE (idx), idx,
++				array_ref_element_size (lvalue)); 
++
++	  base = array_to_pointer_conversion (base);
++	  base_type = TREE_TYPE (base);
++
++	  res = build2 (PLUS_EXPR, base_type,
++			base, convert (base_type, offset));
+ 	}
+       else
+-	res = build1 (ADDR_EXPR, atype, lvalue);
++	{
++	  ortho_mark_addressable (lvalue);
++
++	  if (TREE_TYPE (lvalue) != TREE_TYPE (atype))
++	    {
++	      tree ptr;
++	      ptr = build_pointer_type (TREE_TYPE (lvalue));
++	      res = build1 (ADDR_EXPR, ptr, lvalue);
++	    }
++	  else
++	    res = build1 (ADDR_EXPR, atype, lvalue);
++	}
++      res = fold (res);
+     }
+ 
+   if (TREE_TYPE (res) != atype)
+-    res = fold (build1 (NOP_EXPR, atype, res));
++    res = fold_build1 (NOP_EXPR, atype, res);
+ 
+   return res;
++}
+ 
+-#if 0
+-  /* res = build_addr (lvalue, atype); */
+-  if (TREE_TYPE (res) != atype)
++/* Convert the array expression EXP to a pointer.  */
++static tree
++array_to_pointer_conversion (tree exp)
++{
++  tree type = TREE_TYPE (exp);
++  tree adr;
++  tree restype = TREE_TYPE (type);
++  tree ptrtype;
++
++  gcc_assert (TREE_CODE (type) == ARRAY_TYPE);
++
++  /* Create a pointer to elements.  */
++  ptrtype = build_pointer_type (restype);
++
++  switch (TREE_CODE (exp))
+     {
+-      if (TREE_CODE (TREE_TYPE (res)) != POINTER_TYPE)
+-	abort ();
+-      res = build1 (NOP_EXPR, atype, res);
++    case INDIRECT_REF:
++      return convert (ptrtype, TREE_OPERAND (exp, 0));
++
++    case VAR_DECL:
++      /* Convert array to pointer to elements.  */
++      adr = build1 (ADDR_EXPR, ptrtype, exp);
++      ortho_mark_addressable (exp);
++      TREE_SIDE_EFFECTS (adr) = 0;   /* Default would be, same as EXP.  */
++      return adr;
++
++    default:
++      /* Get address.  */
++      return ortho_build_addr (exp, ptrtype);
+     }
+-  return res;
+-#endif
++}
++
++tree
++new_unchecked_address (tree lvalue, tree atype)
++{
++  return ortho_build_addr (lvalue, atype);
+ }
+ 
+ tree
+ new_address (tree lvalue, tree atype)
+ {
+-  return new_unchecked_address (lvalue, atype);
++  return ortho_build_addr (lvalue, atype);
+ }
+ 
+ tree
+ new_global_address (tree lvalue, tree atype)
+ {
+-  return new_unchecked_address (lvalue, atype);
++  return ortho_build_addr (lvalue, atype);
+ }
+ 
+ tree
+ new_global_unchecked_address (tree lvalue, tree atype)
+ {
+-  return new_unchecked_address (lvalue, atype);
++  return ortho_build_addr (lvalue, atype);
+ }
+ 
+ /*  Return a pointer to function FUNC. */
+@@ -1748,6 +1872,10 @@
+ 
+   gimplify_function_tree (func);
+ 
++  /* Dump the genericized tree IR.
++     Enabled by -fdump-tree-gimple.  */
++  dump_function (TDI_generic, func);
++
+   parent = DECL_CONTEXT (func);
+ 
+   if (parent != NULL)
 diff -urN ghdl-0.21/vhdl/parse.adb ghdl-0.22dev/vhdl/parse.adb
 --- ghdl-0.21/vhdl/parse.adb	2005-12-17 07:18:00.000000000 +0100
 +++ ghdl-0.22dev/vhdl/parse.adb	2006-03-16 20:51:10.000000000 +0100
