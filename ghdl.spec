@@ -1,12 +1,11 @@
 %define gccver 4.1.0
 %define ghdlver 0.21
 %define ghdlsvnver 50
-%define DATE 20060304
 
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: 0.22
-Release: 0.%{ghdlsvnver}svn.1%{?dist}
+Release: 0.%{ghdlsvnver}svn.0%{?dist}
 License: GPL
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -14,21 +13,8 @@ URL: http://ghdl.free.fr/
 # check out the SVN repo
 # cd translate/gcc/
 # ./dist.sh sources
-Source0: gcc-%{gccver}-%{DATE}.tar.bz2
+Source0: ftp://gcc.gnu.org/pub/gcc/releases/gcc-%{gccver}/gcc-core-%{gccver}.tar.bz2
 Source100: http://ghdl.free.fr/ghdl-%{ghdlver}.tar.bz2
-Patch1: gcc41-ice-hack.patch
-Patch2: gcc41-ppc64-m32-m64-multilib-only.patch
-Patch3: gcc41-ia64-libunwind.patch
-Patch4: gcc41-gnuc-rh-release.patch
-Patch5: gcc41-java-nomulti.patch
-Patch6: gcc41-ada-pr18302.patch
-Patch7: gcc41-ada-tweaks.patch
-Patch8: gcc41-java-slow_pthread_self.patch
-Patch9: gcc41-ppc32-retaddr.patch
-Patch10: gcc41-x86_64-sse3.patch
-Patch11: gcc41-mni.patch
-Patch12: gcc41-cfaval.patch
-Patch13: gcc41-rh184446.patch
 Patch100: ghdl-svn%{ghdlsvnver}.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(post): /sbin/install-info
@@ -123,22 +109,7 @@ object files into simulator executables. grt contains the simulator kernel
 that tracks signal updates and schedules processes.
 
 %prep
-%setup -q -n gcc-%{gccver}-%{DATE} -T -b 0 -a 100
-%patch1 -p0 -b .ice-hack~
-%patch2 -p0 -b .ppc64-m32-m64-multilib-only~
-%patch3 -p0 -b .ia64-libunwind~
-#patch4 -p0 -b .gnuc-rh-release~
-%patch5 -p0 -b .java-nomulti~
-%patch6 -p0 -b .ada-pr18302~
-%patch7 -p0 -b .ada-tweaks~
-%patch8 -p0 -b .java-slow_pthread_self~
-%patch9 -p0 -b .ppc32-retaddr~
-%patch10 -p0 -b .x86_64-sse3~
-%patch11 -p0 -b .mni~
-%patch12 -p0 -b .cfaval~
-%patch13 -p0 -b .rh184446~
-sed -i -e 's/4\.1\.1/4.1.0/' gcc/BASE-VER gcc/version.c
-sed -i -e 's/" (Red Hat[^)]*)"/" (Red Hat %{version}-%{gccver})"/' gcc/version.c
+%setup -q -n gcc-%{gccver} -T -b 0 -a 100
 pushd ghdl-%{ghdlver}
 %patch100 -p1
 %{__mv} vhdl ../gcc/
@@ -324,6 +295,8 @@ popd
 - update to svn50, to fix x86_64 breakage
 - move grt (ghdl runtime library) into separate package, to allow parallel
   install of i386 and x86_64 grt on x86_64 machines, thus making -m32 work
+- back to using FSF gcc as base compiler sources, using core gcc sources
+  causes segfaults during library compile on x86_64
 
 * Sun Mar 19 2006 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.22-0.49svn.1
 - use core gcc as base compiler sources
