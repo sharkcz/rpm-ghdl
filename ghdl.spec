@@ -5,7 +5,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: 0.22
-Release: 0.%{ghdlsvnver}svn.0%{?dist}
+Release: 0.%{ghdlsvnver}svn.1%{?dist}
 License: GPL
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -48,10 +48,6 @@ BuildRequires: glibc-devel >= 2.3.90-2
 %ifarch ppc ppc64 s390 s390x sparc sparcv9 alpha
 # Make sure glibc supports TFmode long double
 BuildRequires: glibc >= 2.3.90-35
-%endif
-%ifarch %{multilib_64_archs} sparc ppc
-# Ensure glibc{,-devel} is installed for both multilib arches
-BuildRequires: /lib/libc.so.6 /usr/lib/libc.so /lib64/libc.so.6 /usr/lib64/libc.so
 %endif
 # Ada requires Ada to build
 BuildRequires: gcc-gnat >= 3.1, libgnat >= 3.1
@@ -291,6 +287,9 @@ popd
 
 
 %changelog
+* Fri Mar 24 2006 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.22-0.50svn.1
+- do not require /lib/libc.so.* on x86_64, this does not work under mock
+
 * Wed Mar 22 2006 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.22-0.50svn.0
 - update to svn50, to fix x86_64 breakage
 - move grt (ghdl runtime library) into separate package, to allow parallel
