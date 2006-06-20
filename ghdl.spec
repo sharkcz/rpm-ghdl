@@ -1,11 +1,11 @@
 %define gccver 4.1.0
-%define ghdlver 0.21
-%define ghdlsvnver 50
+%define ghdlver 0.23
+%define ghdlsvnver 57
 
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
-Version: 0.22
-Release: 0.%{ghdlsvnver}svn.1%{?dist}
+Version: 0.23
+Release: 0.%{ghdlsvnver}svn.0%{?dist}
 License: GPL
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -287,6 +287,9 @@ popd
 
 
 %changelog
+* Tue Jun 20 2006 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.23-0.57svn.0
+- update to svn57
+
 * Fri Mar 24 2006 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.22-0.50svn.1
 - do not require /lib/libc.so.* on x86_64, this does not work under mock
 
