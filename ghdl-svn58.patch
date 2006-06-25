@@ -172,6 +172,64 @@ diff -urN ghdl-0.23/vhdl/flags.ads ghdl-0.23dev/vhdl/flags.ads
  
     --  --warn-body
     --  Emit a warning when a package body is not required but is analyzed.
+diff -urN ghdl-0.23/vhdl/ghdldrv/ghdllocal.adb ghdl-0.23dev/vhdl/ghdldrv/ghdllocal.adb
+--- ghdl-0.23/vhdl/ghdldrv/ghdllocal.adb	2005-12-07 09:50:00.000000000 +0100
++++ ghdl-0.23dev/vhdl/ghdldrv/ghdllocal.adb	2006-06-25 21:08:28.000000000 +0200
+@@ -149,16 +149,15 @@
+       use Ada.Text_IO;
+       procedure P (Str : String) renames Put_Line;
+    begin
+-      P ("Options:");
++      P ("Main options (try --options-help for details):");
+       P (" --std=XX       Use XX as VHDL standard (87,93c,93,00 or 02)");
+       P (" --work=NAME    Set the name of the WORK library");
+       P (" -PDIR          Add DIR in the library search path");
+       P (" --workdir=DIR  Specify the directory of the WORK library");
+       P (" --PREFIX=DIR   Specify installation prefix");
+-
+       P (" --ieee=NAME    Use NAME as ieee library, where name is:");
+       P ("    standard: standard version (default)");
+-      P ("    synopsys, mentor: vendor version (bad)");
++      P ("    synopsys, mentor: vendor version (not advised)");
+       P ("    none: do not use a predefined ieee library");
+    end Disp_Long_Help;
+ 
+diff -urN ghdl-0.23/vhdl/ghdldrv/ghdlmain.adb ghdl-0.23dev/vhdl/ghdldrv/ghdlmain.adb
+--- ghdl-0.23/vhdl/ghdldrv/ghdlmain.adb	2006-03-07 04:19:56.000000000 +0100
++++ ghdl-0.23dev/vhdl/ghdldrv/ghdlmain.adb	2006-06-25 21:08:28.000000000 +0200
+@@ -132,9 +132,10 @@
+             C := C.Next;
+          end loop;
+          New_Line;
+-         Put_Line
+-           ("To display the options of a GHDL program, run your program");
+-         Put_Line ("  with the --help option.");
++         Put_Line ("To display the options of a GHDL program,");
++         Put_Line ("  run your programm with the --help option.");
++         Put_Line ("Also see --options-help for analyzer options.");
++         New_Line;
+          Put_Line ("Please, refer to the GHDL manual for more information.");
+          Put_Line ("Report bugs on http://gna.org/projects/ghdl");
+       elsif Args'Length = 1 then
+@@ -171,7 +172,7 @@
+    is
+       pragma Unreferenced (Cmd);
+    begin
+-      return "--options-help     Disp help for compiler options";
++      return "--options-help     Disp help for analyzer options";
+    end Get_Short_Help;
+ 
+    procedure Perform_Action (Cmd : in out Command_Option_Help;
+@@ -352,8 +353,8 @@
+    procedure Register_Commands is
+    begin
+       Register_Command (new Command_Help);
+-      Register_Command (new Command_Option_Help);
+       Register_Command (new Command_Version);
++      Register_Command (new Command_Option_Help);
+    end Register_Commands;
+ end Ghdlmain;
+ 
 diff -urN ghdl-0.23/vhdl/ghdl.texi ghdl-0.23dev/vhdl/ghdl.texi
 --- ghdl-0.23/vhdl/ghdl.texi	2006-03-16 05:10:09.000000000 +0100
 +++ ghdl-0.23dev/vhdl/ghdl.texi	2006-06-20 13:57:57.000000000 +0200
@@ -558,6 +616,18 @@ diff -urN ghdl-0.23/vhdl/grt/grt-signals.ads ghdl-0.23dev/vhdl/grt/grt-signals.a
     pragma Export (C, Ghdl_Create_Signal_I32,
                    "__ghdl_create_signal_i32");
     pragma Export (C, Ghdl_Signal_Init_I32,
+diff -urN ghdl-0.23/vhdl/grt/grt-waves.adb ghdl-0.23dev/vhdl/grt/grt-waves.adb
+--- ghdl-0.23/vhdl/grt/grt-waves.adb	2005-12-20 15:48:15.000000000 +0100
++++ ghdl-0.23dev/vhdl/grt/grt-waves.adb	2006-06-25 21:08:28.000000000 +0200
+@@ -305,7 +305,7 @@
+    --  Called before elaboration.
+    procedure Wave_Init
+    is
+-      Mode : constant String := "wt" & NUL;
++      Mode : constant String := "wb" & NUL;
+    begin
+       if Wave_Filename = null then
+          Wave_Stream := NULL_Stream;
 diff -urN ghdl-0.23/vhdl/ieee-std_logic_1164.adb ghdl-0.23dev/vhdl/ieee-std_logic_1164.adb
 --- ghdl-0.23/vhdl/ieee-std_logic_1164.adb	2005-09-22 23:28:05.000000000 +0200
 +++ ghdl-0.23dev/vhdl/ieee-std_logic_1164.adb	2006-06-20 13:58:05.000000000 +0200
@@ -596,6 +666,42 @@ diff -urN ghdl-0.23/vhdl/ieee-vital_timing.adb ghdl-0.23dev/vhdl/ieee-vital_timi
 +         Warning_Vital (Disp_Node (Decl) & " is not a VITAL generic", Decl);
        end if;
     end Check_Entity_Generic_Declaration;
+ 
+diff -urN ghdl-0.23/vhdl/iirs.ads ghdl-0.23dev/vhdl/iirs.ads
+--- ghdl-0.23/vhdl/iirs.ads	2005-11-14 21:44:52.000000000 +0100
++++ ghdl-0.23dev/vhdl/iirs.ads	2006-06-25 21:08:28.000000000 +0200
+@@ -2517,7 +2517,6 @@
+        Iir_Kind_Overload_List,  -- used internally by sem_expr.
+ 
+    -- Declarations.
+-   --  iir_kinds_nonoverloadable_declaration
+        Iir_Kind_Type_Declaration,
+        Iir_Kind_Anonymous_Type_Declaration,
+        Iir_Kind_Subtype_Declaration,
+diff -urN ghdl-0.23/vhdl/libraries/std/textio_body.vhdl ghdl-0.23dev/vhdl/libraries/std/textio_body.vhdl
+--- ghdl-0.23/vhdl/libraries/std/textio_body.vhdl	2005-12-11 15:43:46.000000000 +0100
++++ ghdl-0.23dev/vhdl/libraries/std/textio_body.vhdl	2006-06-25 21:08:28.000000000 +0200
+@@ -541,7 +541,7 @@
+   is
+     variable nl : line;
+   begin
+-    if l'length = 0 then
++    if l = null or l'length = 0 then
+       good := false;
+     else
+       value := l (l'left);
+@@ -1169,10 +1169,10 @@
+ 	    when digits =>
+ 	      state := decimals;
+ 	    when others =>
+-	      return;
++	      exit;
+ 	  end case;
+ 	when others =>
+-	  return;
++          exit;
+       end case;
+     end loop;
  
 diff -urN ghdl-0.23/vhdl/ortho-lang.c ghdl-0.23dev/vhdl/ortho-lang.c
 --- ghdl-0.23/vhdl/ortho-lang.c	2006-03-22 03:16:54.000000000 +0100
@@ -856,6 +962,51 @@ diff -urN ghdl-0.23/vhdl/sem_expr.adb ghdl-0.23dev/vhdl/sem_expr.adb
           return Null_Iir;
        end if;
        return Res;
+diff -urN ghdl-0.23/vhdl/sem_names.adb ghdl-0.23dev/vhdl/sem_names.adb
+--- ghdl-0.23/vhdl/sem_names.adb	2006-05-16 05:42:23.000000000 +0200
++++ ghdl-0.23dev/vhdl/sem_names.adb	2006-06-25 21:08:28.000000000 +0200
+@@ -703,6 +703,7 @@
+       Prefix_Type : Iir;
+       Index_Type : Iir;
+       Prefix : Iir;
++      Staticness : Iir_Staticness;
+    begin
+       --  LRM93 14.1
+       --  Parameter: A locally static expression of type universal_integer, the
+@@ -777,7 +778,19 @@
+       --  A globally static array subtype is a constrained array subtype
+       --  formed by imposing on an unconstrained array type a globally static
+       --  index constraint.
+-      Set_Expr_Staticness (Attr, Get_Type_Staticness (Prefix_Type));
++      Staticness := Get_Type_Staticness (Prefix_Type);
++      if Flags.Vhdl_Std = Vhdl_93c
++        and then Get_Kind (Prefix) not in Iir_Kinds_Type_Declaration
++      then
++         --  For 93c:
++         --  if the prefix is a static expression, the staticness of the
++         --   expression may be higher than the staticness of the type
++         --   (eg: generic whose type is an unconstrained array).
++         --   Also consider expression staticness.
++         Staticness := Iir_Staticness'Max (Staticness,
++                                           Get_Expr_Staticness (Prefix));
++      end if;
++      Set_Expr_Staticness (Attr, Staticness);
+    end Finish_Sem_Array_Attribute;
+ 
+    procedure Finish_Sem_Scalar_Type_Attribute (Attr : Iir; Param : Iir)
+@@ -2102,7 +2115,11 @@
+            | Iir_Kind_Slice_Name =>
+             Error_Msg_Sem ("prefix of user defined attribute cannot be an "
+                            & "object subelement", Attr);
+-            return Null_Iir;
++            return Error_Mark;
++         when Iir_Kind_Dereference =>
++            Error_Msg_Sem ("prefix of user defined attribute cannot be an "
++                           & "anonymous object", Attr);
++            return Error_Mark;
+          when Iir_Kinds_Object_Declaration
+            | Iir_Kind_Design_Unit
+            | Iir_Kind_Type_Declaration
 diff -urN ghdl-0.23/vhdl/std_package.adb ghdl-0.23dev/vhdl/std_package.adb
 --- ghdl-0.23/vhdl/std_package.adb	2005-10-26 12:03:20.000000000 +0200
 +++ ghdl-0.23dev/vhdl/std_package.adb	2006-06-20 13:58:05.000000000 +0200
@@ -1118,8 +1269,74 @@ diff -urN ghdl-0.23/vhdl/trans_decls.ads ghdl-0.23dev/vhdl/trans_decls.ads
     Ghdl_Value_P64 : O_Dnode;
 diff -urN ghdl-0.23/vhdl/translation.adb ghdl-0.23dev/vhdl/translation.adb
 --- ghdl-0.23/vhdl/translation.adb	2006-05-16 06:26:55.000000000 +0200
-+++ ghdl-0.23dev/vhdl/translation.adb	2006-06-20 13:58:01.000000000 +0200
-@@ -6663,7 +6663,10 @@
++++ ghdl-0.23dev/vhdl/translation.adb	2006-06-25 21:08:28.000000000 +0200
+@@ -4598,30 +4598,30 @@
+          Tinfo : Type_Info_Acc;
+       begin
+          Info := Get_Info (Inter);
+-         if Info.Interface_Field = O_Fnode_Null then
+-            case Get_Kind (Inter) is
+-               when Iir_Kind_Constant_Interface_Declaration
+-                 | Iir_Kind_Variable_Interface_Declaration
+-                 | Iir_Kind_File_Interface_Declaration =>
+-                  Mode := Mode_Value;
+-               when Iir_Kind_Signal_Interface_Declaration =>
+-                  Mode := Mode_Signal;
+-               when others =>
+-                  Error_Kind ("translate_interface_type", Inter);
+-            end case;
+-            Tinfo := Get_Info (Get_Type (Inter));
+-            case Tinfo.Type_Mode is
+-               when Type_Mode_Unknown =>
+-                  raise Internal_Error;
+-               when Type_Mode_By_Value =>
+-                  return Tinfo.Ortho_Type (Mode);
+-               when Type_Mode_By_Copy
+-                 | Type_Mode_By_Ref =>
+-                  return Tinfo.Ortho_Ptr_Type (Mode);
+-            end case;
+-         else
++         if Info.Interface_Field /= O_Fnode_Null then
+             return O_Tnode_Null;
+          end if;
++
++         case Get_Kind (Inter) is
++            when Iir_Kind_Constant_Interface_Declaration
++              | Iir_Kind_Variable_Interface_Declaration
++              | Iir_Kind_File_Interface_Declaration =>
++               Mode := Mode_Value;
++            when Iir_Kind_Signal_Interface_Declaration =>
++               Mode := Mode_Signal;
++            when others =>
++               Error_Kind ("translate_interface_type", Inter);
++         end case;
++         Tinfo := Get_Info (Get_Type (Inter));
++         case Tinfo.Type_Mode is
++            when Type_Mode_Unknown =>
++               raise Internal_Error;
++            when Type_Mode_By_Value =>
++               return Tinfo.Ortho_Type (Mode);
++            when Type_Mode_By_Copy
++              | Type_Mode_By_Ref =>
++               return Tinfo.Ortho_Ptr_Type (Mode);
++         end case;
+       end Translate_Interface_Type;
+ 
+       procedure Translate_Subprogram_Declaration (Spec : Iir)
+@@ -4709,8 +4709,12 @@
+                if Get_Kind (Inter) = Iir_Kind_Variable_Interface_Declaration
+                  and then Get_Mode (Inter) in Iir_Out_Modes
+                  and then Tinfo.Type_Mode not in Type_Mode_By_Ref
++                 and then Tinfo.Type_Mode /= Type_Mode_File
+                then
+                   --  This interface is done via the result record.
++                  --  Note: file passed through variables are vhdl87 files,
++                  --        which are initialized at elaboration and thus
++                  --        behave like an IN parameter.
+                   if not Has_Result_Record then
+                      --  Create the record.
+                      Start_Record_Type (El_List);
+@@ -6663,7 +6667,10 @@
              case Get_Kind (El) is
                 when Iir_Kind_Function_Declaration
                   | Iir_Kind_Procedure_Declaration =>
@@ -1131,7 +1348,7 @@ diff -urN ghdl-0.23/vhdl/translation.adb ghdl-0.23dev/vhdl/translation.adb
                 when others =>
                    Error_Kind ("translate_protected_type_subprograms", El);
              end case;
-@@ -8132,10 +8135,11 @@
+@@ -8132,10 +8139,11 @@
                    end;
                 when Type_Mode_Fat_Array =>
                    --  a fat array.
@@ -1145,7 +1362,7 @@ diff -urN ghdl-0.23/vhdl/translation.adb ghdl-0.23dev/vhdl/translation.adb
                 when Type_Mode_Record
                   | Type_Mode_Ptr_Array =>
                    Gen_Memcpy
-@@ -9431,6 +9435,9 @@
+@@ -9431,6 +9439,9 @@
              when Type_Mode_E8 =>
                 Create_Subprg := Ghdl_Create_Signal_E8;
                 Conv := Ghdl_I32_Type;
@@ -1155,7 +1372,7 @@ diff -urN ghdl-0.23/vhdl/translation.adb ghdl-0.23dev/vhdl/translation.adb
              when Type_Mode_I32
                | Type_Mode_P32 =>
                 Create_Subprg := Ghdl_Create_Signal_I32;
-@@ -10623,11 +10630,7 @@
+@@ -10623,11 +10634,7 @@
                 when Iir_Kind_Procedure_Declaration
                   | Iir_Kind_Function_Declaration =>
                    --  Translate interfaces.
@@ -1168,7 +1385,7 @@ diff -urN ghdl-0.23/vhdl/translation.adb ghdl-0.23dev/vhdl/translation.adb
                       Info := Add_Info (El, Kind_Subprg);
                       Chap2.Translate_Subprogram_Interfaces (El);
                       if Get_Kind (El) = Iir_Kind_Function_Declaration
-@@ -10660,18 +10663,16 @@
+@@ -10660,18 +10667,16 @@
              case Get_Kind (El) is
                 when Iir_Kind_Procedure_Declaration
                   | Iir_Kind_Function_Declaration =>
@@ -1190,7 +1407,7 @@ diff -urN ghdl-0.23/vhdl/translation.adb ghdl-0.23dev/vhdl/translation.adb
                       Chap2.Translate_Subprogram_Body (El);
                       Translate_Resolution_Function_Body
                         (Get_Subprogram_Specification (El), Block);
-@@ -11478,6 +11479,9 @@
+@@ -11478,6 +11483,9 @@
                    when Type_Mode_E8 =>
                       Subprg := Ghdl_Signal_Associate_E8;
                       Conv := Ghdl_I32_Type;
@@ -1200,7 +1417,7 @@ diff -urN ghdl-0.23/vhdl/translation.adb ghdl-0.23dev/vhdl/translation.adb
                    when Type_Mode_I32 =>
                       Subprg := Ghdl_Signal_Associate_I32;
                       Conv := Ghdl_I32_Type;
-@@ -11873,6 +11877,24 @@
+@@ -11873,6 +11881,24 @@
                       if Get_Whole_Association_Flag (Assoc) then
                          Elab_Unconstrained_Port (Formal, Get_Actual (Assoc));
                       end if;
@@ -1225,7 +1442,7 @@ diff -urN ghdl-0.23/vhdl/translation.adb ghdl-0.23dev/vhdl/translation.adb
                    when Iir_Kind_Association_Element_By_Individual =>
                       Open_Temp;
                       declare
-@@ -14941,8 +14963,6 @@
+@@ -14941,8 +14967,6 @@
        begin
           Tinfo := Get_Info (Target_Type);
           Open_Temp;
@@ -1234,7 +1451,7 @@ diff -urN ghdl-0.23/vhdl/translation.adb ghdl-0.23dev/vhdl/translation.adb
           Targ := Stabilize (Target);
           Base := Stabilize (Chap3.Get_Array_Base (Targ));
           Bounds := Stabilize (Chap3.Get_Array_Bounds (Targ));
-@@ -15076,6 +15096,10 @@
+@@ -15076,6 +15100,10 @@
           Translate_Array_Aggregate_Gen
             (Base, Bounds, Aggr, Aggr_Type, 1, Var_Index);
           Close_Temp;
@@ -1245,7 +1462,7 @@ diff -urN ghdl-0.23/vhdl/translation.adb ghdl-0.23dev/vhdl/translation.adb
        end Translate_Array_Aggregate;
  
        procedure Translate_Aggregate
-@@ -15197,7 +15221,8 @@
+@@ -15197,7 +15225,8 @@
           Res_Info := Get_Info (Res_Type);
           Expr_Info := Get_Info (Expr_Type);
           case Res_Info.Type_Mode is
@@ -1255,7 +1472,19 @@ diff -urN ghdl-0.23/vhdl/translation.adb ghdl-0.23dev/vhdl/translation.adb
                 declare
                    E : O_Dnode;
                 begin
-@@ -19427,6 +19452,9 @@
+@@ -19092,7 +19121,10 @@
+                   raise Internal_Error;
+                end if;
+                Params (Pos) := Stabilize (Param);
+-               if In_Conv /= Null_Iir or else Out_Conv = Null_Iir then
++               if In_Conv /= Null_Iir
++                 or else Get_Mode (Formal) = Iir_Inout_Mode
++                 -- or else Out_Conv = Null_Iir
++               then
+                   --  Arguments may be assigned if there is an in conversion,
+                   --  or no out conversion.
+                   --  We try to assign even OUT argument, to avoid
+@@ -19427,6 +19459,9 @@
              when Type_Mode_E8 =>
                 Subprg := Ghdl_Signal_Simple_Assign_E8;
                 Conv := Ghdl_I32_Type;
@@ -1265,7 +1494,7 @@ diff -urN ghdl-0.23/vhdl/translation.adb ghdl-0.23dev/vhdl/translation.adb
              when Type_Mode_I32
                | Type_Mode_P32 =>
                 Subprg := Ghdl_Signal_Simple_Assign_I32;
-@@ -19549,6 +19577,9 @@
+@@ -19549,6 +19584,9 @@
              when Type_Mode_E8 =>
                 Subprg := Ghdl_Signal_Start_Assign_E8;
                 Conv := Ghdl_I32_Type;
@@ -1275,7 +1504,7 @@ diff -urN ghdl-0.23/vhdl/translation.adb ghdl-0.23dev/vhdl/translation.adb
              when Type_Mode_I32
                | Type_Mode_P32 =>
                 Subprg := Ghdl_Signal_Start_Assign_I32;
-@@ -19715,6 +19746,9 @@
+@@ -19715,6 +19753,9 @@
              when Type_Mode_E8 =>
                 Subprg := Ghdl_Signal_Next_Assign_E8;
                 Conv := Ghdl_I32_Type;
@@ -1285,7 +1514,7 @@ diff -urN ghdl-0.23/vhdl/translation.adb ghdl-0.23dev/vhdl/translation.adb
              when Type_Mode_I32
                | Type_Mode_P32 =>
                 Subprg := Ghdl_Signal_Next_Assign_I32;
-@@ -21030,6 +21064,9 @@
+@@ -21030,6 +21071,9 @@
                 when Type_Mode_E8 =>
                    Init_Subprg := Ghdl_Signal_Init_E8;
                    Conv := Ghdl_I32_Type;
@@ -1295,7 +1524,7 @@ diff -urN ghdl-0.23/vhdl/translation.adb ghdl-0.23dev/vhdl/translation.adb
                 when Type_Mode_I32
                   | Type_Mode_P32 =>
                    Init_Subprg := Ghdl_Signal_Init_I32;
-@@ -22848,6 +22885,8 @@
+@@ -22848,6 +22892,8 @@
                 Subprg := Ghdl_Signal_Driving_Value_B2;
              when Type_Mode_E8 =>
                 Subprg := Ghdl_Signal_Driving_Value_E8;
@@ -1304,7 +1533,7 @@ diff -urN ghdl-0.23/vhdl/translation.adb ghdl-0.23dev/vhdl/translation.adb
              when Type_Mode_I32
                | Type_Mode_P32 =>
                 Subprg := Ghdl_Signal_Driving_Value_I32;
-@@ -22904,6 +22943,9 @@
+@@ -22904,6 +22950,9 @@
              when Type_Mode_E8 =>
                 Subprg := Ghdl_Image_E8;
                 Conv := Ghdl_I32_Type;
@@ -1314,7 +1543,7 @@ diff -urN ghdl-0.23/vhdl/translation.adb ghdl-0.23dev/vhdl/translation.adb
              when Type_Mode_I32 =>
                 Subprg := Ghdl_Image_I32;
                 Conv := Ghdl_I32_Type;
-@@ -22958,6 +23000,8 @@
+@@ -22958,6 +23007,8 @@
                 Subprg := Ghdl_Value_B2;
              when Type_Mode_E8 =>
                 Subprg := Ghdl_Value_E8;
@@ -1323,7 +1552,7 @@ diff -urN ghdl-0.23/vhdl/translation.adb ghdl-0.23dev/vhdl/translation.adb
              when Type_Mode_I32 =>
                 Subprg := Ghdl_Value_I32;
              when Type_Mode_P64 =>
-@@ -26585,6 +26629,12 @@
+@@ -26585,6 +26636,12 @@
        Create_Image_Value_Subprograms
          ("e8", Ghdl_I32_Type, True, Ghdl_Image_E8, Ghdl_Value_E8);
  
@@ -1336,7 +1565,7 @@ diff -urN ghdl-0.23/vhdl/translation.adb ghdl-0.23dev/vhdl/translation.adb
        --  procedure __ghdl_image_i32 (res : std_string_ptr_node;
        --                              val : ghdl_i32_type);
        Create_Image_Value_Subprograms
-@@ -26919,6 +26969,19 @@
+@@ -26919,6 +26976,19 @@
                                   Ghdl_Signal_Associate_E8,
                                   Ghdl_Signal_Driving_Value_E8);
  
@@ -1356,7 +1585,7 @@ diff -urN ghdl-0.23/vhdl/translation.adb ghdl-0.23dev/vhdl/translation.adb
        --  function __ghdl_create_signal_b2 (init_val : ghdl_bool_type)
        --                                    return __ghdl_signal_ptr;
        --  procedure __ghdl_signal_simple_assign_b2 (sign : __ghdl_signal_ptr;
-@@ -27699,6 +27762,7 @@
+@@ -27699,6 +27769,7 @@
           begin
              --  Load the unit in memory to compute the dependence list.
              Libraries.Load_Design_Unit (Unit, Null_Iir);
