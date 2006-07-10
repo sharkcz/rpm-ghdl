@@ -5,7 +5,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: 0.24
-Release: 0.%{ghdlsvnver}svn.0%{?dist}
+Release: 0.%{ghdlsvnver}svn.1%{?dist}
 License: GPL
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -279,6 +279,7 @@ popd
 # Need to own directory %{_libexecdir}/gcc even though we only want the
 # %{gcc_target_platform}/%{gccver} subdirectory
 %{_libexecdir}/gcc/
+%{_mandir}/man1/*
 
 %files grt
 # Need to own directory %{_libdir}/gcc even though we only want the
@@ -287,6 +288,9 @@ popd
 
 
 %changelog
+* Mon Jul 10 2006 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.24-0.59svn.1
+- add missing manpage
+
 * Mon Jul 10 2006 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.24-0.59svn.0
 - update to svn59
 
