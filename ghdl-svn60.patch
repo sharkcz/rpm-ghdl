@@ -1,0 +1,1387 @@
+diff -urN ghdl-0.24-orig/vhdl/canon.adb ghdl-0.24/vhdl/canon.adb
+--- ghdl-0.24-orig/vhdl/canon.adb	2006-06-19 21:05:08.000000000 +0200
++++ ghdl-0.24/vhdl/canon.adb	2006-08-06 20:16:50.000000000 +0200
+@@ -226,7 +226,8 @@
+            | Iir_Kind_Constant_Interface_Declaration
+            | Iir_Kind_Iterator_Declaration
+            | Iir_Kind_Variable_Declaration
+-           | Iir_Kind_Variable_Interface_Declaration =>
++           | Iir_Kind_Variable_Interface_Declaration
++           | Iir_Kind_File_Declaration =>
+             null;
+ 
+          when Iir_Kind_Left_Array_Attribute
+diff -urN ghdl-0.24-orig/vhdl/disp_vhdl.adb ghdl-0.24/vhdl/disp_vhdl.adb
+--- ghdl-0.24-orig/vhdl/disp_vhdl.adb	2005-10-08 14:29:56.000000000 +0200
++++ ghdl-0.24/vhdl/disp_vhdl.adb	2006-08-06 20:16:50.000000000 +0200
+@@ -680,6 +680,8 @@
+             Put ("variable ");
+          when Iir_Kind_Constant_Interface_Declaration =>
+             Put ("constant ");
++         when Iir_Kind_File_Interface_Declaration =>
++            Put ("file ");
+          when others =>
+             Error_Kind ("disp_interface_declaration", Inter);
+       end case;
+diff -urN ghdl-0.24-orig/vhdl/ghdl.texi ghdl-0.24/vhdl/ghdl.texi
+--- ghdl-0.24-orig/vhdl/ghdl.texi	2006-06-17 02:14:11.000000000 +0200
++++ ghdl-0.24/vhdl/ghdl.texi	2006-08-06 20:16:41.000000000 +0200
+@@ -11,7 +11,7 @@
+ @titlepage
+ @title GHDL guide
+ @subtitle GHDL, a VHDL compiler
+-@subtitle For GHDL version 0.22 (Sokcho edition)
++@subtitle For GHDL version 0.25 (Sokcho edition)
+ @author Tristan Gingold
+ @c The following two commands start the copyright page.
+ @page
+@@ -163,10 +163,14 @@
+ the analysis time should be shorter than with a compiler using an
+ intermediary language.
+ 
++The Windows(TM) version of @code{GHDL} is not based on @code{GCC} but on
++an internal code generator.
++
+ The current version of @code{GHDL} does not contain any graphical
+ viewer: you cannot see signal waves.  You can still check with a test
+ bench.  The current version can produce a @code{VCD} file which can be
+-viewed with a wave viewer.
++viewed with a wave viewer, as well as @code{ghw} files to be viewed by
++@samp{gtkwave}.
+ 
+ @code{GHDL} aims at implementing @code{VHDL} as defined by IEEE 1076.
+ It supports most of the 1987 standard and most features added by the
+@@ -217,9 +221,10 @@
+ @smallexample
+ $ ghdl -a hello.vhdl
+ @end smallexample
+-This command generates a file @file{hello.o}, which is the object file
+-corresponding to your VHDL program.  This command also creates or updates
+-a file @file{work-obj93.cf}, which describes the library @samp{work}.
++This command creates or updates a file @file{work-obj93.cf}, which
++describes the library @samp{work}.  On GNU/Linux, this command generates a
++file @file{hello.o}, which is the object file corresponding to your
++VHDL program.  The object file is not created on Windows.
+ 
+ Then, you have to build an executable file.
+ @smallexample
+@@ -229,7 +234,8 @@
+ creates code in order to elaborate a design, with the @samp{hello}
+ entity at the top of the hierarchy.
+ 
+-The result is an executable program called @file{hello} which can be run:
++On GNU/Linux, the result is an executable program called @file{hello}
++which can be run:
+ @smallexample
+ $ ghdl -r hello_world
+ @end smallexample
+@@ -238,7 +244,12 @@
+ $ ./hello_world
+ @end smallexample
+ 
+-and which should display:
++On Windows, no file is created.  The simulation is launched using this command:
++@smallexample
++> ghdl -r hello_world
++@end smallexample
++
++The result of the simulation appears on the screen:
+ @smallexample
+ Hello world!
+ @end smallexample
+@@ -558,10 +569,13 @@
+ $ ghdl -e [@var{options}] @var{primary_unit} [@var{secondary_unit}]
+ @end smallexample
+ 
+-The @dfn{elaboration} command creates an executable containing the
+-code of the @code{VHDL} sources, the elaboration code and simulation
+-code to execute a design hiearachy.  The elaboration command is selected
+-with @var{-e} switch, and must be followed by either:
++On GNU/Linux the @dfn{elaboration} command creates an executable
++containing the code of the @code{VHDL} sources, the elaboration code
++and simulation code to execute a design hiearachy. On Windows this
++command elaborates the design but does not generate anything.
++
++The elaboration command is selected with @var{-e} switch, and must be
++followed by either:
+ 
+ @itemize @bullet
+ @item a name of a configuration unit
+@@ -576,9 +590,10 @@
+ @xref{Top entity}, for the restrictions on the root design of a
+ hierarchy.
+ 
+-The file name of the executable is the name of the primary unit, or for
+-the later case, the concatenation of the name of the primary unit, a
+-dash, and the name of the secondary unit (or architecture).
++On GNU/Linux the file name of the executable is the name of the
++primary unit, or for the later case, the concatenation of the name of
++the primary unit, a dash, and the name of the secondary unit (or
++architecture).  On Windows there is no executable generated.
+ 
+ The @option{-o} followed by a file name can override the default
+ executable file name.
+@@ -603,9 +618,10 @@
+ $ ghdl -r @var{primary_unit} [@var{secondary_unit}] [@var{simulation_options}]
+ @end smallexample
+ 
+-The arguments are the same as the @xref{Elaboration command}.  This command
+-simply build the filename of the executable and execute it.  You may also
+-directly execute the program.
++The arguments are the same as the @xref{Elaboration command}.
++
++On GNU/Linux this command simply build the filename of the executable
++and execute it.  You may also directly execute the program.
+ 
+ This command exists for three reasons:
+ @itemize @bullet{}
+@@ -614,10 +630,12 @@
+ @item
+ It is coherent with the @samp{-a} and @samp{-e} commands.
+ @item
+-It will work with future implementations, where the code is generated in
++It works with the Windows implementation, where the code is generated in
+ memory.
+ @end itemize
+ 
++On Windows this command elaborate and launch the simulation.
++
+ @xref{Simulation and run time}, for details on options.
+ 
+ @node Elaborate and run command, Bind command, Run command, Building commands
+@@ -644,6 +662,8 @@
+ $ ghdl --bind [@var{options}] @var{primary_unit} [@var{secondary_unit}]
+ @end smallexample
+ 
++This command is only available on GNU/Linux.
++
+ This performs only the first stage of the elaboration command; the list
+ of objects files is created but the executable is not built.  This
+ command should be used only when the main entry point is not ghdl.
+@@ -672,6 +692,8 @@
+ $ ghdl --list-link @var{primary_unit} [@var{secondary_unit}]
+ @end smallexample
+ 
++This command is only available on GNU/Linux.
++
+ This command may be used only after a bind command.  GHDL displays all
+ the files which will be linked to create an executable.  This command is
+ intended to add object files in a link of an foreign program.
+@@ -683,7 +705,7 @@
+ Analyze files but do not generate code.
+ 
+ @smallexample
+-$ ghdl -a [@var{options}] @var{files}
++$ ghdl -s [@var{options}] @var{files}
+ @end smallexample
+ 
+ This command may be used to check the syntax of files.  It does not update
+@@ -695,13 +717,19 @@
+ @cindex @option{-c} command
+ Analyze files and elaborate in the same time.
+ 
++On GNU/Linux:
+ @smallexample
+ $ ghdl -c [@var{options}] @var{file}@dots{} -e @var{primary_unit} [@var{secondary_unit}]
+ @end smallexample
+ 
++On Windows:
++@smallexample
++$ ghdl -c [@var{options}] @var{file}@dots{} -r @var{primary_unit} [@var{secondary_unit}]
++@end smallexample
++
+ This command combines analyze and elaboration: @var{file}s are analyzed and
+ the unit is then elaborated.  However, code is only generated during the
+-elaboration.
++elaboration.  On Windows the simulation is launched.
+ 
+ To be more precise, the files are first parsed, and then the elaboration
+ drives the analysis.  Therefore, there is no analysis order, and you don't
+@@ -878,6 +906,9 @@
+ @node Passing options to other programs, GHDL warnings, GHDL options, Invoking GHDL
+ @comment  node-name,  next,  previous,  up
+ @section Passing options to other programs
++
++These options are only available on GNU/Linux.
++
+ For many commands, @code{GHDL} acts as a driver: it invokes programs to perform
+ the command.  You can pass arbritrary options to these programs.
+ 
+@@ -1671,6 +1702,8 @@
+ @section Debugging VHDL programs
+ @cindex debugging
+ @cindex @code{__ghdl_fatal}
++Debugging VHDL programs usign @code{GDB} is possible only on GNU/Linux systems.
++
+ @code{GDB} is a general purpose debugger for programs compiled by @code{GCC}.
+ Currently, there is no VHDL support for @code{GDB}.  It may be difficult
+ to inspect variables or signals in @code{GDB}, however, @code{GDB} is
+@@ -1949,6 +1982,8 @@
+ @cindex foreign
+ @cindex VHPI
+ @cindex VHPIDIRECT
++Interfacing with foreign languages is possible only on GNU/Linux systems.
++
+ You can define a subprogram in a foreign language (such as @code{C} or
+ @code{Ada}) and import it in a VHDL design.
+ 
+diff -urN ghdl-0.24-orig/vhdl/grt/grt-avhpi.adb ghdl-0.24/vhdl/grt/grt-avhpi.adb
+--- ghdl-0.24-orig/vhdl/grt/grt-avhpi.adb	2006-05-29 21:36:38.000000000 +0200
++++ ghdl-0.24/vhdl/grt/grt-avhpi.adb	2006-08-06 20:16:45.000000000 +0200
+@@ -330,7 +330,7 @@
+             end;
+          when Ghdl_Rtik_Type_B2
+            | Ghdl_Rtik_Type_E8
+-	   | Ghdl_Rtik_Type_E32 =>
++           | Ghdl_Rtik_Type_E32 =>
+             Res := (Kind => VhpiEnumTypeDeclK,
+                     Ctxt => Ctxt,
+                     Atype => Rti);
+diff -urN ghdl-0.24-orig/vhdl/grt/grt-rtis_addr.adb ghdl-0.24/vhdl/grt/grt-rtis_addr.adb
+--- ghdl-0.24-orig/vhdl/grt/grt-rtis_addr.adb	2006-05-29 21:36:38.000000000 +0200
++++ ghdl-0.24/vhdl/grt/grt-rtis_addr.adb	2006-08-06 20:16:45.000000000 +0200
+@@ -253,7 +253,7 @@
+             return To_Ghdl_Rti_Access
+               (To_Ghdl_Rtin_Subtype_Array_Acc (Atype).Basetype);
+          when Ghdl_Rtik_Type_E8
+-	   | Ghdl_Rtik_Type_E32
++           | Ghdl_Rtik_Type_E32
+            | Ghdl_Rtik_Type_B2 =>
+             return Atype;
+          when others =>
+diff -urN ghdl-0.24-orig/vhdl/grt/grt-signals.ads ghdl-0.24/vhdl/grt/grt-signals.ads
+--- ghdl-0.24-orig/vhdl/grt/grt-signals.ads	2006-05-29 21:36:38.000000000 +0200
++++ ghdl-0.24/vhdl/grt/grt-signals.ads	2006-08-06 20:16:45.000000000 +0200
+@@ -382,6 +382,10 @@
+    --  Update signals.
+    procedure Update_Signals;
+ 
++   --  Set the effective value of signal SIG to VAL.
++   --  If the value is different from the previous one, resume processes.
++   procedure Set_Effective_Value (Sig : Ghdl_Signal_Ptr; Val : Value_Union);
++
+    --  Add PROC in the list of processes to be resumed in case of event on
+    --  SIG.
+    procedure Resume_Process_If_Event
+diff -urN ghdl-0.24-orig/vhdl/grt/grt-vpi.adb ghdl-0.24/vhdl/grt/grt-vpi.adb
+--- ghdl-0.24-orig/vhdl/grt/grt-vpi.adb	2005-12-12 04:30:54.000000000 +0100
++++ ghdl-0.24/vhdl/grt/grt-vpi.adb	2006-08-06 20:16:45.000000000 +0200
+@@ -507,6 +507,189 @@
+    end vpi_get_value;
+ 
+    ------------------------------------------------------------------------
++   -- void  vpiHandle vpi_put_value(vpiHandle obj, p_vpi_value value,
++   --                               p_vpi_time when, int flags)
++   -- Alter the simulation value of an object.
++   -- see IEEE 1364-2001, chapter 27.14, page 675
++   -- FIXME
++
++   procedure ii_vpi_put_value_bin_str_B2 (SigPtr : Ghdl_Signal_Ptr;
++                                          Value : Character)
++   is
++      Tempval : Value_Union;
++   begin
++      -- use the Set_Effective_Value procedure to update the signal
++      case Value is
++         when '0' =>
++            Tempval.B2 := false;
++         when '1' =>
++            Tempval.B2 := true;
++         when others =>
++            dbgPut_Line("ii_vpi_put_value_bin_str_B2: "
++                        & "wrong character - signal wont be set");
++            return;
++      end case;
++      SigPtr.Driving_Value := Tempval;
++      Set_Effective_Value (SigPtr, Tempval);
++   end ii_vpi_put_value_bin_str_B2;
++
++   procedure ii_vpi_put_value_bin_str_E8 (SigPtr : Ghdl_Signal_Ptr;
++                                          Value : Character)
++   is
++      Tempval : Value_Union;
++   begin
++      case Value is
++         when 'U' =>
++            Tempval.E8 := 0;
++         when 'X' =>
++            Tempval.E8 := 1;
++         when '0' =>
++            Tempval.E8 := 2;
++         when '1' =>
++            Tempval.E8 := 3;
++         when 'Z' =>
++            Tempval.E8 := 4;
++         when 'W' =>
++            Tempval.E8 := 5;
++         when 'L' =>
++            Tempval.E8 := 6;
++         when 'H' =>
++            Tempval.E8 := 7;
++         when '-' =>
++            Tempval.E8 := 8;
++         when others =>
++            dbgPut_Line("ii_vpi_put_value_bin_str_B8: "
++                        & "wrong character - signal wont be set");
++            return;
++      end case;
++      SigPtr.Driving_Value := Tempval;
++      Set_Effective_Value (SigPtr, Tempval);
++   end ii_vpi_put_value_bin_str_E8;
++
++
++   procedure ii_vpi_put_value_bin_str(Obj : VhpiHandleT;
++                                      ValueStr : Ghdl_C_String)
++   is
++      Info : Verilog_Wire_Info;
++      Len  : Ghdl_Index_Type;
++   begin
++      -- Check the Obj type.
++      -- * The vpiHandle has a reference (field Ref) to a VhpiHandleT
++      --   when it doesnt come from a callback.
++      case Vhpi_Get_Kind(Obj) is
++         when VhpiPortDeclK
++           | VhpiSigDeclK =>
++            null;
++         when others =>
++            return;
++      end case;
++
++      -- The following code segment was copied from the
++      -- ii_vpi_get_value function.
++      --  Get verilog compat info.
++      Get_Verilog_Wire (Obj, Info);
++      if Info.Kind = Vcd_Bad then
++         return;
++      end if;
++
++      if Info.Irange = null then
++         Len := 1;
++      else
++         Len := Info.Irange.I32.Len;
++      end if;
++
++      -- Step 1: convert vpi object to internal format.
++      --         p_vpi_handle -> Ghdl_Signal_Ptr
++      --         To_Signal_Arr_Ptr (Info.Addr) does part of the magic
++
++      -- Step 2: convert datum to appropriate type.
++      --         Ghdl_C_String -> Value_Union
++
++      -- Step 3: assigns value to object using Set_Effective_Value
++      --         call (from grt-signals)
++      -- Set_Effective_Value(sig_ptr, conv_value);
++
++
++      -- Took the skeleton from ii_vpi_get_value function
++      -- This point of the function must convert the string value to the
++      -- native ghdl format.
++      case Info.Kind is
++         when Vcd_Bad =>
++            return;
++         when Vcd_Bit
++           | Vcd_Bool
++           | Vcd_Bitvector =>
++            for J in 0 .. Len - 1 loop
++               ii_vpi_put_value_bin_str_B2(
++                  To_Signal_Arr_Ptr(Info.Addr)(J), ValueStr(Integer(J+1)));
++            end loop;
++         when Vcd_Stdlogic
++           | Vcd_Stdlogic_Vector =>
++            for J in 0 .. Len - 1 loop
++               ii_vpi_put_value_bin_str_E8(
++                  To_Signal_Arr_Ptr(Info.Addr)(J), ValueStr(Integer(J+1)));
++            end loop;
++         when Vcd_Integer32 =>
++            null;
++      end case;
++
++      -- Always return null, because this simulation kernel cannot send
++      -- a handle to the event back.
++      return;
++   end ii_vpi_put_value_bin_str;
++
++
++   -- vpiHandle vpi_put_value(vpiHandle obj, p_vpi_value value,
++   --                         p_vpi_time when, int flags)
++   function vpi_put_value (aObj: vpiHandle;
++                           aValue: p_vpi_value;
++                           aWhen: p_vpi_time;
++                           aFlags: integer)
++                         return vpiHandle
++   is
++      pragma Unreferenced (aWhen);
++      pragma Unreferenced (aFlags);
++   begin
++      -- A very simple write procedure for VPI.
++      -- Basically, it accepts bin_str values and converts to appropriate
++      -- types (only std_logic and bit values and vectors).
++
++      -- It'll use Set_Effective_Value procedure to update signals
++
++      -- Ignoring aWhen and aFlags, for now.
++
++      -- Checks the format of aValue. Only vpiBinStrVal will be accepted
++      --  for now.
++      case aValue.Format is
++         when vpiObjTypeVal=>
++            dbgPut_Line ("vpi_put_value: vpiObjTypeVal");
++         when vpiBinStrVal=>
++            ii_vpi_put_value_bin_str(aObj.Ref, aValue.Str);
++            dbgPut_Line ("vpi_put_value: vpiBinStrVal");
++         when vpiOctStrVal=>
++            dbgPut_Line ("vpi_put_value: vpiNet, vpiOctStrVal");
++         when vpiDecStrVal=>
++            dbgPut_Line ("vpi_put_value: vpiNet, vpiDecStrVal");
++         when vpiHexStrVal=>
++            dbgPut_Line ("vpi_put_value: vpiNet, vpiHexStrVal");
++         when vpiScalarVal=>
++            dbgPut_Line ("vpi_put_value: vpiNet, vpiScalarVal");
++         when vpiIntVal=>
++            dbgPut_Line ("vpi_put_value: vpiIntVal");
++         when vpiRealVal=>     dbgPut_Line("vpi_put_value: vpiRealVal");
++         when vpiStringVal=>   dbgPut_Line("vpi_put_value: vpiStringVal");
++         when vpiTimeVal=>     dbgPut_Line("vpi_put_value: vpiTimeVal");
++         when vpiVectorVal=>   dbgPut_Line("vpi_put_value: vpiVectorVal");
++         when vpiStrengthVal=> dbgPut_Line("vpi_put_value: vpiStrengthVal");
++         when others=>         dbgPut_Line("vpi_put_value: unknown mFormat");
++      end case;
++
++      -- Must return a scheduled event caused by vpi_put_value()
++      -- Still dont know how to do it.
++      return null;
++   end vpi_put_value;
++
++   ------------------------------------------------------------------------
+    -- void  vpi_get_time(vpiHandle obj, s_vpi_time*t);
+    -- see IEEE 1364-2001, page xxx
+    Sim_Time : Std_Time;
+@@ -631,22 +814,6 @@
+       return 0;
+    end vpi_mcd_open;
+ 
+-   -- vpiHandle vpi_put_value(vpiHandle obj, p_vpi_value value,
+-   --                         p_vpi_time when, int flags)
+-   function vpi_put_value (aObj: vpiHandle;
+-                           aValue: p_vpi_value;
+-                           aWhen: p_vpi_time;
+-                           aFlags: integer)
+-                         return vpiHandle
+-   is
+-      pragma Unreferenced (aObj);
+-      pragma Unreferenced (aValue);
+-      pragma Unreferenced (aWhen);
+-      pragma Unreferenced (aFlags);
+-   begin
+-      return null;
+-   end vpi_put_value;
+-
+    -- void vpi_register_systf(const struct t_vpi_systf_data*ss)
+    procedure vpi_register_systf(aSs: System.Address)
+    is
+diff -urN ghdl-0.24-orig/vhdl/iirs.adb ghdl-0.24/vhdl/iirs.adb
+--- ghdl-0.24-orig/vhdl/iirs.adb	2005-11-14 21:44:55.000000000 +0100
++++ ghdl-0.24/vhdl/iirs.adb	2006-08-06 20:16:50.000000000 +0200
+@@ -449,14 +449,6 @@
+            | Iir_Kind_Pred_Attribute
+            | Iir_Kind_Leftof_Attribute
+            | Iir_Kind_Rightof_Attribute
+-           | Iir_Kind_Left_Array_Attribute
+-           | Iir_Kind_Right_Array_Attribute
+-           | Iir_Kind_High_Array_Attribute
+-           | Iir_Kind_Low_Array_Attribute
+-           | Iir_Kind_Range_Array_Attribute
+-           | Iir_Kind_Reverse_Range_Array_Attribute
+-           | Iir_Kind_Length_Array_Attribute
+-           | Iir_Kind_Ascending_Array_Attribute
+            | Iir_Kind_Delayed_Attribute
+            | Iir_Kind_Stable_Attribute
+            | Iir_Kind_Quiet_Attribute
+@@ -473,6 +465,14 @@
+            | Iir_Kind_Simple_Name_Attribute
+            | Iir_Kind_Instance_Name_Attribute
+            | Iir_Kind_Path_Name_Attribute
++           | Iir_Kind_Left_Array_Attribute
++           | Iir_Kind_Right_Array_Attribute
++           | Iir_Kind_High_Array_Attribute
++           | Iir_Kind_Low_Array_Attribute
++           | Iir_Kind_Length_Array_Attribute
++           | Iir_Kind_Ascending_Array_Attribute
++           | Iir_Kind_Range_Array_Attribute
++           | Iir_Kind_Reverse_Range_Array_Attribute
+            | Iir_Kind_Attribute_Name =>
+             return Format_Short;
+          when Iir_Kind_Design_File
+@@ -2276,14 +2276,6 @@
+            | Iir_Kind_Pred_Attribute
+            | Iir_Kind_Leftof_Attribute
+            | Iir_Kind_Rightof_Attribute
+-           | Iir_Kind_Left_Array_Attribute
+-           | Iir_Kind_Right_Array_Attribute
+-           | Iir_Kind_High_Array_Attribute
+-           | Iir_Kind_Low_Array_Attribute
+-           | Iir_Kind_Range_Array_Attribute
+-           | Iir_Kind_Reverse_Range_Array_Attribute
+-           | Iir_Kind_Length_Array_Attribute
+-           | Iir_Kind_Ascending_Array_Attribute
+            | Iir_Kind_Delayed_Attribute
+            | Iir_Kind_Stable_Attribute
+            | Iir_Kind_Quiet_Attribute
+@@ -2298,6 +2290,14 @@
+            | Iir_Kind_Simple_Name_Attribute
+            | Iir_Kind_Instance_Name_Attribute
+            | Iir_Kind_Path_Name_Attribute
++           | Iir_Kind_Left_Array_Attribute
++           | Iir_Kind_Right_Array_Attribute
++           | Iir_Kind_High_Array_Attribute
++           | Iir_Kind_Low_Array_Attribute
++           | Iir_Kind_Length_Array_Attribute
++           | Iir_Kind_Ascending_Array_Attribute
++           | Iir_Kind_Range_Array_Attribute
++           | Iir_Kind_Reverse_Range_Array_Attribute
+            | Iir_Kind_Attribute_Name =>
+             null;
+          when others =>
+@@ -5326,14 +5326,6 @@
+            | Iir_Kind_Pred_Attribute
+            | Iir_Kind_Leftof_Attribute
+            | Iir_Kind_Rightof_Attribute
+-           | Iir_Kind_Left_Array_Attribute
+-           | Iir_Kind_Right_Array_Attribute
+-           | Iir_Kind_High_Array_Attribute
+-           | Iir_Kind_Low_Array_Attribute
+-           | Iir_Kind_Range_Array_Attribute
+-           | Iir_Kind_Reverse_Range_Array_Attribute
+-           | Iir_Kind_Length_Array_Attribute
+-           | Iir_Kind_Ascending_Array_Attribute
+            | Iir_Kind_Delayed_Attribute
+            | Iir_Kind_Stable_Attribute
+            | Iir_Kind_Quiet_Attribute
+@@ -5348,6 +5340,14 @@
+            | Iir_Kind_Simple_Name_Attribute
+            | Iir_Kind_Instance_Name_Attribute
+            | Iir_Kind_Path_Name_Attribute
++           | Iir_Kind_Left_Array_Attribute
++           | Iir_Kind_Right_Array_Attribute
++           | Iir_Kind_High_Array_Attribute
++           | Iir_Kind_Low_Array_Attribute
++           | Iir_Kind_Length_Array_Attribute
++           | Iir_Kind_Ascending_Array_Attribute
++           | Iir_Kind_Range_Array_Attribute
++           | Iir_Kind_Reverse_Range_Array_Attribute
+            | Iir_Kind_Attribute_Name =>
+             null;
+          when others =>
+@@ -5654,14 +5654,6 @@
+            | Iir_Kind_Pred_Attribute
+            | Iir_Kind_Leftof_Attribute
+            | Iir_Kind_Rightof_Attribute
+-           | Iir_Kind_Left_Array_Attribute
+-           | Iir_Kind_Right_Array_Attribute
+-           | Iir_Kind_High_Array_Attribute
+-           | Iir_Kind_Low_Array_Attribute
+-           | Iir_Kind_Range_Array_Attribute
+-           | Iir_Kind_Reverse_Range_Array_Attribute
+-           | Iir_Kind_Length_Array_Attribute
+-           | Iir_Kind_Ascending_Array_Attribute
+            | Iir_Kind_Delayed_Attribute
+            | Iir_Kind_Stable_Attribute
+            | Iir_Kind_Quiet_Attribute
+@@ -5676,6 +5668,14 @@
+            | Iir_Kind_Simple_Name_Attribute
+            | Iir_Kind_Instance_Name_Attribute
+            | Iir_Kind_Path_Name_Attribute
++           | Iir_Kind_Left_Array_Attribute
++           | Iir_Kind_Right_Array_Attribute
++           | Iir_Kind_High_Array_Attribute
++           | Iir_Kind_Low_Array_Attribute
++           | Iir_Kind_Length_Array_Attribute
++           | Iir_Kind_Ascending_Array_Attribute
++           | Iir_Kind_Range_Array_Attribute
++           | Iir_Kind_Reverse_Range_Array_Attribute
+            | Iir_Kind_Attribute_Name =>
+             null;
+          when others =>
+@@ -5724,10 +5724,10 @@
+            | Iir_Kind_Right_Array_Attribute
+            | Iir_Kind_High_Array_Attribute
+            | Iir_Kind_Low_Array_Attribute
+-           | Iir_Kind_Range_Array_Attribute
+-           | Iir_Kind_Reverse_Range_Array_Attribute
+            | Iir_Kind_Length_Array_Attribute
+-           | Iir_Kind_Ascending_Array_Attribute =>
++           | Iir_Kind_Ascending_Array_Attribute
++           | Iir_Kind_Range_Array_Attribute
++           | Iir_Kind_Reverse_Range_Array_Attribute =>
+             null;
+          when others =>
+             Failed ("Index_Subtype", Target);
+@@ -5757,18 +5757,18 @@
+            | Iir_Kind_Pred_Attribute
+            | Iir_Kind_Leftof_Attribute
+            | Iir_Kind_Rightof_Attribute
++           | Iir_Kind_Delayed_Attribute
++           | Iir_Kind_Stable_Attribute
++           | Iir_Kind_Quiet_Attribute
++           | Iir_Kind_Transaction_Attribute
+            | Iir_Kind_Left_Array_Attribute
+            | Iir_Kind_Right_Array_Attribute
+            | Iir_Kind_High_Array_Attribute
+            | Iir_Kind_Low_Array_Attribute
+-           | Iir_Kind_Range_Array_Attribute
+-           | Iir_Kind_Reverse_Range_Array_Attribute
+            | Iir_Kind_Length_Array_Attribute
+            | Iir_Kind_Ascending_Array_Attribute
+-           | Iir_Kind_Delayed_Attribute
+-           | Iir_Kind_Stable_Attribute
+-           | Iir_Kind_Quiet_Attribute
+-           | Iir_Kind_Transaction_Attribute =>
++           | Iir_Kind_Range_Array_Attribute
++           | Iir_Kind_Reverse_Range_Array_Attribute =>
+             null;
+          when others =>
+             Failed ("Parameter", Target);
+diff -urN ghdl-0.24-orig/vhdl/iirs.ads ghdl-0.24/vhdl/iirs.ads
+--- ghdl-0.24-orig/vhdl/iirs.ads	2006-06-20 21:10:58.000000000 +0200
++++ ghdl-0.24/vhdl/iirs.ads	2006-08-06 20:16:50.000000000 +0200
+@@ -2646,14 +2646,6 @@
+        Iir_Kind_Pred_Attribute,                 --  scalar_type_attribute
+        Iir_Kind_Leftof_Attribute,               --  scalar_type_attribute
+        Iir_Kind_Rightof_Attribute,              --  scalar_type_attribute
+-       Iir_Kind_Left_Array_Attribute,           --  array_attribute
+-       Iir_Kind_Right_Array_Attribute,          --  array_attribute
+-       Iir_Kind_High_Array_Attribute,           --  array_attribute
+-       Iir_Kind_Low_Array_Attribute,            --  array_attribute
+-       Iir_Kind_Range_Array_Attribute,          --  array_attribute
+-       Iir_Kind_Reverse_Range_Array_Attribute,  --  array_attribute
+-       Iir_Kind_Length_Array_Attribute,         --  array_attribute
+-       Iir_Kind_Ascending_Array_Attribute,      --  array_attribute
+        Iir_Kind_Delayed_Attribute,              --  signal_attribute
+        Iir_Kind_Stable_Attribute,               --  signal_attribute
+        Iir_Kind_Quiet_Attribute,                --  signal_attribute
+@@ -2670,6 +2662,14 @@
+        Iir_Kind_Simple_Name_Attribute,
+        Iir_Kind_Instance_Name_Attribute,
+        Iir_Kind_Path_Name_Attribute,
++       Iir_Kind_Left_Array_Attribute,           --  array_attribute
++       Iir_Kind_Right_Array_Attribute,          --  array_attribute
++       Iir_Kind_High_Array_Attribute,           --  array_attribute
++       Iir_Kind_Low_Array_Attribute,            --  array_attribute
++       Iir_Kind_Length_Array_Attribute,         --  array_attribute
++       Iir_Kind_Ascending_Array_Attribute,      --  array_attribute
++       Iir_Kind_Range_Array_Attribute,          --  array_attribute
++       Iir_Kind_Reverse_Range_Array_Attribute,  --  array_attribute
+ 
+        Iir_Kind_Attribute_Name
+       );
+@@ -3205,14 +3205,6 @@
+    --Iir_Kind_Pred_Attribute
+    --Iir_Kind_Leftof_Attribute
+    --Iir_Kind_Rightof_Attribute
+-   --Iir_Kind_Left_Array_Attribute
+-   --Iir_Kind_Right_Array_Attribute
+-   --Iir_Kind_High_Array_Attribute
+-   --Iir_Kind_Low_Array_Attribute
+-   --Iir_Kind_Range_Array_Attribute
+-   --Iir_Kind_Reverse_Range_Array_Attribute
+-   --Iir_Kind_Length_Array_Attribute
+-   --Iir_Kind_Ascending_Array_Attribute
+    --Iir_Kind_Delayed_Attribute
+    --Iir_Kind_Stable_Attribute
+    --Iir_Kind_Quiet_Attribute
+@@ -3228,7 +3220,14 @@
+    --Iir_Kind_Structure_Attribute
+    --Iir_Kind_Simple_Name_Attribute
+    --Iir_Kind_Instance_Name_Attribute
+-     Iir_Kind_Path_Name_Attribute;
++   --Iir_Kind_Path_Name_Attribute
++   --Iir_Kind_Left_Array_Attribute
++   --Iir_Kind_Right_Array_Attribute
++   --Iir_Kind_High_Array_Attribute
++   --Iir_Kind_Low_Array_Attribute
++   --Iir_Kind_Length_Array_Attribute
++     Iir_Kind_Ascending_Array_Attribute;
++
+ 
+    subtype Iir_Kinds_Attribute is Iir_Kind range
+      Iir_Kind_Base_Attribute ..
+@@ -3254,10 +3253,10 @@
+    --Iir_Kind_Right_Array_Attribute
+    --Iir_Kind_High_Array_Attribute
+    --Iir_Kind_Low_Array_Attribute
+-   --Iir_Kind_Range_Array_Attribute
+-   --Iir_Kind_Reverse_Range_Array_Attribute
+    --Iir_Kind_Length_Array_Attribute
+-     Iir_Kind_Ascending_Array_Attribute;
++   --Iir_Kind_Ascending_Array_Attribute
++   --Iir_Kind_Range_Array_Attribute
++     Iir_Kind_Reverse_Range_Array_Attribute;
+ 
+    subtype Iir_Kinds_Signal_Attribute is Iir_Kind range
+      Iir_Kind_Delayed_Attribute ..
+diff -urN ghdl-0.24-orig/vhdl/lang-specs.h ghdl-0.24/vhdl/lang-specs.h
+--- ghdl-0.24-orig/vhdl/lang-specs.h	2005-02-27 18:00:59.000000000 +0100
++++ ghdl-0.24/vhdl/lang-specs.h	2006-08-06 20:16:44.000000000 +0200
+@@ -22,7 +22,7 @@
+ /* This is the contribution to the `default_compilers' array in gcc.c for
+    GHDL.  */
+ 
+-  {".vhd", "@vhdl", 0},
+-  {".vhdl", "@vhdl", 0},
++  {".vhd", "@vhdl", 0, 0, 0},
++  {".vhdl", "@vhdl", 0, 0, 0},
+   {"@vhdl",
+-   "ghdl1 %i %(cc1_options) %{!fsyntax-only:%(invoke_as)}", 0},
++   "ghdl1 %i %(cc1_options) %{!fsyntax-only:%(invoke_as)}", 0, 0, 0},
+diff -urN ghdl-0.24-orig/vhdl/Makefile.in ghdl-0.24/vhdl/Makefile.in
+--- ghdl-0.24-orig/vhdl/Makefile.in	2006-06-25 06:42:09.000000000 +0200
++++ ghdl-0.24/vhdl/Makefile.in	2006-08-06 20:23:11.000000000 +0200
+@@ -315,7 +315,7 @@
+ 	prev=`pwd`; cd $(SYN93_DIR); \
+ 	$(CP) ../ieee/ieee-obj93.cf .; \
+ 	test x$(VHDLLIBS_COPY_OBJS) = "xno" || \
+-	for i in $(IEEE_SRCS) $(VITAL2000_SRCS); do \
++	for i in $(IEEE_SRCS) $(MATH_SRCS) $(VITAL2000_SRCS); do \
+ 	  b=`basename $$i .vhdl`; $(LN) ../ieee/$$b.o $$b.o || exit 1; \
+ 	done; \
+ 	for i in $(SYNOPSYS93_BSRCS); do \
+@@ -330,7 +330,7 @@
+ 	prev=`pwd`; cd $(MENTOR93_DIR); \
+ 	$(CP) ../ieee/ieee-obj93.cf . ;\
+ 	test x$(VHDLLIBS_COPY_OBJS) = "xno" || \
+-	for i in $(IEEE_SRCS) $(VITAL2000_SRCS); do \
++	for i in $(IEEE_SRCS) $(MATH_SRCS) $(VITAL2000_SRCS); do \
+ 	  b=`basename $$i .vhdl`; $(LN) ../ieee/$$b.o $$b.o || exit 1; \
+ 	done ; \
+ 	for i in $(MENTOR93_BSRCS); do \
+@@ -451,6 +451,11 @@
+   GRT_TARGET_OBJS=amd64.o linux.o times.o
+   GRT_EXTRA_LIB=-ldl -lm $(GRT_ELF_OPTS)
+ endif
++ifeq ($(filter-out i%86 freebsd%,$(arch) $(osys)),)
++  GRT_TARGET_OBJS=i386.o linux.o times.o
++  GRT_EXTRA_LIB=-lm $(GRT_ELF_OPTS)
++  ADAC=gnatgcc
++endif
+ ifeq ($(filter-out sparc solaris%,$(arch) $(osys)),)
+   GRT_TARGET_OBJS=sparc.o linux.o times.o
+   GRT_EXTRA_LIB=-ldl -lm
+diff -urN ghdl-0.24-orig/vhdl/scan-scan_literal.adb ghdl-0.24/vhdl/scan-scan_literal.adb
+--- ghdl-0.24-orig/vhdl/scan-scan_literal.adb	2005-09-22 23:30:52.000000000 +0200
++++ ghdl-0.24/vhdl/scan-scan_literal.adb	2006-08-06 20:16:50.000000000 +0200
+@@ -228,6 +228,8 @@
+       Dividend : Uint16_Array (0 .. Nbr_Digits);
+       A_F : constant Sint16 := First_Digit (A);
+       B_F : constant Sint16 := First_Digit (B);
++
++      --  Digit corresponding to the first digit of B.
+       Doff : constant Sint16 := Dividend'Last - B_F;
+       Q : Uint16;
+       C, N_C : Uint16;
+@@ -238,6 +240,9 @@
+       end if;
+ 
+       --  Copy and shift dividend.
++      --  Bit 15 of the most significant digit of A becomes bit 0 of the
++      --  most significant digit of DIVIDEND.  Therefore we are sure
++      --  DIVIDEND < B (after realignment).
+       C := 0;
+       for K in 0 .. A_F loop
+          N_C := Shift_Right (A.S (K), 15);
+@@ -249,6 +254,7 @@
+       Dividend (0 .. Dividend'last - 2 - A_F) := (others => 0);
+ 
+       --  Algorithm is the same as division by hand.
++      C := 0;
+       for I in reverse Digit_Range loop
+          Q := 0;
+          for J in 0 .. 15 loop
+@@ -271,7 +277,13 @@
+                   Tmp (K) := Dividend (Doff + K) - V16;
+                end loop;
+ 
++               --  If the last shift creates a carry, we are sure Dividend > B
++               if C /= 0 then
++                  Borrow := 0;
++               end if;
++
+                Q := Q * 2;
++               --  Begin of : Dividend = Dividend * 2
+                C := 0;
+                for K in 0 .. Doff - 1 loop
+                   N_C := Shift_Right (Dividend (K), 15);
+@@ -280,13 +292,17 @@
+                end loop;
+ 
+                if Borrow = 0 then
++                  --  Dividend > B
+                   Q := Q + 1;
++                  --  Dividend = Tmp * 2
++                  --           = (Dividend - B) * 2
+                   for K in Doff .. Nbr_Digits loop
+                      N_C := Shift_Right (Tmp (K - Doff), 15);
+                      Dividend (K) := Shift_Left (Tmp (K - Doff), 1) or C;
+                      C := N_C;
+                   end loop;
+                else
++                  --  Dividend = Dividend * 2
+                   for K in Doff .. Nbr_Digits loop
+                      N_C := Shift_Right (Dividend (K), 15);
+                      Dividend (K) := Shift_Left (Dividend (K), 1) or C;
+diff -urN ghdl-0.24-orig/vhdl/sem.adb ghdl-0.24/vhdl/sem.adb
+--- ghdl-0.24-orig/vhdl/sem.adb	2006-06-17 02:05:21.000000000 +0200
++++ ghdl-0.24/vhdl/sem.adb	2006-08-06 20:16:50.000000000 +0200
+@@ -487,6 +487,21 @@
+                when others =>
+                   --  Expression.
+                   Set_Collapse_Signal_Flag (El, False);
++
++                  --  If there is an IN conversion, re-integrate it into
++                  --  the actual.
++                  declare
++                     In_Conv : Iir;
++                  begin
++                     In_Conv := Get_In_Conversion (El);
++                     if In_Conv /= Null_Iir then
++                        Set_In_Conversion (El, Null_Iir);
++                        Set_Expr_Staticness
++                          (In_Conv, Get_Expr_Staticness (Actual));
++                        Actual := In_Conv;
++                        Set_Actual (El, Actual);
++                     end if;
++                  end;
+                   if Flags.Vhdl_Std >= Vhdl_93c then
+                      --  LRM93 1.1.1.2 Ports
+                      --  Moreover, the ports of a block may be associated
+@@ -1079,6 +1094,9 @@
+            | Iir_Kind_Variable_Interface_Declaration
+            | Iir_Kind_Signal_Interface_Declaration
+            | Iir_Kind_File_Interface_Declaration =>
++            if Get_Identifier (Left) /= Get_Identifier (Right) then
++               return False;
++            end if;
+             if Get_Lexical_Layout (Left) /= Get_Lexical_Layout (Right)
+               or else Get_Mode (Left) /= Get_Mode (Right)
+             then
+diff -urN ghdl-0.24-orig/vhdl/sem_assocs.adb ghdl-0.24/vhdl/sem_assocs.adb
+--- ghdl-0.24-orig/vhdl/sem_assocs.adb	2006-01-14 00:21:59.000000000 +0100
++++ ghdl-0.24/vhdl/sem_assocs.adb	2006-08-06 20:16:50.000000000 +0200
+@@ -1118,6 +1118,10 @@
+       Res : Iir;
+    begin
+       Res_Base_Type := Get_Base_Type (Res_Type);
++      if Param_Type = Null_Iir then
++         --  In case of error.
++         return Null_Iir;
++      end if;
+       Param_Base_Type := Get_Base_Type (Param_Type);
+       if Is_Overload_List (Conv) then
+          List := Get_Overload_List (Conv);
+@@ -1359,7 +1363,9 @@
+       end if;
+ 
+       if Res_Type = Null_Iir then
+-         raise Internal_Error;
++         --  In case of error, do not go farther.
++         Match := False;
++         return;
+       end if;
+ 
+       if Get_Formal (Assoc) /= Null_Iir then
+@@ -1569,9 +1575,7 @@
+                end if;
+                if Finish then
+                   Sem_Association (Assoc, Inter, True, Match);
+-                  if not Match then
+-                     raise Internal_Error;
+-                  end if;
++                  --  MATCH can be false du to errors.
+                end if;
+             else
+                -- Not found.
+diff -urN ghdl-0.24-orig/vhdl/sem_decls.adb ghdl-0.24/vhdl/sem_decls.adb
+--- ghdl-0.24-orig/vhdl/sem_decls.adb	2006-05-13 17:28:13.000000000 +0200
++++ ghdl-0.24/vhdl/sem_decls.adb	2006-08-06 20:16:49.000000000 +0200
+@@ -995,6 +995,7 @@
+          Def := Create_Iir (Iir_Kind_Incomplete_Type_Definition);
+          Location_Copy (Def, Decl);
+          Set_Type (Decl, Def);
++         Set_Base_Type (Def, Def);
+          Set_Signal_Type_Flag (Def, True);
+          Set_Type_Declarator (Def, Decl);
+          Set_Visible_Flag (Decl, True);
+diff -urN ghdl-0.24-orig/vhdl/sem_expr.adb ghdl-0.24/vhdl/sem_expr.adb
+--- ghdl-0.24-orig/vhdl/sem_expr.adb	2006-05-30 00:14:09.000000000 +0200
++++ ghdl-0.24/vhdl/sem_expr.adb	2006-08-06 20:16:49.000000000 +0200
+@@ -167,7 +167,8 @@
+            | Iir_Kind_Library_Declaration
+            | Iir_Kind_Library_Clause
+            | Iir_Kind_Component_Declaration
+-           | Iir_Kinds_Procedure_Declaration =>
++           | Iir_Kinds_Procedure_Declaration
++           | Iir_Kind_Range_Array_Attribute =>
+             Error_Msg_Sem (Disp_Node (Expr)
+                            & " not allowed in an expression", Loc);
+             return Null_Iir;
+@@ -1801,7 +1802,7 @@
+             return;
+          end if;
+          Set_Expression (Choice, Expr);
+-         if Get_Expr_Staticness (Expr) > Locally then
++         if Get_Expr_Staticness (Expr) < Locally then
+             Error_Msg_Sem ("choice must be locally static expression", Expr);
+             return;
+          end if;
+diff -urN ghdl-0.24-orig/vhdl/sem_names.adb ghdl-0.24/vhdl/sem_names.adb
+--- ghdl-0.24-orig/vhdl/sem_names.adb	2006-06-22 21:30:58.000000000 +0200
++++ ghdl-0.24/vhdl/sem_names.adb	2006-08-06 20:16:50.000000000 +0200
+@@ -2376,9 +2376,13 @@
+                --  At least, this type is valid; and even if the array was
+                --  constrained, the base type would be the same.
+             end if;
+-         when Iir_Kind_Process_Statement =>
++         when Iir_Kind_Range_Array_Attribute
++           | Iir_Kind_Reverse_Range_Array_Attribute
++           | Iir_Kind_Process_Statement =>
+             Error_Msg_Sem
+-              (Disp_Node (Prefix) & " is not an appropriate attribute prefix",
++              (Disp_Node (Prefix) & " is not an appropriate prefix for '"
++               & Name_Table.Image (Get_Attribute_Identifier (Attr))
++               & " attribute",
+                Attr);
+             return Error_Mark;
+          when others =>
+diff -urN ghdl-0.24-orig/vhdl/sem_specs.adb ghdl-0.24/vhdl/sem_specs.adb
+--- ghdl-0.24-orig/vhdl/sem_specs.adb	2005-12-12 03:14:23.000000000 +0100
++++ ghdl-0.24/vhdl/sem_specs.adb	2006-08-06 20:16:50.000000000 +0200
+@@ -1264,15 +1264,20 @@
+      (Parent_Stmts : Iir; Conf : Iir_Configuration_Specification)
+    is
+       Primary_Entity_Aspect : Iir;
++      Component : Iir;
+    begin
+       Sem_Component_Specification (Parent_Stmts, Conf, Primary_Entity_Aspect);
++      Component := Get_Component_Name (Conf);
++
++      --  Return now in case of error.
++      if Get_Kind (Component) /= Iir_Kind_Component_Declaration then
++         return;
++      end if;
+       --  Extend scope of component interface declaration.
+       Sem_Scopes.Open_Scope_Extension;
+-      Sem_Scopes.Add_Component_Declarations (Get_Component_Name (Conf));
++      Sem_Scopes.Add_Component_Declarations (Component);
+       Sem_Binding_Indication (Get_Binding_Indication (Conf),
+-                              Get_Component_Name (Conf),
+-                              Conf,
+-                              Primary_Entity_Aspect);
++                              Component, Conf, Primary_Entity_Aspect);
+       --  FIXME: check default port and generic association.
+       Sem_Scopes.Close_Scope_Extension;
+    end Sem_Configuration_Specification;
+diff -urN ghdl-0.24-orig/vhdl/trans_be.adb ghdl-0.24/vhdl/trans_be.adb
+--- ghdl-0.24-orig/vhdl/trans_be.adb	2005-09-22 23:43:54.000000000 +0200
++++ ghdl-0.24/vhdl/trans_be.adb	2006-08-06 20:16:46.000000000 +0200
+@@ -144,6 +144,6 @@
+             Error_Kind ("sem_foreign", Decl);
+       end case;
+       --  Let is generate error messages.
+-      Fi := Translate_Foreign_Id (Decl, False);
++      Fi := Translate_Foreign_Id (Decl);
+    end Sem_Foreign;
+ end Trans_Be;
+diff -urN ghdl-0.24-orig/vhdl/translation.adb ghdl-0.24/vhdl/translation.adb
+--- ghdl-0.24-orig/vhdl/translation.adb	2006-06-24 15:50:09.000000000 +0200
++++ ghdl-0.24/vhdl/translation.adb	2006-08-06 20:16:46.000000000 +0200
+@@ -2897,15 +2897,13 @@
+       end if;
+    end Create_Temp;
+ 
+-   function Translate_Foreign_Id (Decl : Iir; Extract_Name : Boolean)
+-                                 return Foreign_Info_Type
++   function Translate_Foreign_Id (Decl : Iir) return Foreign_Info_Type
+    is
+       use Name_Table;
+       Attr : Iir_Attribute_Value;
+       Spec : Iir_Attribute_Specification;
+       Attr_Decl : Iir;
+       Expr : Iir;
+-      P : Natural;
+    begin
+       --  Look for 'FOREIGN.
+       Attr := Get_Attribute_Value_Chain (Decl);
+@@ -2972,27 +2970,60 @@
+       if Name_Length >= 10
+         and then Name_Buffer (1 .. 10) = "VHPIDIRECT"
+       then
+-         P := 11;
++         declare
++            P : Natural;
++            Sf, Sl : Natural;
++            Lf, Ll : Natural;
++         begin
++            P := 11;
+ 
+-         --  Skip spaces.
+-         while P <= Name_Length and then Name_Buffer (P) = ' ' loop
++            --  Skip spaces.
++            while P <= Name_Length and then Name_Buffer (P) = ' ' loop
++               P := P + 1;
++            end loop;
++            if P > Name_Length then
++               Error_Msg_Sem
++                 ("missing subprogram/library name after VHPIDIRECT", Spec);
++            end if;
++            --  Extract library.
++            Lf := P;
++            while P < Name_Length and then Name_Buffer (P) /= ' ' loop
++               P := P + 1;
++            end loop;
++            Ll := P;
++            --  Extract subprogram.
+             P := P + 1;
+-         end loop;
+-         if Extract_Name then
++            while P <= Name_Length and then Name_Buffer (P) = ' ' loop
++               P := P + 1;
++            end loop;
++            Sf := P;
++            while P < Name_Length and then Name_Buffer (P) /= ' ' loop
++               P := P + 1;
++            end loop;
++            Sl := P;
++            if P < Name_Length then
++               Error_Msg_Sem ("garbage at end of VHPIDIRECT", Spec);
++            end if;
++
++            --  Accept empty library.
++            if Sf > Name_Length then
++               Sf := Lf;
++               Sl := Ll;
++               Lf := 0;
++               Ll := 0;
++            end if;
++
+             return Foreign_Info_Type'
+               (Kind => Foreign_Vhpidirect,
+-               Subprg => Get_Identifier (Name_Buffer (P .. Name_Length)),
+-               Lib => Null_Identifier);
+-         else
+-            return Foreign_Info_Type'(Kind => Foreign_Vhpidirect,
+-                                      Subprg => O_Ident_Nul,
+-                                      Lib => Null_Identifier);
+-         end if;
++               Lib_First => Lf,
++               Lib_Last => Ll,
++               Subprg_First => Sf,
++               Subprg_Last => Sl);
++         end;
+       elsif Name_Length = 14
+         and then Name_Buffer (1 .. 14) = "GHDL intrinsic"
+       then
+-         return Foreign_Info_Type'(Kind => Foreign_Intrinsic,
+-                                   Subprg => Create_Identifier);
++         return Foreign_Info_Type'(Kind => Foreign_Intrinsic);
+       else
+          Error_Msg_Sem
+            ("value of 'FOREIGN attribute does not begin with VHPIDIRECT",
+@@ -4640,6 +4671,7 @@
+          Rtype : Iir;
+          Id : O_Ident;
+          Storage : O_Storage;
++         Foreign : Foreign_Info_Type := Foreign_Bad;
+       begin
+          Info := Get_Info (Spec);
+          Info.Res_Interface := O_Dnode_Null;
+@@ -4650,20 +4682,18 @@
+          Push_Subprg_Identifier (Spec, Mark);
+ 
+          if Get_Foreign_Flag (Spec) then
+-            declare
+-               Fi : Foreign_Info_Type;
+-            begin
+-               Fi := Translate_Foreign_Id (Spec, True);
+-               case Fi.Kind is
+-                  when Foreign_Unknown =>
+-                     Id := Create_Identifier;
+-                  when Foreign_Intrinsic =>
+-                     Id := Fi.Subprg;
+-                  when Foreign_Vhpidirect =>
+-                     Id := Fi.Subprg;
+-               end case;
+-               Storage := O_Storage_External;
+-            end;
++            Foreign := Translate_Foreign_Id (Spec);
++            case Foreign.Kind is
++               when Foreign_Unknown =>
++                  Id := Create_Identifier;
++               when Foreign_Intrinsic =>
++                  Id := Create_Identifier;
++               when Foreign_Vhpidirect =>
++                  Id := Get_Identifier
++                    (Name_Table.Name_Buffer (Foreign.Subprg_First
++                                             .. Foreign.Subprg_Last));
++            end case;
++            Storage := O_Storage_External;
+          else
+             Id := Create_Identifier;
+             Storage := Global_Storage;
+@@ -4778,6 +4808,10 @@
+          end loop;
+          Finish_Subprogram_Decl (Interface_List, Info.Ortho_Func);
+ 
++         if Get_Foreign_Flag (Spec) and then Foreign_Hook /= null then
++            Foreign_Hook.all (Spec, Foreign, Info.Ortho_Func);
++         end if;
++
+          Save_Local_Identifier (Info.Subprg_Local_Id);
+          Pop_Identifier_Prefix (Mark);
+       end Translate_Subprogram_Declaration;
+@@ -4804,7 +4838,7 @@
+          Old_Subprogram : Iir;
+          Mark : Id_Mark_Type;
+          Final : Boolean;
+-         Is_Func : Boolean;
++         Is_Ortho_Func : Boolean;
+ 
+          --  Set for a public method.  In this case, the lock must be acquired
+          --  and retained.
+@@ -4877,8 +4911,8 @@
+                Chap3.Call_Ghdl_Protected_Procedure (Get_Method_Type (Spec),
+                                                     Ghdl_Protected_Enter);
+             end if;
+-            Is_Func := Is_Subprogram_Ortho_Function (Spec);
+-            if Is_Func then
++            Is_Ortho_Func := Is_Subprogram_Ortho_Function (Spec);
++            if Is_Ortho_Func then
+                New_Var_Decl
+                  (Info.Subprg_Result, Get_Identifier ("RESULT"),
+                   O_Storage_Local,
+@@ -4906,7 +4940,7 @@
+                Chap3.Call_Ghdl_Protected_Procedure (Get_Method_Type (Spec),
+                                                     Ghdl_Protected_Leave);
+             end if;
+-            if Is_Func then
++            if Is_Ortho_Func then
+                New_Return_Stmt (New_Obj_Value (Info.Subprg_Result));
+             end if;
+          end if;
+@@ -5082,14 +5116,16 @@
+             return;
+          end if;
+ 
++         Pkg := Get_Package (Decl);
++         Restore_Local_Identifier (Get_Info (Pkg).Package_Local_Id);
++         Chap4.Translate_Declaration_Chain (Decl);
++
+          if Flag_Rti then
+             Rtis.Generate_Unit (Decl);
+          end if;
+ 
+-         Pkg := Get_Package (Decl);
+-         Restore_Local_Identifier (Get_Info (Pkg).Package_Local_Id);
+-         Chap4.Translate_Declaration_Chain (Decl);
+          Chap4.Translate_Declaration_Chain_Subprograms (Decl, Null_Iir);
++
+          Elab_Package_Body (Pkg, Decl);
+       end Translate_Package_Body;
+ 
+@@ -13216,6 +13252,7 @@
+          Res : O_Cnode;
+       begin
+          Lit_Type := Get_Type (Str);
++
+          Chap3.Translate_Anonymous_Type_Definition (Lit_Type, True);
+ 
+          Start_Array_Aggr (List, Get_Ortho_Type (Lit_Type, Mode_Value));
+@@ -13228,6 +13265,86 @@
+          return Res;
+       end Translate_Static_String_Literal;
+ 
++      --  Some strings literal have an unconstrained array type,
++      --  eg: 'image of constant.  Its type is not constrained
++      --  because it is not so in VHDL!
++      function Translate_Static_Unconstrained_String_Literal (Str : Iir)
++        return O_Cnode
++      is
++         use Name_Table;
++
++         Lit_Type : Iir;
++         Element_Type : Iir;
++         Index_Type : Iir;
++         Val_Aggr : O_Array_Aggr_List;
++         Bound_Aggr : O_Record_Aggr_List;
++         Index_Aggr : O_Record_Aggr_List;
++         Res_Aggr : O_Record_Aggr_List;
++         Res : O_Cnode;
++         Str_Type : O_Tnode;
++         Type_Info : Type_Info_Acc;
++         Index_Type_Info : Type_Info_Acc;
++         Len : Int32;
++         Val : Var_Acc;
++         Bound : Var_Acc;
++      begin
++         Lit_Type := Get_Type (Str);
++         Type_Info := Get_Info (Get_Base_Type (Lit_Type));
++
++         --  Create the string value.
++         Len := Get_String_Length (Str);
++         Str_Type := New_Constrained_Array_Type
++           (Type_Info.T.Base_Type (Mode_Value),
++            New_Unsigned_Literal (Ghdl_Index_Type, Unsigned_64 (Len)));
++
++         Start_Array_Aggr (Val_Aggr, Str_Type);
++         Element_Type := Get_Element_Subtype (Lit_Type);
++         Translate_Static_String_Literal_Inner (Val_Aggr, Str, Element_Type);
++         Finish_Array_Aggr (Val_Aggr, Res);
++
++         Val := Create_Global_Const
++           (Create_Uniq_Identifier, Str_Type, O_Storage_Private, Res);
++
++         --  Create the string bound.
++         Index_Type := Get_First_Element (Get_Index_Subtype_List (Lit_Type));
++         Index_Type_Info := Get_Info (Index_Type);
++         Start_Record_Aggr (Bound_Aggr, Type_Info.T.Bounds_Type);
++         Start_Record_Aggr (Index_Aggr, Index_Type_Info.T.Range_Type);
++         New_Record_Aggr_El
++           (Index_Aggr,
++            New_Signed_Literal (Index_Type_Info.Ortho_Type (Mode_Value), 0));
++         New_Record_Aggr_El
++           (Index_Aggr,
++            New_Signed_Literal (Index_Type_Info.Ortho_Type (Mode_Value),
++                                Integer_64 (Len - 1)));
++         New_Record_Aggr_El
++           (Index_Aggr, Ghdl_Dir_To_Node);
++         New_Record_Aggr_El
++           (Index_Aggr,
++            New_Unsigned_Literal (Ghdl_Index_Type, Unsigned_64 (Len)));
++         Finish_Record_Aggr (Index_Aggr, Res);
++         New_Record_Aggr_El (Bound_Aggr, Res);
++         Finish_Record_Aggr (Bound_Aggr, Res);
++         Bound := Create_Global_Const
++           (Create_Uniq_Identifier, Type_Info.T.Bounds_Type,
++            O_Storage_Private, Res);
++
++         --  The descriptor.
++         Start_Record_Aggr (Res_Aggr, Type_Info.Ortho_Type (Mode_Value));
++         New_Record_Aggr_El
++           (Res_Aggr,
++            New_Global_Address (Get_Var_Label (Val),
++                                Type_Info.T.Base_Ptr_Type (Mode_Value)));
++         New_Record_Aggr_El
++           (Res_Aggr,
++            New_Global_Address (Get_Var_Label (Bound),
++                                Type_Info.T.Bounds_Ptr_Type));
++         Finish_Record_Aggr (Res_Aggr, Res);
++         Free_Var (Val);
++         Free_Var (Bound);
++         return Res;
++      end Translate_Static_Unconstrained_String_Literal;
++
+       --  Only for Strings of STD.Character.
+       function Translate_Static_String (Str_Type : Iir; Str_Ident : Name_Id)
+         return O_Cnode
+@@ -13282,7 +13399,13 @@
+       begin
+          case Get_Kind (Str) is
+             when Iir_Kind_String_Literal =>
+-               Res := Translate_Static_String_Literal (Str);
++               if Get_Kind (Get_Type (Str))
++                 = Iir_Kind_Array_Subtype_Definition
++               then
++                  Res := Translate_Static_String_Literal (Str);
++               else
++                  Res := Translate_Static_Unconstrained_String_Literal (Str);
++               end if;
+             when Iir_Kind_Bit_String_Literal =>
+                Res := Translate_Static_Bit_String_Literal (Str);
+             when Iir_Kind_Simple_Aggregate =>
+@@ -25323,9 +25446,22 @@
+                when Iir_Kind_Type_Declaration
+                  | Iir_Kind_Subtype_Declaration =>
+                   Add_Rti_Node (Generate_Type_Decl (Decl));
++               when Iir_Kind_Constant_Declaration =>
++                  --  Do not generate RTIs for full declarations.
++                  --  (RTI will be generated for the deferred declaration).
++                  if Get_Deferred_Declaration (Decl) = Null_Iir
++                    or else Get_Deferred_Declaration_Flag (Decl)
++                  then
++                     declare
++                        Info : Object_Info_Acc;
++                     begin
++                        Info := Get_Info (Decl);
++                        Generate_Object (Decl, Info.Object_Rti);
++                        Add_Rti_Node (Info.Object_Rti);
++                     end;
++                  end if;
+                when Iir_Kind_Signal_Declaration
+                  | Iir_Kind_Signal_Interface_Declaration
+-                 | Iir_Kind_Constant_Declaration
+                  | Iir_Kind_Constant_Interface_Declaration
+                  | Iir_Kind_Variable_Declaration
+                  | Iir_Kind_File_Declaration
+@@ -25463,8 +25599,8 @@
+                Generate_Declaration_Chain (Get_Declaration_Chain (Blk));
+             when Iir_Kind_Package_Body =>
+                Kind := Ghdl_Rtik_Package_Body;
+-               -- FIXME: yes or not ?
+-               --Generate_Declaration_Chain (Get_Declaration_Chain (Blk));
++               --  Required at least for 'image
++               Generate_Declaration_Chain (Get_Declaration_Chain (Blk));
+             when Iir_Kind_Architecture_Declaration =>
+                Kind := Ghdl_Rtik_Architecture;
+                Generate_Declaration_Chain (Get_Declaration_Chain (Blk));
+diff -urN ghdl-0.24-orig/vhdl/translation.ads ghdl-0.24/vhdl/translation.ads
+--- ghdl-0.24-orig/vhdl/translation.ads	2005-09-22 23:46:05.000000000 +0200
++++ ghdl-0.24/vhdl/translation.ads	2006-08-06 20:16:46.000000000 +0200
+@@ -17,8 +17,6 @@
+ --  02111-1307, USA.
+ with Iirs; use Iirs;
+ with Ortho_Nodes;
+-with Ortho_Ident; use Ortho_Ident;
+-with Types; use Types;
+ 
+ package Translation is
+    --  Initialize the package: create internal nodes.
+@@ -69,20 +67,21 @@
+ 
+    type Foreign_Info_Type (Kind : Foreign_Kind_Type := Foreign_Unknown)
+    is record
+-      Subprg : O_Ident;
+-
+       case Kind is
+          when Foreign_Unknown =>
+             null;
+          when Foreign_Vhpidirect =>
+-            Lib : Name_Id;
++            --  Positions in name_table.name_buffer.
++            Lib_First : Natural;
++            Lib_Last : Natural;
++            Subprg_First : Natural;
++            Subprg_Last : Natural;
+          when Foreign_Intrinsic =>
+             null;
+       end case;
+    end record;
+ 
+-   Foreign_Bad : constant Foreign_Info_Type := (Kind => Foreign_Unknown,
+-                                                Subprg => O_Ident_Nul);
++   Foreign_Bad : constant Foreign_Info_Type := (Kind => Foreign_Unknown);
+ 
+    --  Return a foreign_info for DECL.
+    --  Can generate error messages, if the attribute expression is ill-formed.
+@@ -90,7 +89,12 @@
+    --  Otherwise, only KIND discriminent is set.
+    --  EXTRACT_NAME should be set only inside translation itself, since the
+    --  name can be based on the prefix.
+-   function Translate_Foreign_Id (Decl : Iir; Extract_Name : Boolean)
+-                                 return Foreign_Info_Type;
++   function Translate_Foreign_Id (Decl : Iir) return Foreign_Info_Type;
+ 
++   --  If not null, this procedure is called when a foreign subprogram is
++   --  created.
++   type Foreign_Hook_Access is access procedure (Decl : Iir;
++                                                 Info : Foreign_Info_Type;
++                                                 Ortho : Ortho_Nodes.O_Dnode);
++   Foreign_Hook : Foreign_Hook_Access := null;
+ end Translation;
