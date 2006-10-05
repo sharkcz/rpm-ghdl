@@ -1,6 +1,6 @@
 %define gccver 4.1.1
 %define ghdlver 0.25
-%define ghdlsvnver 61
+%define ghdlsvnver 71
 
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
@@ -288,6 +288,9 @@ popd
 
 
 %changelog
+* Thu Oct  5 2006 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.25-0.71svn.0
+- update to svn71
+
 * Sun Aug 27 2006 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.25-0.61svn.0
 - update to svn61
 
