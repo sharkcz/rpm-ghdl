@@ -1,11 +1,11 @@
 %define gccver 4.1.1
 %define ghdlver 0.25
-%define ghdlsvnver 71
+%define ghdlsvnver 73
 
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: 0.25
-Release: 0.%{ghdlsvnver}svn.1%{?dist}
+Release: 0.%{ghdlsvnver}svn.0%{?dist}
 License: GPL
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -288,6 +288,9 @@ popd
 
 
 %changelog
+* Fri Oct  6 2006 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.25-0.73svn.0
+- update to svn73
+
 * Thu Oct  5 2006 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.25-0.71svn.1
 - bump release
 

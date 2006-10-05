@@ -2368,7 +2368,7 @@ diff -urN ghdl-0.25/vhdl/lang.opt ghdl-0.26dev/vhdl/lang.opt
  Use synthetizer rules for default bindings
 diff -urN ghdl-0.25/vhdl/Makefile.in ghdl-0.26dev/vhdl/Makefile.in
 --- ghdl-0.25/vhdl/Makefile.in	2006-08-11 05:16:14.000000000 +0200
-+++ ghdl-0.26dev/vhdl/Makefile.in	2006-10-05 11:55:15.000000000 +0200
++++ ghdl-0.26dev/vhdl/Makefile.in	2006-10-06 01:27:46.000000000 +0200
 @@ -520,6 +520,9 @@
  i386.o: $(GRTSRCDIR)/config/i386.S
  	$(CC) -c $(GRT_FLAGS) -o $@ $<
@@ -2620,7 +2620,7 @@ diff -urN ghdl-0.25/vhdl/sem_names.ads ghdl-0.26dev/vhdl/sem_names.ads
     --  Decl_Any : no checks is performed.
 diff -urN ghdl-0.25/vhdl/sem_stmts.adb ghdl-0.26dev/vhdl/sem_stmts.adb
 --- ghdl-0.25/vhdl/sem_stmts.adb	2005-12-11 15:55:23.000000000 +0100
-+++ ghdl-0.26dev/vhdl/sem_stmts.adb	2006-10-05 11:35:25.000000000 +0200
++++ ghdl-0.26dev/vhdl/sem_stmts.adb	2006-10-06 01:27:21.000000000 +0200
 @@ -335,7 +335,7 @@
           return;
        end if;
@@ -2648,7 +2648,7 @@ diff -urN ghdl-0.25/vhdl/sem_stmts.adb ghdl-0.26dev/vhdl/sem_stmts.adb
              case Get_Kind (Prefix) is
                 when Iir_Kind_Signal_Declaration
                   | Iir_Kind_Guard_Signal_Declaration
-@@ -1835,9 +1835,6 @@
+@@ -1835,14 +1835,11 @@
     is
        Sig_Object : Iir;
        Sig_Object_Type : Iir;
@@ -2658,6 +2658,12 @@ diff -urN ghdl-0.25/vhdl/sem_stmts.adb ghdl-0.26dev/vhdl/sem_stmts.adb
     begin
        if Sig = Null_Iir then
           return;
+       end if;
+-      Sig_Object := Get_Base_Name (Sig);
++      Sig_Object := Get_Object_Prefix (Sig);
+       Sig_Object_Type := Get_Type (Sig_Object);
+ 
+       --  LRM 4.3.1.2 Signal Declaration
 @@ -1889,57 +1886,19 @@
                   not in Iir_Kinds_Process_Statement)
        then
