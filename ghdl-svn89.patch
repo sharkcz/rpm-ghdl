@@ -1,6 +1,6 @@
 diff -urN ghdl-0.25/vhdl/back_end.ads ghdl-0.26dev/vhdl/back_end.ads
 --- ghdl-0.25/vhdl/back_end.ads	2005-09-22 23:07:25.000000000 +0200
-+++ ghdl-0.26dev/vhdl/back_end.ads	2006-10-05 11:35:25.000000000 +0200
++++ ghdl-0.26dev/vhdl/back_end.ads	2006-11-20 00:36:24.000000000 +0100
 @@ -29,6 +29,14 @@
     Library_To_File_Name : Library_To_File_Name_Acc :=
       Default_Library_To_File_Name'Access;
@@ -27,7 +27,7 @@ diff -urN ghdl-0.25/vhdl/back_end.ads ghdl-0.26dev/vhdl/back_end.ads
  
 diff -urN ghdl-0.25/vhdl/bug.adb ghdl-0.26dev/vhdl/bug.adb
 --- ghdl-0.25/vhdl/bug.adb	2005-11-18 02:34:12.000000000 +0100
-+++ ghdl-0.26dev/vhdl/bug.adb	2006-10-05 11:35:25.000000000 +0200
++++ ghdl-0.26dev/vhdl/bug.adb	2006-11-20 00:36:24.000000000 +0100
 @@ -70,7 +70,7 @@
        Put_Line
          (Standard_Error,
@@ -39,7 +39,7 @@ diff -urN ghdl-0.25/vhdl/bug.adb ghdl-0.26dev/vhdl/bug.adb
                  GNAT.Directory_Operations.Get_Current_Dir);
 diff -urN ghdl-0.25/vhdl/canon.adb ghdl-0.26dev/vhdl/canon.adb
 --- ghdl-0.25/vhdl/canon.adb	2006-07-29 06:42:30.000000000 +0200
-+++ ghdl-0.26dev/vhdl/canon.adb	2006-10-05 11:35:25.000000000 +0200
++++ ghdl-0.26dev/vhdl/canon.adb	2006-11-20 00:36:24.000000000 +0100
 @@ -847,22 +847,6 @@
        end loop;
     end Canon_Sequential_Stmts;
@@ -110,7 +110,7 @@ diff -urN ghdl-0.25/vhdl/canon.adb ghdl-0.26dev/vhdl/canon.adb
                 null;
 diff -urN ghdl-0.25/vhdl/disp_tree.adb ghdl-0.26dev/vhdl/disp_tree.adb
 --- ghdl-0.25/vhdl/disp_tree.adb	2005-10-26 14:31:21.000000000 +0200
-+++ ghdl-0.26dev/vhdl/disp_tree.adb	2006-10-05 11:35:25.000000000 +0200
++++ ghdl-0.26dev/vhdl/disp_tree.adb	2006-11-20 00:36:24.000000000 +0100
 @@ -1023,8 +1023,6 @@
              Disp_Depth (Get_Subprogram_Depth (Tree));
              Header ("subprogram_body:");
@@ -131,7 +131,7 @@ diff -urN ghdl-0.25/vhdl/disp_tree.adb ghdl-0.26dev/vhdl/disp_tree.adb
              Header ("process statements:");
 diff -urN ghdl-0.25/vhdl/disp_vhdl.adb ghdl-0.26dev/vhdl/disp_vhdl.adb
 --- ghdl-0.25/vhdl/disp_vhdl.adb	2006-07-09 03:55:28.000000000 +0200
-+++ ghdl-0.26dev/vhdl/disp_vhdl.adb	2006-10-05 11:35:25.000000000 +0200
++++ ghdl-0.26dev/vhdl/disp_vhdl.adb	2006-11-20 00:36:24.000000000 +0100
 @@ -893,25 +893,6 @@
        Put_Line (";");
     end Disp_Object_Declaration;
@@ -207,7 +207,7 @@ diff -urN ghdl-0.25/vhdl/disp_vhdl.adb ghdl-0.26dev/vhdl/disp_vhdl.adb
        end case;
 diff -urN ghdl-0.25/vhdl/flags.adb ghdl-0.26dev/vhdl/flags.adb
 --- ghdl-0.25/vhdl/flags.adb	2006-03-16 04:15:00.000000000 +0100
-+++ ghdl-0.26dev/vhdl/flags.adb	2006-10-05 11:35:25.000000000 +0200
++++ ghdl-0.26dev/vhdl/flags.adb	2006-11-20 00:36:24.000000000 +0100
 @@ -19,6 +19,7 @@
  with Name_Table;
  with Libraries;
@@ -256,7 +256,7 @@ diff -urN ghdl-0.25/vhdl/flags.adb ghdl-0.26dev/vhdl/flags.adb
     procedure Create_Flag_String is
 diff -urN ghdl-0.25/vhdl/ghdldrv/ghdldrv.adb ghdl-0.26dev/vhdl/ghdldrv/ghdldrv.adb
 --- ghdl-0.25/vhdl/ghdldrv/ghdldrv.adb	2005-12-10 17:21:09.000000000 +0100
-+++ ghdl-0.26dev/vhdl/ghdldrv/ghdldrv.adb	2006-10-05 11:35:22.000000000 +0200
++++ ghdl-0.26dev/vhdl/ghdldrv/ghdldrv.adb	2006-11-20 00:36:11.000000000 +0100
 @@ -741,7 +741,25 @@
        end if;
        Put ("linker command: ");
@@ -294,7 +294,7 @@ diff -urN ghdl-0.25/vhdl/ghdldrv/ghdldrv.adb ghdl-0.26dev/vhdl/ghdldrv/ghdldrv.a
           Put (Version_String.all);
 diff -urN ghdl-0.25/vhdl/ghdldrv/ghdllocal.adb ghdl-0.26dev/vhdl/ghdldrv/ghdllocal.adb
 --- ghdl-0.25/vhdl/ghdldrv/ghdllocal.adb	2006-06-21 21:51:20.000000000 +0200
-+++ ghdl-0.26dev/vhdl/ghdldrv/ghdllocal.adb	2006-10-05 11:35:22.000000000 +0200
++++ ghdl-0.26dev/vhdl/ghdldrv/ghdllocal.adb	2006-11-20 00:36:11.000000000 +0100
 @@ -177,7 +177,7 @@
     function Get_Machine_Path_Prefix return String is
     begin
@@ -334,7 +334,7 @@ diff -urN ghdl-0.25/vhdl/ghdldrv/ghdllocal.adb ghdl-0.26dev/vhdl/ghdldrv/ghdlloc
        else
 diff -urN ghdl-0.25/vhdl/ghdldrv/ghdllocal.ads ghdl-0.26dev/vhdl/ghdldrv/ghdllocal.ads
 --- ghdl-0.25/vhdl/ghdldrv/ghdllocal.ads	2005-12-07 09:45:47.000000000 +0100
-+++ ghdl-0.26dev/vhdl/ghdldrv/ghdllocal.ads	2006-10-05 11:35:22.000000000 +0200
++++ ghdl-0.26dev/vhdl/ghdldrv/ghdllocal.ads	2006-11-20 00:36:11.000000000 +0100
 @@ -53,6 +53,9 @@
     --  Path prefix for libraries.
     Prefix_Path : String_Access := null;
@@ -347,7 +347,7 @@ diff -urN ghdl-0.25/vhdl/ghdldrv/ghdllocal.ads ghdl-0.26dev/vhdl/ghdldrv/ghdlloc
     --  Return FILENAME without the extension.
 diff -urN ghdl-0.25/vhdl/ghdldrv/ghdlmain.adb ghdl-0.26dev/vhdl/ghdldrv/ghdlmain.adb
 --- ghdl-0.25/vhdl/ghdldrv/ghdlmain.adb	2006-06-21 21:48:05.000000000 +0200
-+++ ghdl-0.26dev/vhdl/ghdldrv/ghdlmain.adb	2006-10-05 11:35:22.000000000 +0200
++++ ghdl-0.26dev/vhdl/ghdldrv/ghdlmain.adb	2006-11-20 00:36:11.000000000 +0100
 @@ -216,7 +216,7 @@
        pragma Unreferenced (Cmd);
        use Ada.Text_IO;
@@ -359,7 +359,7 @@ diff -urN ghdl-0.25/vhdl/ghdldrv/ghdlmain.adb ghdl-0.26dev/vhdl/ghdldrv/ghdlmain
           Put (" ");
 diff -urN ghdl-0.25/vhdl/ghdldrv/ghdlprint.adb ghdl-0.26dev/vhdl/ghdldrv/ghdlprint.adb
 --- ghdl-0.25/vhdl/ghdldrv/ghdlprint.adb	2005-09-22 23:49:25.000000000 +0200
-+++ ghdl-0.26dev/vhdl/ghdldrv/ghdlprint.adb	2006-10-05 11:35:22.000000000 +0200
++++ ghdl-0.26dev/vhdl/ghdldrv/ghdlprint.adb	2006-11-20 00:36:11.000000000 +0100
 @@ -475,7 +475,7 @@
        Put_Line ("<p>");
        Put ("<small>This page was generated using ");
@@ -371,7 +371,7 @@ diff -urN ghdl-0.25/vhdl/ghdldrv/ghdlprint.adb ghdl-0.26dev/vhdl/ghdldrv/ghdlpri
        New_Line;
 diff -urN ghdl-0.25/vhdl/ghdl.texi ghdl-0.26dev/vhdl/ghdl.texi
 --- ghdl-0.25/vhdl/ghdl.texi	2006-08-06 08:38:07.000000000 +0200
-+++ ghdl-0.26dev/vhdl/ghdl.texi	2006-10-05 11:35:20.000000000 +0200
++++ ghdl-0.26dev/vhdl/ghdl.texi	2006-11-20 00:35:58.000000000 +0100
 @@ -516,6 +516,7 @@
  * Cross-reference command::     
  * File commands::               
@@ -380,7 +380,47 @@ diff -urN ghdl-0.25/vhdl/ghdl.texi ghdl-0.26dev/vhdl/ghdl.texi
  * IEEE library pitfalls::       
  @end menu
  
-@@ -893,6 +894,11 @@
+@@ -607,21 +608,25 @@
+ 
+ The actual elaboration is performed at run-time.
+ 
++On Windows this command can be skipped because it is also done by the
++run command.
++
+ @node Run command, Elaborate and run command, Elaboration command, Building commands
+ @comment  node-name,  next,  previous,  up
+ @subsection Run command
+ @cindex run
+ @cindex @option{-r} command
+-Run (or simulate) an elaborated design hierarchy.
++Run (or simulate) a design.
+ 
+ @smallexample
+-$ ghdl -r @var{primary_unit} [@var{secondary_unit}] [@var{simulation_options}]
++$ ghdl -r [@var{options}] @var{primary_unit} [@var{secondary_unit}] [@var{simulation_options}]
+ @end smallexample
+ 
+-The arguments are the same as the @xref{Elaboration command}.
++The options and arguments are the same as the @xref{Elaboration command}.
+ 
+ On GNU/Linux this command simply build the filename of the executable
+-and execute it.  You may also directly execute the program.
++and execute it.  Options are ignored. You may also directly execute
++the program.
+ 
+ This command exists for three reasons:
+ @itemize @bullet{}
+@@ -634,7 +639,8 @@
+ memory.
+ @end itemize
+ 
+-On Windows this command elaborate and launch the simulation.
++On Windows this command elaborate and launch the simulation.  As a consequence
++you must use the same options used during analysis.
+ 
+ @xref{Simulation and run time}, for details on options.
+ 
+@@ -893,6 +899,11 @@
  
  This option is only useful during elaboration.
  
@@ -392,7 +432,7 @@ diff -urN ghdl-0.25/vhdl/ghdl.texi ghdl-0.26dev/vhdl/ghdl.texi
  @item --GHDL1=@var{COMMAND}
  @cindex @option{--GHLD1} switch
  Use @var{COMMAND} as the command name for the compiler.  If @var{COMMAND} is
-@@ -1291,7 +1297,7 @@
+@@ -1291,7 +1302,7 @@
  $ ghdl --lines @var{files}
  @end smallexample
  
@@ -401,7 +441,7 @@ diff -urN ghdl-0.25/vhdl/ghdl.texi ghdl-0.26dev/vhdl/ghdl.texi
  @comment  node-name,  next,  previous,  up
  @section Misc commands
  There are a few GHDL commands which are seldom useful.
-@@ -1352,7 +1358,28 @@
+@@ -1352,7 +1363,28 @@
  $ ghdl --version
  @end smallexample
  
@@ -433,8 +473,132 @@ diff -urN ghdl-0.25/vhdl/ghdl.texi ghdl-0.26dev/vhdl/ghdl.texi
  When you use options @option{--ieee=synopsys} or @option{--ieee=mentor},
 diff -urN ghdl-0.25/vhdl/grt/config/win32.c ghdl-0.26dev/vhdl/grt/config/win32.c
 --- ghdl-0.25/vhdl/grt/config/win32.c	2006-03-10 02:47:29.000000000 +0100
-+++ ghdl-0.26dev/vhdl/grt/config/win32.c	2006-10-05 11:35:22.000000000 +0200
-@@ -130,6 +130,23 @@
++++ ghdl-0.26dev/vhdl/grt/config/win32.c	2006-11-20 00:36:14.000000000 +0100
+@@ -21,6 +21,19 @@
+ #include <stdio.h>
+ #include <setjmp.h>
+ #include <assert.h>
++#include <excpt.h>
++
++static EXCEPTION_DISPOSITION
++ghdl_SEH_handler (struct _EXCEPTION_RECORD* ExceptionRecord,
++		  void *EstablisherFrame,
++		  struct _CONTEXT* ContextRecord,
++		  void *DispatcherContext);
++
++struct exception_registration
++{
++  struct exception_registration *prev;
++  void *handler;
++};
+ 
+ struct stack_type
+ {
+@@ -50,6 +63,19 @@
+ grt_stack_loop (void *v_stack)
+ {
+   struct stack_type *stack = (struct stack_type *)v_stack;
++  struct exception_registration er;
++  struct exception_registration *prev;
++
++  /* Get current handler.  */
++  asm ("mov %%fs:(0),%0" : "=r" (prev));
++
++  /* Build regisration.  */
++  er.prev = prev;
++  er.handler = ghdl_SEH_handler;
++
++  /* Register.  */
++  asm ("mov %0,%%fs:(0)" : : "r" (&er));
++
+   while (1)
+     {
+       (*stack->func)(stack->arg);
+@@ -117,19 +143,107 @@
+     longjmp (run_env, val);
+ }
+ 
++extern void grt_stack_error_grow_failed (void);
++extern void grt_stack_error_null_access (void);
++extern void grt_stack_error_memory_access (void);
++extern void grt_overflow_error (void);
++
++static EXCEPTION_DISPOSITION
++ghdl_SEH_handler (struct _EXCEPTION_RECORD* ExceptionRecord,
++		  void *EstablisherFrame,
++		  struct _CONTEXT* ContextRecord,
++		  void *DispatcherContext)
++{
++  const char *msg = "";
++
++  switch (ExceptionRecord->ExceptionCode)
++    {
++    case EXCEPTION_ACCESS_VIOLATION:
++      if (ExceptionRecord->ExceptionInformation[1] == 0)
++	grt_stack_error_null_access ();
++      else
++	grt_stack_error_memory_access ();
++      break;
++          
++    case EXCEPTION_FLT_DENORMAL_OPERAND:
++    case EXCEPTION_FLT_DIVIDE_BY_ZERO:
++    case EXCEPTION_FLT_INVALID_OPERATION:
++    case EXCEPTION_FLT_OVERFLOW:
++    case EXCEPTION_FLT_STACK_CHECK:
++    case EXCEPTION_FLT_UNDERFLOW:
++      msg = "floating point error";
++      break;
++     
++    case EXCEPTION_INT_DIVIDE_BY_ZERO:
++      msg = "division by 0";
++      break;
++     
++    case EXCEPTION_INT_OVERFLOW:
++      grt_overflow_error ();
++      break;
++           
++    case EXCEPTION_STACK_OVERFLOW:
++      msg = "stack overflow";
++      break;
++     
++    default:
++      msg = "unknown reason";
++      break;
++    }
++
++  /* FIXME: is it correct?  */
++  fprintf (stderr, "exception raised: %s\n", msg);
++
++  __ghdl_maybe_return_via_longjump (1);
++  return 0; /* This is never reached, avoid compiler warning  */
++}
++
+ int
+ __ghdl_run_through_longjump (int (*func)(void))
+ {
+   int res;
++  struct exception_registration er;
++  struct exception_registration *prev;
++
++  /* Get current handler.  */
++  asm ("mov %%fs:(0),%0" : "=r" (prev));
++
++  /* Build regisration.  */
++  er.prev = prev;
++  er.handler = ghdl_SEH_handler;
++
++  /* Register.  */
++  asm ("mov %0,%%fs:(0)" : : "r" (&er));
+ 
+   run_env_en = 1;
+   res = setjmp (run_env);
+   if (res == 0)
+     res = (*func)();
+   run_env_en = 0;
++
++  /* Restore.  */
++  asm ("mov %0,%%fs:(0)" : : "r" (prev));
++
    return res;
  }
  
@@ -460,7 +624,7 @@ diff -urN ghdl-0.25/vhdl/grt/config/win32.c ghdl-0.26dev/vhdl/grt/config/win32.c
  {
 diff -urN ghdl-0.25/vhdl/grt/grt-disp.adb ghdl-0.26dev/vhdl/grt/grt-disp.adb
 --- ghdl-0.25/vhdl/grt/grt-disp.adb	2005-10-08 14:04:45.000000000 +0200
-+++ ghdl-0.26dev/vhdl/grt/grt-disp.adb	2006-10-05 11:35:23.000000000 +0200
++++ ghdl-0.26dev/vhdl/grt/grt-disp.adb	2006-11-20 00:36:15.000000000 +0100
 @@ -86,16 +86,20 @@
              Put ("Drv (1 prt) ");
           when Eff_One_Port =>
@@ -525,7 +689,7 @@ diff -urN ghdl-0.25/vhdl/grt/grt-disp.adb ghdl-0.26dev/vhdl/grt/grt-disp.adb
                 null;
 diff -urN ghdl-0.25/vhdl/grt/grt-disp_signals.adb ghdl-0.26dev/vhdl/grt/grt-disp_signals.adb
 --- ghdl-0.25/vhdl/grt/grt-disp_signals.adb	2005-10-08 14:04:56.000000000 +0200
-+++ ghdl-0.26dev/vhdl/grt/grt-disp_signals.adb	2006-10-05 11:35:23.000000000 +0200
++++ ghdl-0.26dev/vhdl/grt/grt-disp_signals.adb	2006-11-20 00:36:15.000000000 +0100
 @@ -77,6 +77,12 @@
                 else
                    Disp_Value (T.Val, Mode);
@@ -571,7 +735,7 @@ diff -urN ghdl-0.25/vhdl/grt/grt-disp_signals.adb ghdl-0.26dev/vhdl/grt/grt-disp
           Put (" net: ");
 diff -urN ghdl-0.25/vhdl/grt/grt-signals.adb ghdl-0.26dev/vhdl/grt/grt-signals.adb
 --- ghdl-0.25/vhdl/grt/grt-signals.adb	2006-08-09 05:14:22.000000000 +0200
-+++ ghdl-0.26dev/vhdl/grt/grt-signals.adb	2006-10-05 11:35:23.000000000 +0200
++++ ghdl-0.26dev/vhdl/grt/grt-signals.adb	2006-11-20 00:36:15.000000000 +0100
 @@ -29,6 +29,18 @@
  with Grt.Threads; use Grt.Threads;
  
@@ -1528,7 +1692,7 @@ diff -urN ghdl-0.25/vhdl/grt/grt-signals.adb ghdl-0.26dev/vhdl/grt/grt-signals.a
        Boolean_Signal_Rti.Obj_Type := Std_Standard_Boolean_RTI_Ptr;
 diff -urN ghdl-0.25/vhdl/grt/grt-signals.ads ghdl-0.26dev/vhdl/grt/grt-signals.ads
 --- ghdl-0.25/vhdl/grt/grt-signals.ads	2006-08-10 08:31:09.000000000 +0200
-+++ ghdl-0.26dev/vhdl/grt/grt-signals.ads	2006-10-05 11:35:23.000000000 +0200
++++ ghdl-0.26dev/vhdl/grt/grt-signals.ads	2006-11-20 00:36:15.000000000 +0100
 @@ -29,6 +29,8 @@
       (
        --  Normal transaction, with a value.
@@ -1692,7 +1856,7 @@ diff -urN ghdl-0.25/vhdl/grt/grt-signals.ads ghdl-0.26dev/vhdl/grt/grt-signals.a
  end Grt.Signals;
 diff -urN ghdl-0.25/vhdl/grt/grt-stats.adb ghdl-0.26dev/vhdl/grt/grt-stats.adb
 --- ghdl-0.25/vhdl/grt/grt-stats.adb	2005-11-07 23:32:29.000000000 +0100
-+++ ghdl-0.26dev/vhdl/grt/grt-stats.adb	2006-10-05 11:35:23.000000000 +0200
++++ ghdl-0.26dev/vhdl/grt/grt-stats.adb	2006-11-20 00:36:15.000000000 +0100
 @@ -184,6 +184,8 @@
        Nbr_Resolv : Ghdl_I32;
        Nbr_Multi_Src : Ghdl_I32;
@@ -1749,7 +1913,7 @@ diff -urN ghdl-0.25/vhdl/grt/grt-stats.adb ghdl-0.26dev/vhdl/grt/grt-stats.adb
        for I in Mode_Type loop
 diff -urN ghdl-0.25/vhdl/grt/grt-types.ads ghdl-0.26dev/vhdl/grt/grt-types.ads
 --- ghdl-0.25/vhdl/grt/grt-types.ads	2005-10-24 21:30:15.000000000 +0200
-+++ ghdl-0.26dev/vhdl/grt/grt-types.ads	2006-10-05 11:35:23.000000000 +0200
++++ ghdl-0.26dev/vhdl/grt/grt-types.ads	2006-11-20 00:36:15.000000000 +0100
 @@ -252,7 +252,7 @@
     type Mode_Signal_Type is
       (Mode_Signal,
@@ -1771,7 +1935,7 @@ diff -urN ghdl-0.25/vhdl/grt/grt-types.ads ghdl-0.26dev/vhdl/grt/grt-types.ads
       (Kind_Signal_No, Kind_Signal_Register, Kind_Signal_Bus);
 diff -urN ghdl-0.25/vhdl/iirs.adb ghdl-0.26dev/vhdl/iirs.adb
 --- ghdl-0.25/vhdl/iirs.adb	2006-07-29 06:32:14.000000000 +0200
-+++ ghdl-0.26dev/vhdl/iirs.adb	2006-10-05 11:35:25.000000000 +0200
++++ ghdl-0.26dev/vhdl/iirs.adb	2006-11-20 00:36:24.000000000 +0100
 @@ -1602,6 +1602,33 @@
        Set_Flag3 (Target, Flag);
     end Set_Open_Flag;
@@ -1924,7 +2088,7 @@ diff -urN ghdl-0.25/vhdl/iirs.adb ghdl-0.26dev/vhdl/iirs.adb
     procedure Check_Kind_For_Incomplete_Type_List (Target : Iir) is
 diff -urN ghdl-0.25/vhdl/iirs.ads ghdl-0.26dev/vhdl/iirs.ads
 --- ghdl-0.25/vhdl/iirs.ads	2006-07-29 06:32:11.000000000 +0200
-+++ ghdl-0.26dev/vhdl/iirs.ads	2006-10-05 11:35:25.000000000 +0200
++++ ghdl-0.26dev/vhdl/iirs.ads	2006-11-20 00:36:24.000000000 +0100
 @@ -92,17 +92,9 @@
     --   procedure Set_Location (Target: in out Iir; Location: Location_Type);
     --   function Get_Location (Target: in out Iir) return Location_Type;
@@ -2157,7 +2321,7 @@ diff -urN ghdl-0.25/vhdl/iirs.ads ghdl-0.26dev/vhdl/iirs.ads
  
 diff -urN ghdl-0.25/vhdl/iirs_utils.adb ghdl-0.26dev/vhdl/iirs_utils.adb
 --- ghdl-0.25/vhdl/iirs_utils.adb	2006-06-05 08:55:06.000000000 +0200
-+++ ghdl-0.26dev/vhdl/iirs_utils.adb	2006-10-05 11:35:25.000000000 +0200
++++ ghdl-0.26dev/vhdl/iirs_utils.adb	2006-11-20 00:36:24.000000000 +0100
 @@ -175,7 +175,7 @@
                | Iir_Kind_Slice_Name
                | Iir_Kind_Selected_Element
@@ -2212,7 +2376,7 @@ diff -urN ghdl-0.25/vhdl/iirs_utils.adb ghdl-0.26dev/vhdl/iirs_utils.adb
  
 diff -urN ghdl-0.25/vhdl/iirs_utils.ads ghdl-0.26dev/vhdl/iirs_utils.ads
 --- ghdl-0.25/vhdl/iirs_utils.ads	2005-10-26 12:23:19.000000000 +0200
-+++ ghdl-0.26dev/vhdl/iirs_utils.ads	2006-10-05 11:35:25.000000000 +0200
++++ ghdl-0.26dev/vhdl/iirs_utils.ads	2006-11-20 00:36:24.000000000 +0100
 @@ -146,7 +146,6 @@
     --        if ASPECT is open, return Null_Iir;
     function Get_Entity_From_Entity_Aspect (Aspect : Iir) return Iir;
@@ -2223,7 +2387,7 @@ diff -urN ghdl-0.25/vhdl/iirs_utils.ads ghdl-0.26dev/vhdl/iirs_utils.ads
     --  a unit_declaration.
 diff -urN ghdl-0.25/vhdl/iirs_walk.adb ghdl-0.26dev/vhdl/iirs_walk.adb
 --- ghdl-0.25/vhdl/iirs_walk.adb	1970-01-01 01:00:00.000000000 +0100
-+++ ghdl-0.26dev/vhdl/iirs_walk.adb	2006-10-05 11:35:25.000000000 +0200
++++ ghdl-0.26dev/vhdl/iirs_walk.adb	2006-11-20 00:36:24.000000000 +0100
 @@ -0,0 +1,96 @@
 +package body Iirs_Walk is
 +   function Walk_Chain (Chain : Iir; Cb : Walk_Cb) return Walk_Status
@@ -2323,7 +2487,7 @@ diff -urN ghdl-0.25/vhdl/iirs_walk.adb ghdl-0.26dev/vhdl/iirs_walk.adb
 +end Iirs_Walk;
 diff -urN ghdl-0.25/vhdl/iirs_walk.ads ghdl-0.26dev/vhdl/iirs_walk.ads
 --- ghdl-0.25/vhdl/iirs_walk.ads	1970-01-01 01:00:00.000000000 +0100
-+++ ghdl-0.26dev/vhdl/iirs_walk.ads	2006-10-05 11:35:25.000000000 +0200
++++ ghdl-0.26dev/vhdl/iirs_walk.ads	2006-11-20 00:36:24.000000000 +0100
 @@ -0,0 +1,27 @@
 +with Iirs; use Iirs;
 +
@@ -2354,7 +2518,7 @@ diff -urN ghdl-0.25/vhdl/iirs_walk.ads ghdl-0.26dev/vhdl/iirs_walk.ads
 +end Iirs_Walk;
 diff -urN ghdl-0.25/vhdl/lang.opt ghdl-0.26dev/vhdl/lang.opt
 --- ghdl-0.25/vhdl/lang.opt	2005-12-18 14:48:12.000000000 +0100
-+++ ghdl-0.26dev/vhdl/lang.opt	2006-10-05 11:35:24.000000000 +0200
++++ ghdl-0.26dev/vhdl/lang.opt	2006-11-20 00:36:19.000000000 +0100
 @@ -65,6 +65,10 @@
  vhdl
  Explicit function declarations override implicit one in use
@@ -2368,7 +2532,7 @@ diff -urN ghdl-0.25/vhdl/lang.opt ghdl-0.26dev/vhdl/lang.opt
  Use synthetizer rules for default bindings
 diff -urN ghdl-0.25/vhdl/Makefile.in ghdl-0.26dev/vhdl/Makefile.in
 --- ghdl-0.25/vhdl/Makefile.in	2006-08-11 05:16:14.000000000 +0200
-+++ ghdl-0.26dev/vhdl/Makefile.in	2006-10-06 01:27:46.000000000 +0200
++++ ghdl-0.26dev/vhdl/Makefile.in	2006-11-20 00:36:39.000000000 +0100
 @@ -520,6 +520,9 @@
  i386.o: $(GRTSRCDIR)/config/i386.S
  	$(CC) -c $(GRT_FLAGS) -o $@ $<
@@ -2381,7 +2545,7 @@ diff -urN ghdl-0.25/vhdl/Makefile.in ghdl-0.26dev/vhdl/Makefile.in
  
 diff -urN ghdl-0.25/vhdl/nodes.adb ghdl-0.26dev/vhdl/nodes.adb
 --- ghdl-0.25/vhdl/nodes.adb	2005-10-26 14:10:12.000000000 +0200
-+++ ghdl-0.26dev/vhdl/nodes.adb	2006-10-05 11:35:25.000000000 +0200
++++ ghdl-0.26dev/vhdl/nodes.adb	2006-11-20 00:36:24.000000000 +0100
 @@ -384,12 +384,12 @@
  
     function Get_Odigit2 (N : Node_Type) return Bit3_Type is
@@ -2399,7 +2563,7 @@ diff -urN ghdl-0.25/vhdl/nodes.adb ghdl-0.26dev/vhdl/nodes.adb
  
 diff -urN ghdl-0.25/vhdl/nodes.ads ghdl-0.26dev/vhdl/nodes.ads
 --- ghdl-0.25/vhdl/nodes.ads	2005-10-26 14:10:28.000000000 +0200
-+++ ghdl-0.26dev/vhdl/nodes.ads	2006-10-05 11:35:25.000000000 +0200
++++ ghdl-0.26dev/vhdl/nodes.ads	2006-11-20 00:36:24.000000000 +0100
 @@ -365,29 +365,20 @@
        -- choice_staticness for iir_kind_choice_by_expression
        State2 : Bit2_Type := 0;
@@ -2436,7 +2600,7 @@ diff -urN ghdl-0.25/vhdl/nodes.ads ghdl-0.26dev/vhdl/nodes.ads
        Location: Location_Type := Location_Nil;
 diff -urN ghdl-0.25/vhdl/ortho_front.adb ghdl-0.26dev/vhdl/ortho_front.adb
 --- ghdl-0.25/vhdl/ortho_front.adb	2005-09-22 23:44:59.000000000 +0200
-+++ ghdl-0.26dev/vhdl/ortho_front.adb	2006-10-05 11:35:23.000000000 +0200
++++ ghdl-0.26dev/vhdl/ortho_front.adb	2006-11-20 00:36:15.000000000 +0100
 @@ -71,8 +71,7 @@
     procedure Init is
     begin
@@ -2449,7 +2613,7 @@ diff -urN ghdl-0.25/vhdl/ortho_front.adb ghdl-0.26dev/vhdl/ortho_front.adb
        Elab_Filelist := null;
 diff -urN ghdl-0.25/vhdl/sem.adb ghdl-0.26dev/vhdl/sem.adb
 --- ghdl-0.25/vhdl/sem.adb	2006-08-02 05:16:27.000000000 +0200
-+++ ghdl-0.26dev/vhdl/sem.adb	2006-10-05 11:35:25.000000000 +0200
++++ ghdl-0.26dev/vhdl/sem.adb	2006-11-20 00:36:24.000000000 +0100
 @@ -277,7 +277,7 @@
        end if;
  
@@ -2470,7 +2634,7 @@ diff -urN ghdl-0.25/vhdl/sem.adb ghdl-0.26dev/vhdl/sem.adb
                 when Iir_Kind_Signal_Declaration
 diff -urN ghdl-0.25/vhdl/sem_assocs.adb ghdl-0.26dev/vhdl/sem_assocs.adb
 --- ghdl-0.25/vhdl/sem_assocs.adb	2006-08-02 05:12:59.000000000 +0200
-+++ ghdl-0.26dev/vhdl/sem_assocs.adb	2006-10-05 11:35:25.000000000 +0200
++++ ghdl-0.26dev/vhdl/sem_assocs.adb	2006-11-20 00:36:24.000000000 +0100
 @@ -148,7 +148,7 @@
                 Actual := Get_Actual (Assoc);
                 Object := Name_To_Object (Actual);
@@ -2519,7 +2683,7 @@ diff -urN ghdl-0.25/vhdl/sem_assocs.adb ghdl-0.26dev/vhdl/sem_assocs.adb
        Set_Out_Conversion (Assoc, Out_Conv);
 diff -urN ghdl-0.25/vhdl/sem_decls.adb ghdl-0.26dev/vhdl/sem_decls.adb
 --- ghdl-0.25/vhdl/sem_decls.adb	2006-07-29 05:57:49.000000000 +0200
-+++ ghdl-0.26dev/vhdl/sem_decls.adb	2006-10-05 11:35:25.000000000 +0200
++++ ghdl-0.26dev/vhdl/sem_decls.adb	2006-11-20 00:36:24.000000000 +0100
 @@ -1691,7 +1691,7 @@
             | Iir_Kind_Indexed_Name
             | Iir_Kind_Selected_Name
@@ -2531,7 +2695,7 @@ diff -urN ghdl-0.25/vhdl/sem_decls.adb ghdl-0.26dev/vhdl/sem_decls.adb
           when others =>
 diff -urN ghdl-0.25/vhdl/sem_names.adb ghdl-0.26dev/vhdl/sem_names.adb
 --- ghdl-0.25/vhdl/sem_names.adb	2006-08-01 06:10:33.000000000 +0200
-+++ ghdl-0.26dev/vhdl/sem_names.adb	2006-10-05 11:35:25.000000000 +0200
++++ ghdl-0.26dev/vhdl/sem_names.adb	2006-11-20 00:36:24.000000000 +0100
 @@ -1198,6 +1198,7 @@
             | Iir_Kind_Group_Declaration
             | Iir_Kind_Attribute_Declaration
@@ -2548,6 +2712,15 @@ diff -urN ghdl-0.25/vhdl/sem_names.adb ghdl-0.26dev/vhdl/sem_names.adb
           Add_Result (Res, Se);
        end Sem_As_Selected_Element;
  
+@@ -2482,7 +2484,7 @@
+       Base : Iir;
+    begin
+       Prefix := Get_Named_Entity (Get_Prefix (Attr));
+-      Base := Get_Base_Name (Prefix);
++      Base := Get_Object_Prefix (Prefix);
+       case Get_Kind (Base) is
+          when Iir_Kind_Signal_Declaration
+            | Iir_Kind_Signal_Interface_Declaration
 @@ -2909,6 +2911,7 @@
           when Iir_Kind_Error =>
              null;
@@ -2558,7 +2731,7 @@ diff -urN ghdl-0.25/vhdl/sem_names.adb ghdl-0.26dev/vhdl/sem_names.adb
             | Iir_Kind_Slice_Name
 diff -urN ghdl-0.25/vhdl/sem_names.ads ghdl-0.26dev/vhdl/sem_names.ads
 --- ghdl-0.25/vhdl/sem_names.ads	2005-09-22 23:16:20.000000000 +0200
-+++ ghdl-0.26dev/vhdl/sem_names.ads	2006-10-05 11:35:25.000000000 +0200
++++ ghdl-0.26dev/vhdl/sem_names.ads	2006-11-20 00:36:24.000000000 +0100
 @@ -40,6 +40,25 @@
     --  To be used only for names (weakly) semantized by sem_name_soft.
     procedure Sem_Name_Clean (Name : Iir);
@@ -2620,7 +2793,7 @@ diff -urN ghdl-0.25/vhdl/sem_names.ads ghdl-0.26dev/vhdl/sem_names.ads
     --  Decl_Any : no checks is performed.
 diff -urN ghdl-0.25/vhdl/sem_stmts.adb ghdl-0.26dev/vhdl/sem_stmts.adb
 --- ghdl-0.25/vhdl/sem_stmts.adb	2005-12-11 15:55:23.000000000 +0100
-+++ ghdl-0.26dev/vhdl/sem_stmts.adb	2006-10-06 01:27:21.000000000 +0200
++++ ghdl-0.26dev/vhdl/sem_stmts.adb	2006-11-20 00:36:24.000000000 +0100
 @@ -335,7 +335,7 @@
           return;
        end if;
@@ -2630,7 +2803,17 @@ diff -urN ghdl-0.25/vhdl/sem_stmts.adb ghdl-0.26dev/vhdl/sem_stmts.adb
        Targ_Obj_Kind := Get_Kind (Target_Prefix);
        case Targ_Obj_Kind is
           when Iir_Kind_Signal_Interface_Declaration =>
-@@ -405,7 +405,7 @@
+@@ -351,7 +351,8 @@
+             Error_Msg_Sem ("implicit GUARD signal cannot be assigned", Stmt);
+             return;
+          when others =>
+-            Error_Msg_Sem ("target is not a signal", Stmt);
++            Error_Msg_Sem ("target (" & Disp_Node (Get_Base_Name (Target))
++                           & ") is not a signal", Stmt);
+             return;
+       end case;
+       if Get_Name_Staticness (Target_Object) < Staticness then
+@@ -405,7 +406,7 @@
           Error_Msg_Sem ("target is not a variable name", Stmt);
           return;
        end if;
@@ -2639,7 +2822,33 @@ diff -urN ghdl-0.25/vhdl/sem_stmts.adb ghdl-0.26dev/vhdl/sem_stmts.adb
        case Get_Kind (Target_Prefix) is
           when Iir_Kind_Variable_Interface_Declaration =>
              if not Iir_Mode_Writable (Get_Mode (Target_Prefix)) then
-@@ -966,7 +966,7 @@
+@@ -461,14 +462,18 @@
+    begin
+       Ok := True;
+       -- Find the signal.
+-      Target := Get_Target (Stmt);
+-      Target := Sem_Expression (Target, Sig_Type);
+-      if Target /= Null_Iir then
+-         Set_Target (Stmt, Target);
+-         Check_Target (Stmt, Target);
+-         Sem_Types.Set_Type_Has_Signal (Get_Type (Target));
+-      else
++      if Sig_Type = Null_Iir then
+          Ok := False;
++      else
++         Target := Get_Target (Stmt);
++         Target := Sem_Expression (Target, Sig_Type);
++         if Target /= Null_Iir then
++            Set_Target (Stmt, Target);
++            Check_Target (Stmt, Target);
++            Sem_Types.Set_Type_Has_Signal (Get_Type (Target));
++         else
++            Ok := False;
++         end if;
+       end if;
+ 
+       Expr := Get_Reject_Time_Expression (Stmt);
+@@ -966,7 +971,7 @@
           elsif Is_Overload_List (Res) or else not Is_Object_Name (Res) then
              Error_Msg_Sem ("a sensitivity element must be a signal name", El);
           else
@@ -2648,7 +2857,7 @@ diff -urN ghdl-0.25/vhdl/sem_stmts.adb ghdl-0.26dev/vhdl/sem_stmts.adb
              case Get_Kind (Prefix) is
                 when Iir_Kind_Signal_Declaration
                   | Iir_Kind_Guard_Signal_Declaration
-@@ -1835,14 +1835,11 @@
+@@ -1835,14 +1840,11 @@
     is
        Sig_Object : Iir;
        Sig_Object_Type : Iir;
@@ -2664,7 +2873,7 @@ diff -urN ghdl-0.25/vhdl/sem_stmts.adb ghdl-0.26dev/vhdl/sem_stmts.adb
        Sig_Object_Type := Get_Type (Sig_Object);
  
        --  LRM 4.3.1.2 Signal Declaration
-@@ -1889,57 +1886,19 @@
+@@ -1889,57 +1891,19 @@
                   not in Iir_Kinds_Process_Statement)
        then
           --  Not within a process statement.
@@ -2683,7 +2892,7 @@ diff -urN ghdl-0.25/vhdl/sem_stmts.adb ghdl-0.26dev/vhdl/sem_stmts.adb
 +            return;
           end if;
 -      end if;
- 
+-
 -      --  The driver is attached to the current process (if any), or to
 -      --  the current subprogram (if any) or to nothing.
 -      if Current_Concurrent_Statement /= Null_Iir
@@ -2696,7 +2905,7 @@ diff -urN ghdl-0.25/vhdl/sem_stmts.adb ghdl-0.26dev/vhdl/sem_stmts.adb
 -      else
 -         return;
 -      end if;
--
+ 
 -      case Get_Kind (Sig_Object) is
 -         when Iir_Kind_Signal_Interface_Declaration =>
 -            Parent := Get_Parent (Sig_Object);
@@ -2733,9 +2942,23 @@ diff -urN ghdl-0.25/vhdl/sem_stmts.adb ghdl-0.26dev/vhdl/sem_stmts.adb
 -      Add_Element (Driver_List, Get_Longuest_Static_Prefix (Sig));
     end Sem_Add_Driver;
  end Sem_Stmts;
+diff -urN ghdl-0.25/vhdl/sem_types.adb ghdl-0.26dev/vhdl/sem_types.adb
+--- ghdl-0.25/vhdl/sem_types.adb	2006-05-13 17:33:58.000000000 +0200
++++ ghdl-0.26dev/vhdl/sem_types.adb	2006-11-20 00:36:24.000000000 +0100
+@@ -62,7 +62,9 @@
+                Func := Get_Resolution_Function (Atype);
+                if Func /= Null_Iir then
+                   Func := Get_Named_Entity (Func);
+-                  Set_Resolution_Function_Flag (Func, True);
++                  if Func /= Error_Mark then
++                     Set_Resolution_Function_Flag (Func, True);
++                  end if;
+                end if;
+                Mark := Get_Type_Mark (Atype);
+                if Mark /= Null_Iir then
 diff -urN ghdl-0.25/vhdl/trans_analyzes.adb ghdl-0.26dev/vhdl/trans_analyzes.adb
 --- ghdl-0.25/vhdl/trans_analyzes.adb	1970-01-01 01:00:00.000000000 +0100
-+++ ghdl-0.26dev/vhdl/trans_analyzes.adb	2006-10-05 11:35:23.000000000 +0200
++++ ghdl-0.26dev/vhdl/trans_analyzes.adb	2006-11-20 00:36:15.000000000 +0100
 @@ -0,0 +1,163 @@
 +with Iirs_Utils; use Iirs_Utils;
 +with Iirs_Walk; use Iirs_Walk;
@@ -2902,7 +3125,7 @@ diff -urN ghdl-0.25/vhdl/trans_analyzes.adb ghdl-0.26dev/vhdl/trans_analyzes.adb
 +end Trans_Analyzes;
 diff -urN ghdl-0.25/vhdl/trans_analyzes.ads ghdl-0.26dev/vhdl/trans_analyzes.ads
 --- ghdl-0.25/vhdl/trans_analyzes.ads	1970-01-01 01:00:00.000000000 +0100
-+++ ghdl-0.26dev/vhdl/trans_analyzes.ads	2006-10-05 11:35:23.000000000 +0200
++++ ghdl-0.26dev/vhdl/trans_analyzes.ads	2006-11-20 00:36:15.000000000 +0100
 @@ -0,0 +1,13 @@
 +with Iirs; use Iirs;
 +
@@ -2919,7 +3142,7 @@ diff -urN ghdl-0.25/vhdl/trans_analyzes.ads ghdl-0.26dev/vhdl/trans_analyzes.ads
 +end Trans_Analyzes;
 diff -urN ghdl-0.25/vhdl/trans_be.adb ghdl-0.26dev/vhdl/trans_be.adb
 --- ghdl-0.25/vhdl/trans_be.adb	2006-08-02 05:57:46.000000000 +0200
-+++ ghdl-0.26dev/vhdl/trans_be.adb	2006-10-05 11:35:23.000000000 +0200
++++ ghdl-0.26dev/vhdl/trans_be.adb	2006-11-20 00:36:15.000000000 +0100
 @@ -15,6 +15,7 @@
  --  along with GCC; see the file COPYING.  If not, write to the Free
  --  Software Foundation, 59 Temple Place - Suite 330, Boston, MA
@@ -2976,7 +3199,7 @@ diff -urN ghdl-0.25/vhdl/trans_be.adb ghdl-0.26dev/vhdl/trans_be.adb
  end Trans_Be;
 diff -urN ghdl-0.25/vhdl/trans_be.ads ghdl-0.26dev/vhdl/trans_be.ads
 --- ghdl-0.25/vhdl/trans_be.ads	2005-09-22 23:43:28.000000000 +0200
-+++ ghdl-0.26dev/vhdl/trans_be.ads	2006-10-05 11:35:23.000000000 +0200
++++ ghdl-0.26dev/vhdl/trans_be.ads	2006-11-20 00:36:15.000000000 +0100
 @@ -15,12 +15,7 @@
  --  along with GCC; see the file COPYING.  If not, write to the Free
  --  Software Foundation, 59 Temple Place - Suite 330, Boston, MA
@@ -2993,7 +3216,7 @@ diff -urN ghdl-0.25/vhdl/trans_be.ads ghdl-0.26dev/vhdl/trans_be.ads
  
 diff -urN ghdl-0.25/vhdl/trans_decls.ads ghdl-0.26dev/vhdl/trans_decls.ads
 --- ghdl-0.25/vhdl/trans_decls.ads	2006-05-29 21:37:11.000000000 +0200
-+++ ghdl-0.26dev/vhdl/trans_decls.ads	2006-10-05 11:35:23.000000000 +0200
++++ ghdl-0.26dev/vhdl/trans_decls.ads	2006-11-20 00:36:15.000000000 +0100
 @@ -69,6 +69,8 @@
     Ghdl_Signal_Start_Assign_Null : O_Dnode;
     Ghdl_Signal_Next_Assign_Null : O_Dnode;
@@ -3015,7 +3238,7 @@ diff -urN ghdl-0.25/vhdl/trans_decls.ads ghdl-0.26dev/vhdl/trans_decls.ads
     Ghdl_Create_Quiet_Signal : O_Dnode;
 diff -urN ghdl-0.25/vhdl/translation.adb ghdl-0.26dev/vhdl/translation.adb
 --- ghdl-0.25/vhdl/translation.adb	2006-08-11 05:13:31.000000000 +0200
-+++ ghdl-0.26dev/vhdl/translation.adb	2006-10-05 11:35:23.000000000 +0200
++++ ghdl-0.26dev/vhdl/translation.adb	2006-11-20 00:36:15.000000000 +0100
 @@ -40,6 +40,7 @@
  with GNAT.Table;
  with Canon;
@@ -4649,7 +4872,7 @@ diff -urN ghdl-0.25/vhdl/translation.adb ghdl-0.26dev/vhdl/translation.adb
           is
 diff -urN ghdl-0.25/vhdl/translation.ads ghdl-0.26dev/vhdl/translation.ads
 --- ghdl-0.25/vhdl/translation.ads	2006-08-02 06:13:50.000000000 +0200
-+++ ghdl-0.26dev/vhdl/translation.ads	2006-10-05 11:35:23.000000000 +0200
++++ ghdl-0.26dev/vhdl/translation.ads	2006-11-20 00:36:15.000000000 +0100
 @@ -61,6 +61,21 @@
     --  If set, do not generate code for unused implicit subprograms.
     Flag_Discard_Unused_Implicit : Boolean := False;
@@ -4674,7 +4897,7 @@ diff -urN ghdl-0.25/vhdl/translation.ads ghdl-0.26dev/vhdl/translation.ads
                                Foreign_Intrinsic);
 diff -urN ghdl-0.25/vhdl/version.ads ghdl-0.26dev/vhdl/version.ads
 --- ghdl-0.25/vhdl/version.ads	2006-08-11 05:15:55.000000000 +0200
-+++ ghdl-0.26dev/vhdl/version.ads	2006-10-05 11:35:25.000000000 +0200
++++ ghdl-0.26dev/vhdl/version.ads	2006-11-20 00:36:24.000000000 +0100
 @@ -1,4 +1,5 @@
  package Version is
 -   Ghdl_Version : constant String :=
