@@ -5,7 +5,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: 0.25
-Release: 0.%{ghdlsvnver}svn.0%{?dist}
+Release: 0.%{ghdlsvnver}svn.1%{?dist}
 License: GPL
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -16,12 +16,11 @@ URL: http://ghdl.free.fr/
 Source0: ftp://gcc.gnu.org/pub/gcc/releases/gcc-%{gccver}/gcc-core-%{gccver}.tar.bz2
 Source100: http://ghdl.free.fr/ghdl-%{ghdlver}.tar.bz2
 Patch100: ghdl-svn%{ghdlsvnver}.patch
+Patch101: ghdl-svn89-fix.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
 Requires: gcc
-# gcc-gnat missing on ppc: Bug 174720
-ExcludeArch: ppc
 # (Build)Requires from fc gcc41 package
 %define multilib_64_archs sparc64 ppc64 s390x x86_64
 %ifarch s390x
@@ -108,6 +107,7 @@ that tracks signal updates and schedules processes.
 %setup -q -n gcc-%{gccver} -T -b 0 -a 100
 pushd ghdl-%{ghdlver}
 %patch100 -p1
+%patch101 -p0 -R -b .fix
 %{__mv} vhdl ../gcc/
 popd
 
@@ -288,6 +288,10 @@ popd
 
 
 %changelog
+* Fri Jan  5 2007 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.25-0.89svn.1
+- back out hunks that cause build failures
+- un-exclude ppc
+
 * Mon Nov 20 2006 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.25-0.89svn.0
 - update to svn89
 
