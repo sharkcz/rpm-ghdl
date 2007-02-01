@@ -5,7 +5,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: 0.25
-Release: 0.%{ghdlsvnver}svn.1%{?dist}
+Release: 0.%{ghdlsvnver}svn.2%{?dist}
 License: GPL
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -195,7 +195,7 @@ popd
 %ifarch x86_64
 pushd obj-%{gcc_target_platform}/gcc/vhdl
 P32=%{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/vhdl/lib/32/
-%{__install} -d -o 0 -g 0 ${P32}
+%{__install} -d ${P32}
 make ghdllibs-clean
 %if %{!?_without_mock:0}%{?_without_mock:1}
 make grt-clean
@@ -207,8 +207,8 @@ make grt.lst
 %endif
 PDIR=`pwd`
 pushd ${P32}/../..
-%{__install} -d -o 0 -g 0 lib/32/v93
-%{__install} -d -o 0 -g 0 lib/32/v87
+%{__install} -d lib/32/v93
+%{__install} -d lib/32/v87
 %{__make} -f ${PDIR}/Makefile REL_DIR=../../../.. \
          LIBSRC_DIR="src" LIB93_DIR=lib/32/v93 LIB87_DIR=lib/32/v87 \
          ANALYZE="${PDIR}/../ghdl -a -m32 --GHDL1=${PDIR}/../ghdl1 --ieee=none" \
@@ -288,6 +288,9 @@ popd
 
 
 %changelog
+* Fri Jan  5 2007 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.25-0.89svn.2
+- do not try to set user/group during install
+
 * Fri Jan  5 2007 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.25-0.89svn.1
 - back out hunks that cause build failures
 - un-exclude ppc
