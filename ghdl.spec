@@ -5,7 +5,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: 0.25
-Release: 0.%{ghdlsvnver}svn.3%{?dist}
+Release: 0.%{ghdlsvnver}svn.4%{?dist}
 License: GPLv2+
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -40,7 +40,7 @@ Requires: gcc
 # Need binutils which handle -msecure-plt on ppc >= 2.16.91.0.2-2
 # Need binutils which support .weakref >= 2.16.91.0.3-1
 BuildRequires: binutils >= 2.16.91.0.3-1
-BuildRequires: zlib-devel, gettext, bison, flex, texinfo
+BuildRequires: zlib-devel, gettext, bison, flex, texinfo, gawk
 # Make sure pthread.h doesn't contain __thread tokens
 # Make sure glibc supports stack protector
 BuildRequires: glibc-devel >= 2.3.90-2
@@ -288,6 +288,9 @@ popd
 
 
 %changelog
+* Fri Aug 24 2007 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.25-0.89svn.4
+- fix BR
+
 * Fri Aug 24 2007 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.25-0.89svn.3
 - fix license tag
 
