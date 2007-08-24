@@ -5,8 +5,8 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: 0.25
-Release: 0.%{ghdlsvnver}svn.2%{?dist}
-License: GPL
+Release: 0.%{ghdlsvnver}svn.3%{?dist}
+License: GPLv2+
 Group: Development/Languages
 URL: http://ghdl.free.fr/
 # HOWTO create source files from ghdl SVN at https://gna.org/projects/ghdl/
@@ -288,6 +288,9 @@ popd
 
 
 %changelog
+* Fri Aug 24 2007 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.25-0.89svn.3
+- fix license tag
+
 * Fri Jan  5 2007 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.25-0.89svn.2
 - do not try to set user/group during install
 
