@@ -5,7 +5,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: 0.25
-Release: 0.%{ghdlsvnver}svn.4%{?dist}
+Release: 0.%{ghdlsvnver}svn.5%{?dist}
 License: GPLv2+
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -21,6 +21,8 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
 Requires: gcc
+# gcc-gnat missing on ppc64: Bug 254126
+ExcludeArch: ppc64
 # (Build)Requires from fc gcc41 package
 %define multilib_64_archs sparc64 ppc64 s390x x86_64
 %ifarch s390x
@@ -288,6 +290,9 @@ popd
 
 
 %changelog
+* Fri Aug 24 2007 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.25-0.89svn.5
+- excludearch ppc64
+
 * Fri Aug 24 2007 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.25-0.89svn.4
 - fix BR
 
