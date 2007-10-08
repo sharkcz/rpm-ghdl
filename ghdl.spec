@@ -5,7 +5,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: 0.25
-Release: 0.%{ghdlsvnver}svn.5%{?dist}
+Release: 0.%{ghdlsvnver}svn.6%{?dist}
 License: GPLv2+
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -99,6 +99,8 @@ Ada95.
 %package grt
 Summary: GHDL runtime libraries
 Group: System Environment/Libraries
+# rhbz #316311
+Requires: zlib-devel
 
 %description grt
 This package contains the runtime libraries needed to link ghdl-compiled
@@ -290,6 +292,9 @@ popd
 
 
 %changelog
+* Mon Oct  8 2007 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.25-0.89svn.6
+- ghdl-grt requires zlib-devel (rhbz 316311)
+
 * Fri Aug 24 2007 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.25-0.89svn.5
 - excludearch ppc64
 
