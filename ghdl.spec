@@ -17,6 +17,7 @@ Source0: ftp://gcc.gnu.org/pub/gcc/releases/gcc-%{gccver}/gcc-core-%{gccver}.tar
 Source100: http://ghdl.free.fr/ghdl-%{ghdlver}.tar.bz2
 Patch100: ghdl-svn%{ghdlsvnver}.patch
 Patch101: ghdl-svn89-fix.patch
+Patch102: gcc41-makeinfo.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -114,6 +115,7 @@ pushd ghdl-%{ghdlver}
 %patch101 -p0 -R -b .fix
 %{__mv} vhdl ../gcc/
 popd
+%patch102 -p1 -b .makeinfo
 
 %build
 %{__rm} -fr obj-%{gcc_target_platform}
@@ -294,6 +296,7 @@ popd
 %changelog
 * Mon Oct  8 2007 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.25-0.89svn.6
 - ghdl-grt requires zlib-devel (rhbz 316311)
+- make it build with makeinfo >= 4.10
 
 * Fri Aug 24 2007 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.25-0.89svn.5
 - excludearch ppc64
