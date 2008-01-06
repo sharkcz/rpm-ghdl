@@ -1,0 +1,17 @@
+--- vhdl/grt/grt.adc.noruntime	2005-11-08 21:01:08.000000000 +0100
++++ vhdl/grt/grt.adc	2008-01-06 17:17:53.000000000 +0100
+@@ -27,11 +27,11 @@
+ --
+ --  This files is *not* names gnat.adc, in order to ease the possibility of
+ --  not using it.
+-pragma Restrictions (No_Exception_Handlers);
+-pragma restrictions (No_Exceptions);
++-- pragma Restrictions (No_Exception_Handlers);
++-- pragma restrictions (No_Exceptions);
+ pragma Restrictions (No_Secondary_Stack);
+ --pragma Restrictions (No_Elaboration_Code);
+ pragma Restrictions (No_Io);
+ pragma Restrictions (Max_Tasks => 0);
+ pragma Restrictions (No_Implicit_Heap_Allocations);
+-pragma No_Run_Time;
++-- pragma No_Run_Time;

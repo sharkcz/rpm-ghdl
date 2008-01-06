@@ -5,7 +5,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: 0.25
-Release: 0.%{ghdlsvnver}svn.6%{?dist}
+Release: 0.%{ghdlsvnver}svn.7%{?dist}
 License: GPLv2+
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -18,6 +18,7 @@ Source100: http://ghdl.free.fr/ghdl-%{ghdlver}.tar.bz2
 Patch100: ghdl-svn%{ghdlsvnver}.patch
 Patch101: ghdl-svn89-fix.patch
 Patch102: gcc41-makeinfo.patch
+Patch103: ghdl-noruntime.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -113,6 +114,7 @@ that tracks signal updates and schedules processes.
 pushd ghdl-%{ghdlver}
 %patch100 -p1
 %patch101 -p0 -R -b .fix
+%patch103 -p0 -b .noruntime
 %{__mv} vhdl ../gcc/
 popd
 %patch102 -p1 -b .makeinfo
@@ -294,6 +296,10 @@ popd
 
 
 %changelog
+* Sun Jan  6 2008 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.25-0.89svn.7
+- disable Pragma No_Run_Time; it does not seem to make much sense and causes
+  problems with gcc-4.3
+
 * Mon Oct  8 2007 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.25-0.89svn.6
 - ghdl-grt requires zlib-devel (rhbz 316311)
 - make it build with makeinfo >= 4.10
