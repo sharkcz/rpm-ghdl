@@ -1,10 +1,10 @@
-%define gccver 4.1.1
-%define ghdlver 0.25
-%define ghdlsvnver 89
+%define gccver 4.1.2
+%define ghdlver 0.26
+%define ghdlsvnver 94
 
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
-Version: 0.25
+Version: %{ghdlver}
 Release: 0.%{ghdlsvnver}svn.7%{?dist}
 License: GPLv2+
 Group: Development/Languages
@@ -16,9 +16,9 @@ URL: http://ghdl.free.fr/
 Source0: ftp://gcc.gnu.org/pub/gcc/releases/gcc-%{gccver}/gcc-core-%{gccver}.tar.bz2
 Source100: http://ghdl.free.fr/ghdl-%{ghdlver}.tar.bz2
 Patch100: ghdl-svn%{ghdlsvnver}.patch
-Patch101: ghdl-svn89-fix.patch
 Patch102: gcc41-makeinfo.patch
 Patch103: ghdl-noruntime.patch
+Patch104: ghdl-svn89-libgnat43.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -113,11 +113,11 @@ that tracks signal updates and schedules processes.
 %setup -q -n gcc-%{gccver} -T -b 0 -a 100
 pushd ghdl-%{ghdlver}
 %patch100 -p1
-%patch101 -p0 -R -b .fix
 %patch103 -p0 -b .noruntime
 %{__mv} vhdl ../gcc/
 popd
 %patch102 -p1 -b .makeinfo
+%patch104 -p0 -b .libgnat43
 
 %build
 %{__rm} -fr obj-%{gcc_target_platform}
@@ -296,6 +296,9 @@ popd
 
 
 %changelog
+* Fri May 16 2008 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.26-0.94svn.7
+- update to svn94
+
 * Sun Jan  6 2008 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.25-0.89svn.7
 - disable Pragma No_Run_Time; it does not seem to make much sense and causes
   problems with gcc-4.3
