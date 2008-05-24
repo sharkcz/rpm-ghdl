@@ -53,7 +53,7 @@ BuildRequires: glibc-devel >= 2.3.90-2
 BuildRequires: glibc >= 2.3.90-35
 %endif
 # Ada requires Ada to build
-BuildRequires: gcc-gnat >= 3.1, libgnat >= 3.1
+BuildRequires: gcc-gnat >= 4.3, libgnat >= 4.3
 # Need .eh_frame ld optimizations
 # Need proper visibility support
 # Need -pie support
@@ -102,7 +102,7 @@ Ada95.
 Summary: GHDL runtime libraries
 Group: System Environment/Libraries
 # rhbz #316311
-Requires: zlib-devel
+Requires: zlib-devel, libgnat >= 4.3
 
 %description grt
 This package contains the runtime libraries needed to link ghdl-compiled
