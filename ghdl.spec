@@ -19,6 +19,7 @@ Patch100: ghdl-svn%{ghdlsvnver}.patch
 Patch102: gcc41-makeinfo.patch
 Patch103: ghdl-noruntime.patch
 Patch104: ghdl-svn89-libgnat43.patch
+Patch105: ghdl-grtadac.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -117,7 +118,8 @@ pushd ghdl-%{ghdlver}
 %{__mv} vhdl ../gcc/
 popd
 #patch102 -p1 -b .makeinfo
-#patch104 -p0 -b .libgnat43
+%patch104 -p0 -b .libgnat43
+%patch105 -p1 -b .grtadac
 
 %build
 %{__rm} -fr obj-%{gcc_target_platform}
@@ -297,6 +299,9 @@ popd
 
 
 %changelog
+* Tue Oct  7 2008 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.27-0.105svn.0
+- update to svn105
+
 * Mon Jun  2 2008 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.26-0.98svn.0
 - update to svn98
 
