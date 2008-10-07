@@ -1,0 +1,41 @@
+diff -urN ghdl-0.27/vhdl/canon.adb ghdl-0.28dev/vhdl/canon.adb
+--- ghdl-0.27/vhdl/canon.adb	2007-03-21 04:47:14.000000000 +0100
++++ ghdl-0.28dev/vhdl/canon.adb	2008-07-26 01:30:14.000000000 +0200
+@@ -239,6 +239,10 @@
+             --Canon_Extract_Sensitivity
+             --  (Get_Prefix (Expr), Sensitivity_List, Is_Target);
+ 
++         when Iir_Kinds_Scalar_Type_Attribute =>
++            Canon_Extract_Sensitivity
++              (Get_Parameter (Expr), Sensitivity_List, Is_Target);
++
+          when Iir_Kind_Aggregate =>
+             declare
+                Aggr_Type : Iir;
+diff -urN ghdl-0.27/vhdl/lang.opt ghdl-0.28dev/vhdl/lang.opt
+--- ghdl-0.27/vhdl/lang.opt	2006-09-04 06:08:17.000000000 +0200
++++ ghdl-0.28dev/vhdl/lang.opt	2008-07-26 01:30:13.000000000 +0200
+@@ -76,3 +76,11 @@
+ l
+ vhdl Joined Separate
+ -l<filename>	Put list of files for link in <filename>
++
++C
++vhdl
++Allow any character in comments
++
++-mb-comments
++vhdl
++Allow any character in comments
+\ No newline at end of file
+diff -urN ghdl-0.27/vhdl/version.ads ghdl-0.28dev/vhdl/version.ads
+--- ghdl-0.27/vhdl/version.ads	2008-07-01 01:59:18.000000000 +0200
++++ ghdl-0.28dev/vhdl/version.ads	2008-07-26 01:30:14.000000000 +0200
+@@ -1,5 +1,5 @@
+ package Version is
+    Ghdl_Release : constant String :=
+-      "GHDL 0.27 (20080701) [Sokcho edition]";
+-   Ghdl_Ver : constant String := "0.27";
++      "GHDL 0.28dev (20080721) [Sokcho edition]";
++   Ghdl_Ver : constant String := "0.28dev";
+ end Version;

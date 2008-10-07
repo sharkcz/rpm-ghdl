@@ -1,6 +1,6 @@
-%define gccver 4.1.2
-%define ghdlver 0.26
-%define ghdlsvnver 98
+%define gccver 4.2.4
+%define ghdlver 0.27
+%define ghdlsvnver 105
 
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
@@ -116,8 +116,8 @@ pushd ghdl-%{ghdlver}
 %patch103 -p0 -b .noruntime
 %{__mv} vhdl ../gcc/
 popd
-%patch102 -p1 -b .makeinfo
-%patch104 -p0 -b .libgnat43
+#patch102 -p1 -b .makeinfo
+#patch104 -p0 -b .libgnat43
 
 %build
 %{__rm} -fr obj-%{gcc_target_platform}
@@ -192,7 +192,8 @@ export TCFLAGS="$OPT_FLAGS"
 %endif
 
 # Parallel make doesn't work, so not using %{?_smp_mflags}
-%{__make} all-host
+#{__make} all-host
+%{__make}
 
 popd
 
