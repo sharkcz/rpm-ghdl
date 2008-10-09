@@ -1,6 +1,6 @@
-%define gccver 4.2.4
+%define gccver 4.3.1
 %define ghdlver 0.27
-%define ghdlsvnver 105
+%define ghdlsvnver 110
 
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
@@ -55,6 +55,8 @@ BuildRequires: glibc >= 2.3.90-35
 %endif
 # Ada requires Ada to build
 BuildRequires: gcc-gnat >= 4.3, libgnat >= 4.3
+# GCC build requirements
+BuildRequires: gmp-devel >= 4.1, mpfr-devel >= 2.3.0
 # Need .eh_frame ld optimizations
 # Need proper visibility support
 # Need -pie support
@@ -168,6 +170,7 @@ export TCFLAGS="$OPT_FLAGS"
 	--sharedstatedir=%{_sharedstatedir} \
 	--mandir=%{_mandir} \
 	--infodir=%{_infodir} \
+	--with-bugurl=http://bugzilla.redhat.com/bugzilla \
 	--enable-languages=vhdl \
 	%{!?_without_mock:--disable-multilib} \
 	--enable-shared \
@@ -190,7 +193,8 @@ export TCFLAGS="$OPT_FLAGS"
 	--with-cpu=default32
 %endif
 %ifnarch sparc ppc
-	--host=%{gcc_target_platform}
+	--host=%{gcc_target_platform} \
+	--build=%{gcc_target_platform}
 %endif
 
 # Parallel make doesn't work, so not using %{?_smp_mflags}
@@ -299,6 +303,9 @@ popd
 
 
 %changelog
+* Tue Oct  7 2008 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.27-0.110svn.0
+- update to svn110
+
 * Tue Oct  7 2008 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.27-0.105svn.0
 - update to svn105
 
