@@ -1,0 +1,11 @@
+--- gcc/config/rs6000/rs6000.c.orig	2009-02-13 19:43:05.000000000 +0100
++++ gcc/config/rs6000/rs6000.c	2009-02-13 19:45:29.000000000 +0100
+@@ -16946,7 +16946,7 @@
+       else if (! strcmp (language_string, "GNU Objective-C"))
+ 	i = 14;
+       else
+-	gcc_unreachable ();
++	i = 0;
+       fprintf (file, "%d,", i);
+ 
+       /* 8 single bit fields: global linkage (not set for C extern linkage,

@@ -5,7 +5,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-Release: 0.%{ghdlsvnver}svn.2%{?dist}
+Release: 0.%{ghdlsvnver}svn.3%{?dist}
 License: GPLv2+
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -20,6 +20,7 @@ Patch102: gcc41-makeinfo.patch
 Patch103: ghdl-noruntime.patch
 Patch104: ghdl-svn89-libgnat43.patch
 Patch105: ghdl-grtadac.patch
+Patch106: ghdl-ppc64abort.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -120,6 +121,7 @@ popd
 #patch102 -p1 -b .makeinfo
 %patch104 -p0 -b .libgnat43
 %patch105 -p1 -b .grtadac
+%patch106 -p0 -b .ppc64abort
 
 %build
 %{__rm} -fr obj-%{gcc_target_platform}
@@ -301,6 +303,9 @@ popd
 
 
 %changelog
+* Fri Feb 13 2009 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.27-0.110svn.3
+- prevent ppc64 abort due to unknown language type
+
 * Fri Feb 13 2009 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.27-0.110svn.2
 - rebuild with ppc64
 
