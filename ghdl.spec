@@ -5,7 +5,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-Release: 0.%{ghdlsvnver}svn.3%{?dist}
+Release: 0.%{ghdlsvnver}svn.3%{?dist}.1
 License: GPLv2+
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -303,6 +303,9 @@ popd
 
 
 %changelog
+* Tue Feb 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.27-0.110svn.3.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
+
 * Fri Feb 13 2009 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.27-0.110svn.3
 - prevent ppc64 abort due to unknown language type
 
