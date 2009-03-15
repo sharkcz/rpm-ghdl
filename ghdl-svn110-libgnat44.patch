@@ -1,0 +1,11 @@
+--- gcc/vhdl/Makefile.in.gnatlib	2008-05-16 11:12:19.000000000 +0200
++++ gcc/vhdl/Makefile.in	2008-05-16 11:15:04.000000000 +0200
+@@ -490,6 +490,8 @@
+  GRT_EXTRA_LIB+=-lpthread
+ endif
+ 
++GRT_EXTRA_LIB+=-lgnat-4.4
++
+ GRT_ARCH?=None
+ 
+ # Configuration pragmas.
