@@ -1,0 +1,272 @@
+--- vhdl/libraries/ieee/math_real.vhdl.orig	2009-04-01 19:21:58.000000000 +0200
++++ vhdl/libraries/ieee/math_real.vhdl	2009-04-01 19:35:06.000000000 +0200
+@@ -102,16 +102,21 @@
+     	-- returns integer FLOOR(X + 0.5) if X > 0;
+     	-- return integer CEIL(X - 0.5) if X < 0
+ 
+-    -- IAC: we are missing the function TRUNC
+-    -- IAC: we are missing the function MOD
+-    -- IAC: functions FMAX and FMIN should be renamed REALMAX and REALMIN
+-    
+-    function FMAX (X, Y : real ) return real;
+-    attribute foreign of fmax : function is "VHPIDIRECT fmax"; 
++    function TRUNC (X : real ) return real;
++    attribute foreign of trunc : function is "VHPIDIRECT trunc"; 
++    	-- returns integer FLOOR(X) if X > 0;
++    	-- return integer CEIL(X) if X < 0
++
++    function "MOD" (X, Y : real ) return real;
++    attribute foreign of "mod" : function is "VHPIDIRECT fmod"; 
++    	-- returns the floating point modulus of X/Y
++
++    function REALMAX (X, Y : real ) return real;
++    attribute foreign of realmax : function is "VHPIDIRECT fmax"; 
+     	-- returns the algebraically larger of X and Y
+ 
+-    function FMIN (X, Y : real ) return real;
+-    attribute foreign of fmin : function is "VHPIDIRECT fmin"; 
++    function REALMIN (X, Y : real ) return real;
++    attribute foreign of realmin : function is "VHPIDIRECT fmin"; 
+     	-- returns the algebraically smaller of X and Y
+ 
+     procedure UNIFORM (variable Seed1,Seed2:inout integer; variable X:out real);
+@@ -203,25 +208,17 @@
+     	-- returns tan X; X in radians
+     	-- X /= ((2k+1) * PI/2), where k is an integer
+ 
+-    -- IAC: function should be called ARCSIN
+-    
+-    function  ASIN (X : real ) return real; 
++    function  ARCSIN (X : real ) return real; 
+     	-- returns  -PI/2 < asin X < PI/2; | X | <= 1
+ 
+-    -- IAC: function should be called ARCCOS
+-    
+-    function  ACOS (X : real ) return real;
++    function  ARCCOS (X : real ) return real;
+     	-- returns  0 < acos X < PI; | X | <= 1
+ 
+-    
+-    -- IAC: function should be called ARCTAN
+-    
+-    function  ATAN (X : real) return real;
+-    attribute foreign of atan : function is "VHPIDIRECT atan"; 
++    function  ARCTAN (X : real) return real;
++    attribute foreign of arctan : function is "VHPIDIRECT atan"; 
+     	-- returns  -PI/2 < atan X < PI/2
+ 
+-    -- IAC: function ATAN2 should not exist
+-    function  ATAN2 (X : real; Y : real) return real;
++    function  ARCTAN (X : real; Y : real) return real;
+     	-- returns  atan (X/Y); -PI < atan2(X,Y) < PI; Y /= 0.0
+ 
+     function SINH (X : real) return real;
+@@ -236,20 +233,14 @@
+     attribute foreign of tanh : function is "VHPIDIRECT tanh"; 
+     	-- hyperbolic tangent; -- returns (e**X - e**(-X))/(e**X + e**(-X))
+ 
+-    -- IAC: function should be called ARCSINH
+-    
+-    function ASINH (X : real) return real;
+-    attribute foreign of asinh : function is "VHPIDIRECT asinh"; 
++    function ARCSINH (X : real) return real;
++    attribute foreign of arcsinh : function is "VHPIDIRECT asinh"; 
+     	-- returns ln( X + sqrt( X**2 + 1))
+ 
+-    -- IAC: function should be called ARCCOSH
+-
+-    function ACOSH (X : real) return real;
++    function ARCCOSH (X : real) return real;
+     	-- returns ln( X + sqrt( X**2 - 1));   X >= 1
+ 
+-    -- IAC: function should be called ARCTANH
+-    
+-    function ATANH (X : real) return real;
++    function ARCTANH (X : real) return real;
+     	-- returns (ln( (1 + X)/(1 - X)))/2 ; | X | < 1
+ 
+ end  MATH_REAL;
+--- vhdl/libraries/ieee/math_real-body.vhdl.orig	2009-04-01 19:22:04.000000000 +0200
++++ vhdl/libraries/ieee/math_real-body.vhdl	2009-04-01 19:34:18.000000000 +0200
+@@ -72,16 +72,41 @@
+     begin
+         assert false severity failure;
+     end ROUND;
+-    
+-    function FMAX (X, Y : real ) return real is
++
++    function TRUNC (X : real ) return real is
+     begin
+         assert false severity failure;
+-    end FMAX;
++    end TRUNC;
++
++    function c_mod (x : real; y : real) return real;
++    attribute foreign of c_mod : function is "VHPIDIRECT fmod"; 
+ 
+-    function FMIN (X, Y : real ) return real is
++    function c_mod (x : real; y: real) return real is
+     begin
+         assert false severity failure;
+-    end FMIN;
++    end c_mod; 
++
++    function "MOD" (X, Y : real ) return real is
++    begin
++        if y = 0.0 then 
++            assert false 
++                report "MOD(X, 0.0) is undefined" 
++                severity ERROR;
++            return 0.0; 
++        else
++            return c_mod(x,y);
++        end if;     
++    end "MOD";
++
++    function REALMAX (X, Y : real ) return real is
++    begin
++        assert false severity failure;
++    end REALMAX;
++
++    function REALMIN (X, Y : real ) return real is
++    begin
++        assert false severity failure;
++    end REALMIN;
+ 
+     --
+     -- Pseudo-random number generators
+@@ -297,18 +322,18 @@
+         assert false severity failure;
+     end c_asin; 
+ 
+-    function ASIN (x : real ) return real is
++    function ARCSIN (x : real ) return real is
+         -- returns  -PI/2 < asin X < PI/2; | X | <= 1
+     begin   
+         if abs x > 1.0 then 
+             assert false
+-                report "Out of range parameter passed to ASIN" 
++                report "Out of range parameter passed to ARCSIN" 
+                 severity ERROR;
+             return x;
+         else
+             return c_asin(x);
+         end if; 
+-    end ASIN; 
++    end ARCSIN; 
+    
+     function c_acos (x : real ) return real;
+     attribute foreign of c_acos : function is "VHPIDIRECT acos"; 
+@@ -318,24 +343,24 @@
+         assert false severity failure;
+     end c_acos; 
+ 
+-    function ACOS (x : REAL) return REAL is
++    function ARCCOS (x : REAL) return REAL is
+     	-- returns  0 < acos X < PI; | X | <= 1
+     begin  
+       if abs x > 1.0 then 
+          assert false 
+-            report "Out of range parameter passed to ACOS" 
++            report "Out of range parameter passed to ARCCOS" 
+ 			severity ERROR; 
+          return x;
+       else
+          return c_acos(x);
+       end if;
+-    end ACOS; 
++    end ARCCOS; 
+    
+-   function ATAN (x : REAL) return REAL is
++    function ARCTAN (x : REAL) return REAL is
+     	-- returns  -PI/2 < atan X < PI/2
+-   begin
++    begin
+         assert false severity failure;
+-   end ATAN; 
++    end ARCTAN; 
+ 
+     function c_atan2 (x : real; y : real) return real;
+     attribute foreign of c_atan2 : function is "VHPIDIRECT atan2"; 
+@@ -345,7 +370,7 @@
+         assert false severity failure;
+     end c_atan2; 
+ 
+-    function ATAN2 (x : REAL; y : REAL) return REAL is 
++    function ARCTAN (x : REAL; y : REAL) return REAL is 
+         -- returns  atan (X/Y); -PI < atan2(X,Y) < PI; Y /= 0.0
+     begin   
+         if y = 0.0 and x = 0.0 then 
+@@ -356,7 +381,7 @@
+         else
+             return c_atan2(x,y);
+         end if;     
+-    end ATAN2; 
++    end ARCTAN; 
+ 
+ 
+     function SINH (X : real) return real is
+@@ -377,11 +402,11 @@
+         assert false severity failure;
+     end TANH;
+     
+-    function ASINH (X : real) return real is
++    function ARCSINH (X : real) return real is
+     	-- returns ln( X + sqrt( X**2 + 1))
+     begin
+         assert false severity failure;
+-    end ASINH;
++    end ARCSINH;
+ 
+     function c_acosh (x : real ) return real;
+     attribute foreign of c_acosh : function is "VHPIDIRECT acosh"; 
+@@ -391,16 +416,16 @@
+         assert false severity failure;
+     end c_acosh;
+ 
+-    function ACOSH (X : real) return real is
++    function ARCCOSH (X : real) return real is
+     	-- returns ln( X + sqrt( X**2 - 1));   X >= 1
+     begin
+       	if abs x >= 1.0 then 
+-         	assert false report "Out of range parameter passed to ACOSH" 
++         	assert false report "Out of range parameter passed to ARCCOSH" 
+ 			severity ERROR; 
+          	return x;
+       	end if; 
+         return c_acosh(x);
+-    end ACOSH;
++    end ARCCOSH;
+ 
+     function c_atanh (x : real ) return real;
+     attribute foreign of c_atanh : function is "VHPIDIRECT atanh"; 
+@@ -410,15 +435,15 @@
+         assert false severity failure;
+     end c_atanh;
+ 
+-    function ATANH (X : real) return real is
++    function ARCTANH (X : real) return real is
+     	-- returns (ln( (1 + X)/(1 - X)))/2 ; | X | < 1
+     begin
+       	if abs x < 1.0 then 
+-        	assert false report "Out of range parameter passed to ATANH" 
++        	assert false report "Out of range parameter passed to ARCTANH" 
+ 			severity ERROR; 
+         	return x;
+       	end if; 
+         return c_atanh(x);
+-    end ATANH; 
++    end ARCTANH; 
+ 
+ end  MATH_REAL;
+--- vhdl/libraries/ieee/math_complex-body.vhdl.orig	2009-04-02 12:08:47.000000000 +0200
++++ vhdl/libraries/ieee/math_complex-body.vhdl	2009-04-02 12:09:18.000000000 +0200
+@@ -119,7 +119,7 @@
+     function COMPLEX_TO_POLAR(Z: in complex ) return complex_polar is
+     	-- converts complex to complex_polar
+     begin
+-    		return COMPLEX_POLAR'(sqrt(z.re**2 + z.im**2),atan2(z.re,z.im));
++    		return COMPLEX_POLAR'(sqrt(z.re**2 + z.im**2),ARCTAN(z.re,z.im));
+     end COMPLEX_TO_POLAR;
+ 
+     function POLAR_TO_COMPLEX(Z: in complex_polar ) return complex is

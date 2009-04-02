@@ -5,7 +5,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-Release: 0.%{ghdlsvnver}svn.4%{?dist}
+Release: 0.%{ghdlsvnver}svn.5%{?dist}
 License: GPLv2+
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -21,6 +21,7 @@ Patch103: ghdl-noruntime.patch
 Patch104: ghdl-svn110-libgnat44.patch
 Patch105: ghdl-grtadac.patch
 Patch106: ghdl-ppc64abort.patch
+Patch107: ieee-mathreal.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -116,6 +117,7 @@ that tracks signal updates and schedules processes.
 pushd ghdl-%{ghdlver}
 %patch100 -p1
 %patch103 -p0 -b .noruntime
+%patch107 -p0 -b .ieeemathreal
 %{__mv} vhdl ../gcc/
 popd
 #patch102 -p1 -b .makeinfo
@@ -303,6 +305,9 @@ popd
 
 
 %changelog
+* Wed Apr  1 2009 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.27-0.110svn.5
+- make ieee.math_real more standards compliant
+
 * Sun Mar 15 2009 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.27-0.110svn.4
 - gnat version is now 4.4
 
