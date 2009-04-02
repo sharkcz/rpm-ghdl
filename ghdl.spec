@@ -5,7 +5,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-Release: 0.%{ghdlsvnver}svn.5%{?dist}
+Release: 0.%{ghdlsvnver}svn.6%{?dist}
 License: GPLv2+
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -305,6 +305,9 @@ popd
 
 
 %changelog
+* Wed Apr  2 2009 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.27-0.110svn.6
+- actually add the patch
+
 * Wed Apr  1 2009 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.27-0.110svn.5
 - make ieee.math_real more standards compliant
 
