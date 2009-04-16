@@ -1,6 +1,6 @@
-%define gccver 4.3.1
-%define ghdlver 0.27
-%define ghdlsvnver 110
+%global gccver 4.3.1
+%global ghdlver 0.27
+%global ghdlsvnver 110
 
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
@@ -27,18 +27,18 @@ Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
 Requires: gcc
 # (Build)Requires from fc gcc41 package
-%define multilib_64_archs sparc64 ppc64 s390x x86_64
+%global multilib_64_archs sparc64 ppc64 s390x x86_64
 %ifarch s390x
-%define multilib_32_arch s390
+%global multilib_32_arch s390
 %endif
 %ifarch sparc64
-%define multilib_32_arch sparc
+%global multilib_32_arch sparc
 %endif
 %ifarch ppc64
-%define multilib_32_arch ppc
+%global multilib_32_arch ppc
 %endif
 %ifarch x86_64
-%define multilib_32_arch i386
+%global multilib_32_arch i386
 %endif
 # Need binutils with -pie support >= 2.14.90.0.4-4
 # Need binutils which can omit dot symbols and overlap .opd on ppc64 >= 2.15.91.0.2-4
@@ -76,17 +76,17 @@ Requires: glibc >= 2.3.90-35
 Requires: ghdl-grt = %{version}-%{release}
 
 # Make sure we don't use clashing namespaces
-%define _vendor fedora_ghdl
+%global _vendor fedora_ghdl
 
-%define _gnu %{nil}
+%global _gnu %{nil}
 %ifarch sparc
-%define gcc_target_platform sparc64-%{_vendor}-%{_target_os}
+%global gcc_target_platform sparc64-%{_vendor}-%{_target_os}
 %endif
 %ifarch ppc
-%define gcc_target_platform ppc64-%{_vendor}-%{_target_os}
+%global gcc_target_platform ppc64-%{_vendor}-%{_target_os}
 %endif
 %ifnarch sparc ppc
-%define gcc_target_platform %{_target_platform}
+%global gcc_target_platform %{_target_platform}
 %endif
 
 %description
@@ -132,23 +132,23 @@ pushd obj-%{gcc_target_platform}
 
 # Flag settings cribbed from gcc package
 OPT_FLAGS=$(echo %{optflags} | %{__sed} \
-	-e 's/\(-Wp,\)\?-D_FORTIFY_SOURCE=[12]//g' \
-	-e 's/-m64//g;s/-m32//g;s/-m31//g' \
+        -e 's/\(-Wp,\)\?-D_FORTIFY_SOURCE=[12]//g' \
+        -e 's/-m64//g;s/-m32//g;s/-m31//g' \
 %ifarch sparc sparc64
-	-e 's/-mcpu=ultrasparc/-mtune=ultrasparc/g' \
+        -e 's/-mcpu=ultrasparc/-mtune=ultrasparc/g' \
 %endif
-	-e 's/[[:blank:]]\+/ /g')
+        -e 's/[[:blank:]]\+/ /g')
 
 # These compiler flags in rawhide seem to break the build, so get rid of them
 OPT_FLAGS=$(echo $OPT_FLAGS | %{__sed} \
 %ifarch i386 i486 i586 i686
-	-e 's/-mtune=generic/-mtune=pentium4/g' \
+        -e 's/-mtune=generic/-mtune=pentium4/g' \
 %endif
 %ifarch x86_64
-	-e 's/-mtune=generic/-mtune=nocona/g' \
+        -e 's/-mtune=generic/-mtune=nocona/g' \
 %endif
-	-e 's/-fstack-protector//g ' \
-	-e 's/--param=ssp-buffer-size=[0-9]*//g')
+        -e 's/-fstack-protector//g ' \
+        -e 's/--param=ssp-buffer-size=[0-9]*//g')
 
 # gcc -m32 fails, so we disable multilibbing.
 # so far multilib isn't very valuable, as the VHDL libraries aren't multilibbed
@@ -158,45 +158,45 @@ export XCFLAGS="$OPT_FLAGS"
 export TCFLAGS="$OPT_FLAGS"
 #configure --enable-languages=vhdl
 ../configure \
-	--program-prefix=%{?_program_prefix} \
-	--prefix=%{_prefix} \
-	--exec-prefix=%{_exec_prefix} \
-	--bindir=%{_bindir} \
-	--sbindir=%{_sbindir} \
-	--sysconfdir=%{_sysconfdir} \
-	--datadir=%{_datadir} \
-	--includedir=%{_includedir} \
-	--libdir=%{_libdir} \
-	--libexecdir=%{_libexecdir} \
-	--localstatedir=%{_localstatedir} \
-	--sharedstatedir=%{_sharedstatedir} \
-	--mandir=%{_mandir} \
-	--infodir=%{_infodir} \
-	--with-bugurl=http://bugzilla.redhat.com/bugzilla \
-	--enable-languages=vhdl \
-	%{!?_without_mock:--disable-multilib} \
-	--enable-shared \
-	--enable-threads=posix \
-	--enable-checking=release \
-	--with-system-zlib \
-	--enable-__cxa_atexit \
-	--disable-libunwind-exceptions \
-	--disable-libgcj \
+        --program-prefix=%{?_program_prefix} \
+        --prefix=%{_prefix} \
+        --exec-prefix=%{_exec_prefix} \
+        --bindir=%{_bindir} \
+        --sbindir=%{_sbindir} \
+        --sysconfdir=%{_sysconfdir} \
+        --datadir=%{_datadir} \
+        --includedir=%{_includedir} \
+        --libdir=%{_libdir} \
+        --libexecdir=%{_libexecdir} \
+        --localstatedir=%{_localstatedir} \
+        --sharedstatedir=%{_sharedstatedir} \
+        --mandir=%{_mandir} \
+        --infodir=%{_infodir} \
+        --with-bugurl=http://bugzilla.redhat.com/bugzilla \
+        --enable-languages=vhdl \
+        %{!?_without_mock:--disable-multilib} \
+        --enable-shared \
+        --enable-threads=posix \
+        --enable-checking=release \
+        --with-system-zlib \
+        --enable-__cxa_atexit \
+        --disable-libunwind-exceptions \
+        --disable-libgcj \
 %ifarch sparc
-	--host=%{gcc_target_platform} \
-	--build=%{gcc_target_platform} \
-	--target=%{gcc_target_platform} \
-	--with-cpu=v7
+        --host=%{gcc_target_platform} \
+        --build=%{gcc_target_platform} \
+        --target=%{gcc_target_platform} \
+        --with-cpu=v7
 %endif
 %ifarch ppc
-	--host=%{gcc_target_platform} \
-	--build=%{gcc_target_platform} \
-	--target=%{gcc_target_platform} \
-	--with-cpu=default32
+        --host=%{gcc_target_platform} \
+        --build=%{gcc_target_platform} \
+        --target=%{gcc_target_platform} \
+        --with-cpu=default32
 %endif
 %ifnarch sparc ppc
-	--host=%{gcc_target_platform} \
-	--build=%{gcc_target_platform}
+        --host=%{gcc_target_platform} \
+        --build=%{gcc_target_platform}
 %endif
 
 # Parallel make doesn't work, so not using %{?_smp_mflags}
@@ -251,29 +251,29 @@ echo "-ldl"
 # Remove files not to be packaged
 pushd %{buildroot}
 %{__rm} -f \
-	.%{_bindir}/{cpp,gcc,gccbug,gcov} \
-	.%{_bindir}/%{gcc_target_platform}-gcc{,-%{gccver}} \
-	.%{_includedir}/mf-runtime.h \
-	.%{_libdir}/lib* \
-	.%{_infodir}/dir \
-	.%{_infodir}/{cpp,cppinternals,gcc,gccinstall,gccint}.info* \
-	.%{_datadir}/locale/*/LC_MESSAGES/{gcc,cpplib}.mo \
-	.%{_mandir}/man1/{cpp,gcc,gcov}.1* \
-	.%{_mandir}/man7/{fsf-funding,gfdl,gpl}.7* \
-	.%{_exec_prefix}/lib/libgcc_s.* \
-	.%{_exec_prefix}/lib/libmudflap.* \
-	.%{_exec_prefix}/lib/libmudflapth.* \
-	.%{_libdir}/32/libiberty.a
+        .%{_bindir}/{cpp,gcc,gccbug,gcov} \
+        .%{_bindir}/%{gcc_target_platform}-gcc{,-%{gccver}} \
+        .%{_includedir}/mf-runtime.h \
+        .%{_libdir}/lib* \
+        .%{_infodir}/dir \
+        .%{_infodir}/{cpp,cppinternals,gcc,gccinstall,gccint}.info* \
+        .%{_datadir}/locale/*/LC_MESSAGES/{gcc,cpplib}.mo \
+        .%{_mandir}/man1/{cpp,gcc,gcov}.1* \
+        .%{_mandir}/man7/{fsf-funding,gfdl,gpl}.7* \
+        .%{_exec_prefix}/lib/libgcc_s.* \
+        .%{_exec_prefix}/lib/libmudflap.* \
+        .%{_exec_prefix}/lib/libmudflapth.* \
+        .%{_libdir}/32/libiberty.a
 # Remove crt/libgcc, as ghdl invokes the native gcc to perform the linking
 %{__rm} -f \
-	.%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/crt* \
-	.%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/libgc* \
-	.%{_libexecdir}/gcc/%{gcc_target_platform}/%{gccver}/{cc1,collect2}
+        .%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/crt* \
+        .%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/libgc* \
+        .%{_libexecdir}/gcc/%{gcc_target_platform}/%{gccver}/{cc1,collect2}
 
 # Remove directory hierarchies not to be packaged
 %{__rm} -rf \
-	.%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/{include,install-tools} \
-	.%{_libexecdir}/gcc/%{gcc_target_platform}/%{gccver}/install-tools
+        .%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/{include,install-tools} \
+        .%{_libexecdir}/gcc/%{gcc_target_platform}/%{gccver}/install-tools
 
 popd
 
@@ -282,11 +282,11 @@ popd
 
 %post
 [ -f %{_infodir}/ghdl.info.gz ] && \
-	/sbin/install-info %{_infodir}/ghdl.info.gz %{_infodir}/dir || :
+        /sbin/install-info %{_infodir}/ghdl.info.gz %{_infodir}/dir || :
 
 %preun
 [ -f %{_infodir}/ghdl.info.gz ] && [ $1 = 0 ] && \
-	/sbin/install-info --delete %{_infodir}/ghdl.info.gz %{_infodir}/dir || :
+        /sbin/install-info --delete %{_infodir}/ghdl.info.gz %{_infodir}/dir || :
 
 %files
 %defattr(-,root,root,-)
@@ -299,6 +299,7 @@ popd
 %{_mandir}/man1/*
 
 %files grt
+%defattr(-,root,root,-)
 # Need to own directory %{_libdir}/gcc even though we only want the
 # %{gcc_target_platform}/%{gccver} subdirectory
 %{_libdir}/gcc/
