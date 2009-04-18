@@ -16,11 +16,16 @@ URL: http://ghdl.free.fr/
 Source0: ftp://gcc.gnu.org/pub/gcc/releases/gcc-%{gccver}/gcc-core-%{gccver}.tar.bz2
 Source100: http://ghdl.free.fr/ghdl-%{ghdlver}.tar.bz2
 Patch100: ghdl-svn%{ghdlsvnver}.patch
-Patch102: gcc41-makeinfo.patch
 Patch103: ghdl-noruntime.patch
 Patch104: ghdl-svn110-libgnat44.patch
 Patch105: ghdl-grtadac.patch
+# Both following patches have been sent to upstream mailing list:
+# From: Thomas Sailer <t.sailer@alumni.ethz.ch>
+# To: ghdl-discuss@gna.org
+# Date: Thu, 02 Apr 2009 15:36:00 +0200
+# https://gna.org/bugs/index.php?13390
 Patch106: ghdl-ppc64abort.patch
+# https://gna.org/bugs/index.php?13389
 Patch107: ieee-mathreal.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(post): /sbin/install-info
