@@ -5,7 +5,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-Release: 0.%{ghdlsvnver}svn.6%{?dist}
+Release: 0.%{ghdlsvnver}svn.7%{?dist}
 License: GPLv2+
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -27,6 +27,8 @@ Patch105: ghdl-grtadac.patch
 Patch106: ghdl-ppc64abort.patch
 # https://gna.org/bugs/index.php?13389
 Patch107: ieee-mathreal.patch
+# https://gna.org/bugs/index.php?13574
+Patch108: ghdl-textio.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -129,6 +131,7 @@ popd
 %patch104 -p0 -b .libgnat43
 %patch105 -p1 -b .grtadac
 %patch106 -p0 -b .ppc64abort
+%patch108 -p0 -b .textio
 
 %build
 %{__rm} -fr obj-%{gcc_target_platform}
@@ -311,6 +314,9 @@ popd
 
 
 %changelog
+* Tue May 26 2009 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.27-0.110svn.7
+- fix bug in std.textio.read (string)
+
 * Wed Apr  2 2009 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.27-0.110svn.6
 - actually add the patch
 

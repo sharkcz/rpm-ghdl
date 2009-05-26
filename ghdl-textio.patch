@@ -1,0 +1,15 @@
+--- gcc/vhdl/libraries/std/textio_body.vhdl.orig	2009-05-25 18:13:20.000000000 +0200
++++ gcc/vhdl/libraries/std/textio_body.vhdl	2009-05-25 18:14:31.000000000 +0200
+@@ -1308,7 +1308,11 @@
+       value := l (l'left to l'left + len - 1);
+       trim (l, l'left + len);
+     else
+-      value := l (l'left downto l'left - len + 1);
++      if len = 1 then
++        value (value'left) := l (l'left);
++      else
++        value := l (l'left downto l'left - len + 1);
++      end if;
+       trim (l, l'left - len);
+     end if;
+   end read;
