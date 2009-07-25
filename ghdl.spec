@@ -5,7 +5,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-Release: 0.%{ghdlsvnver}svn.7%{?dist}
+Release: 0.%{ghdlsvnver}svn.7%{?dist}.1
 License: GPLv2+
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -314,6 +314,9 @@ popd
 
 
 %changelog
+* Fri Jul 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.27-0.110svn.7.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
+
 * Tue May 26 2009 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.27-0.110svn.7
 - fix bug in std.textio.read (string)
 
