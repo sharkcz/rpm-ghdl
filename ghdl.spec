@@ -5,7 +5,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-Release: 0.%{ghdlsvnver}svn.7%{?dist}.1
+Release: 0.%{ghdlsvnver}svn.8%{?dist}
 License: GPLv2+
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -150,7 +150,7 @@ OPT_FLAGS=$(echo %{optflags} | %{__sed} \
 # These compiler flags in rawhide seem to break the build, so get rid of them
 OPT_FLAGS=$(echo $OPT_FLAGS | %{__sed} \
 %ifarch i386 i486 i586 i686
-        -e 's/-mtune=generic/-mtune=pentium4/g' \
+        -e 's/-mtune=atom/-mtune=pentium4/g' \
 %endif
 %ifarch x86_64
         -e 's/-mtune=generic/-mtune=nocona/g' \
@@ -314,6 +314,9 @@ popd
 
 
 %changelog
+* Sun Jul 26 2009 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.27-0.110svn.8
+- this gcc does not understand -mtune=atom
+
 * Fri Jul 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.27-0.110svn.7.1
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
 
