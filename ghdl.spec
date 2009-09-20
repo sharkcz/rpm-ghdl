@@ -1,11 +1,11 @@
 %global gccver 4.3.1
 %global ghdlver 0.27
-%global ghdlsvnver 110
+%global ghdlsvnver 126
 
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-Release: 0.%{ghdlsvnver}svn.8%{?dist}
+Release: 0.%{ghdlsvnver}svn.0%{?dist}
 License: GPLv2+
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -27,8 +27,7 @@ Patch105: ghdl-grtadac.patch
 Patch106: ghdl-ppc64abort.patch
 # https://gna.org/bugs/index.php?13389
 Patch107: ieee-mathreal.patch
-# https://gna.org/bugs/index.php?13574
-Patch108: ghdl-textio.patch
+Patch108: ghdl-llvmpath.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -128,10 +127,10 @@ pushd ghdl-%{ghdlver}
 %{__mv} vhdl ../gcc/
 popd
 #patch102 -p1 -b .makeinfo
-%patch104 -p0 -b .libgnat43
+%patch104 -p0 -b .libgnat44
 %patch105 -p1 -b .grtadac
 %patch106 -p0 -b .ppc64abort
-%patch108 -p0 -b .textio
+%patch108 -p0 -b .llvm
 
 %build
 %{__rm} -fr obj-%{gcc_target_platform}
@@ -314,6 +313,9 @@ popd
 
 
 %changelog
+* Sun Sep 20 2009 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.27-0.126svn.0
+- update to svn126
+
 * Sun Jul 26 2009 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.27-0.110svn.8
 - this gcc does not understand -mtune=atom
 

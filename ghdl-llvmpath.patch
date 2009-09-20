@@ -1,0 +1,11 @@
+--- gcc/vhdl/Makefile.in.llvm	2009-09-20 13:47:57.000000000 +0200
++++ gcc/vhdl/Makefile.in	2009-09-20 13:48:45.000000000 +0200
+@@ -169,6 +169,8 @@
+ 	echo "package Default_Pathes is" >> tmp-dpathes.ads
+ 	echo "   Compiler_Gcc : constant String :=" >> tmp-dpathes.ads
+ 	echo "     \"$(libexecsubdir)/ghdl1$(exeext)\";" >> tmp-dpathes.ads
++	echo "   Compiler_Llvm : constant String :=" >> tmp-dpathes.ads
++	echo "     \"$(libexecsubdir)/ghdl1$(exeext)\";" >> tmp-dpathes.ads
+ 	echo "   Compiler_Debug : constant String :=\"\";" >> tmp-dpathes.ads
+ 	echo "   Compiler_Mcode : constant String :=\"\";" >> tmp-dpathes.ads
+ 	echo "   Post_Processor : constant String :=\"\";" >> tmp-dpathes.ads
