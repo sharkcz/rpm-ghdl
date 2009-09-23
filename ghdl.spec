@@ -1,6 +1,6 @@
-%global gccver 4.3.1
-%global ghdlver 0.27
-%global ghdlsvnver 126
+%global gccver 4.3.4
+%global ghdlver 0.28
+%global ghdlsvnver 130
 
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
@@ -27,7 +27,6 @@ Patch105: ghdl-grtadac.patch
 Patch106: ghdl-ppc64abort.patch
 # https://gna.org/bugs/index.php?13389
 Patch107: ieee-mathreal.patch
-Patch108: ghdl-llvmpath.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -130,7 +129,6 @@ popd
 %patch104 -p0 -b .libgnat44
 %patch105 -p1 -b .grtadac
 %patch106 -p0 -b .ppc64abort
-%patch108 -p0 -b .llvm
 
 %build
 %{__rm} -fr obj-%{gcc_target_platform}
@@ -313,6 +311,9 @@ popd
 
 
 %changelog
+* Wed Sep 23 2009 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.28-0.130svn.0
+- update to 0.28/svn130
+
 * Sun Sep 20 2009 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.27-0.126svn.0
 - update to svn126
 
