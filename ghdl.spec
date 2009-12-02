@@ -5,7 +5,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-Release: 0.%{ghdlsvnver}svn.0%{?dist}
+Release: 0.%{ghdlsvnver}svn.1%{?dist}
 License: GPLv2+
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -282,11 +282,19 @@ pushd %{buildroot}
 
 popd
 
-# Symlink v08 libraries for now
+# copy v08 libraries from v93 for now
 P64=%{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/vhdl/lib/
-%{__ln_s} v93 ${P64}v08
+%{__cp} -rv ${P64}v93 ${P64}v08
+%{__mv} ${P64}v08/std/std-obj93.cf ${P64}v08/std/std-obj08.cf
+%{__mv} ${P64}v08/ieee/ieee-obj93.cf ${P64}v08/ieee/ieee-obj08.cf
+%{__mv} ${P64}v08/mentor/ieee-obj93.cf ${P64}v08/mentor/ieee-obj08.cf
+%{__mv} ${P64}v08/synopsys/ieee-obj93.cf ${P64}v08/synopsys/ieee-obj08.cf
 %ifarch x86_64
-%{__ln_s} v93 ${P32}v08
+%{__cp} -rv ${P32}v93 ${P32}v08
+%{__mv} ${P32}v08/std/std-obj93.cf ${P32}v08/std/std-obj08.cf
+%{__mv} ${P32}v08/ieee/ieee-obj93.cf ${P32}v08/ieee/ieee-obj08.cf
+%{__mv} ${P32}v08/mentor/ieee-obj93.cf ${P32}v08/mentor/ieee-obj08.cf
+%{__mv} ${P32}v08/synopsys/ieee-obj93.cf ${P32}v08/synopsys/ieee-obj08.cf
 %endif
 
 %clean
@@ -318,6 +326,9 @@ P64=%{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/vhdl/lib/
 
 
 %changelog
+* Wed Dec  2 2009 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.28-0.131svn.1
+- copy v08 libraries instead of symlink
+
 * Wed Dec  2 2009 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.28-0.131svn.0
 - update to 0.28/svn131
 - symlink v08 libraries to v93 for now
