@@ -1,6 +1,6 @@
 %global gccver 4.3.4
 %global ghdlver 0.28
-%global ghdlsvnver 130
+%global ghdlsvnver 131
 
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
@@ -282,6 +282,13 @@ pushd %{buildroot}
 
 popd
 
+# Symlink v08 libraries for now
+P64=%{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/vhdl/lib/
+%{__ln} -s v93 ${P64}v08
+%ifarch x86_64
+%{__ln} -s v93 ${P32}v08
+%endif
+
 %clean
 %{__rm} -rf %{buildroot}
 
@@ -311,6 +318,10 @@ popd
 
 
 %changelog
+* Wed Dec  2 2009 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.28-0.131svn.0
+- update to 0.28/svn131
+- symlink v08 libraries to v93 for now
+
 * Wed Sep 23 2009 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.28-0.130svn.0
 - update to 0.28/svn130
 
