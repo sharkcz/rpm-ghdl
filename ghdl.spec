@@ -284,9 +284,9 @@ popd
 
 # Symlink v08 libraries for now
 P64=%{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/vhdl/lib/
-%{__ln} -s v93 ${P64}v08
+%{__ln_s} v93 ${P64}v08
 %ifarch x86_64
-%{__ln} -s v93 ${P32}v08
+%{__ln_s} v93 ${P32}v08
 %endif
 
 %clean
