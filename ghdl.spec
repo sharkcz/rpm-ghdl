@@ -5,7 +5,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-Release: 0.%{ghdlsvnver}svn.1%{?dist}
+Release: 0.%{ghdlsvnver}svn.2%{?dist}
 License: GPLv2+
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -27,6 +27,10 @@ Patch105: ghdl-grtadac.patch
 Patch106: ghdl-ppc64abort.patch
 # https://gna.org/bugs/index.php?13389
 Patch107: ieee-mathreal.patch
+# https://gna.org/bugs/index.php?14930
+Patch108: grt-processtimeoutchain.patch
+# https://gna.org/bugs/index.php?14931
+Patch109: grt-dispmemleak.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -94,6 +98,9 @@ Requires: ghdl-grt = %{version}-%{release}
 %global gcc_target_platform %{_target_platform}
 %endif
 
+# do not strip libgrt.a -- makes debugging tedious otherwise
+%global __os_install_post %(echo '%{__os_install_post}' | sed -e 's#/usr/lib/rpm/redhat/brp-strip-static-archive .*##g')
+
 %description
 GHDL is a VHDL simulator, using the GCC technology. VHDL is a language
 standardized by the IEEE, intended for developing electronic systems. GHDL
@@ -129,6 +136,8 @@ popd
 %patch104 -p0 -b .libgnat44
 %patch105 -p1 -b .grtadac
 %patch106 -p0 -b .ppc64abort
+%patch108 -p0 -b .processtimeoutchain
+%patch109 -p0 -b .dispmemleak
 
 %build
 %{__rm} -fr obj-%{gcc_target_platform}
@@ -326,6 +335,10 @@ P64=%{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/vhdl/lib/
 
 
 %changelog
+* Mon Dec 14 2009 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.28-0.131svn.2
+- Process Timeout Chain bugfix
+- --trace-signals memory leak fix
+
 * Wed Dec  2 2009 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.28-0.131svn.1
 - copy v08 libraries instead of symlink
 

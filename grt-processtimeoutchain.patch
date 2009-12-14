@@ -1,0 +1,11 @@
+--- gcc/vhdl/grt/grt-processes.adb.orig	2009-12-13 00:36:47.000000000 +0100
++++ gcc/vhdl/grt/grt-processes.adb	2009-12-13 00:37:24.000000000 +0100
+@@ -312,6 +312,8 @@
+          Proc.Timeout_Chain_Next.Timeout_Chain_Prev :=
+            Proc.Timeout_Chain_Prev;
+       end if;
++      Proc.Timeout_Chain_Next := null;
++      Proc.Timeout_Chain_Prev := null;
+    end Remove_Process_From_Timeout_Chain;
+ 
+    procedure Ghdl_Process_Wait_Set_Timeout (Time : Std_Time)
