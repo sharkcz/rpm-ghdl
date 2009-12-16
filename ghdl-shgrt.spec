@@ -1,3 +1,8 @@
+# This does not work yet.
+# There is a wild calling orgy between grt and e~xx.o going on
+# grt calls into e~xx.o for __ghdl_ELABORATE and various std__*
+# but grt.ver unglobals all except VPI symbols
+
 %global gccver 4.3.4
 %global ghdlver 0.28
 %global ghdlsvnver 133
@@ -27,6 +32,7 @@ Patch105: ghdl-grtadac.patch
 Patch106: ghdl-ppc64abort.patch
 # https://gna.org/bugs/index.php?13389
 Patch107: ieee-mathreal.patch
+Patch110: grt-so.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -78,7 +84,7 @@ Requires: glibc-devel >= 2.2.90-12
 Requires: glibc >= 2.3.90-35
 %endif
 
-Requires: ghdl-grt = %{version}-%{release}
+Requires: ghdl-devel = %{version}-%{release}
 
 # Make sure we don't use clashing namespaces
 %global _vendor fedora_ghdl
@@ -97,6 +103,8 @@ Requires: ghdl-grt = %{version}-%{release}
 # do not strip libgrt.a -- makes debugging tedious otherwise
 %global __os_install_post %(echo '%{__os_install_post}' | sed -e 's#/usr/lib/rpm/redhat/brp-strip-static-archive .*##g')
 
+%global all_x86 %{ix86} x86_64
+
 %description
 GHDL is a VHDL simulator, using the GCC technology. VHDL is a language
 standardized by the IEEE, intended for developing electronic systems. GHDL
@@ -109,16 +117,42 @@ Since GHDL is a compiler (i.e., it generates object files), you can call
 functions or procedures written in a foreign language, such as C, C++, or
 Ada95.
 
-%package grt
-Summary: GHDL runtime libraries
-Group: System Environment/Libraries
+%package devel
+Summary: GHDL libraries
+Group: Development/Libraries
 # rhbz #316311
 Requires: zlib-devel, libgnat >= 4.3
+Obsoletes: ghdl-grt
 
-%description grt
+%description devel
 This package contains the runtime libraries needed to link ghdl-compiled
-object files into simulator executables. grt contains the simulator kernel
-that tracks signal updates and schedules processes.
+object files into simulator executables. This package also contains sources
+and precompiled binaries for standard VHDL packages.
+
+%ifarch %{all_x86}
+%package libs
+Summary: GHDL runtime libraries
+Group: Development/Libraries
+
+%description libs
+This package contains the runtime libraries needed to run ghdl-compiled
+simulator executables. grt contains the simulator kernel that tracks
+signal updates and schedules processes.
+%endif
+
+%ifarch x86_64
+%package libs32
+Summary: GHDL 32bit runtime libraries
+Group: Development/Libraries
+
+%description libs32
+This package contains the runtime libraries needed to run ghdl-compiled
+simulator executables. grt contains the simulator kernel that tracks
+signal updates and schedules processes. This package is needed to compile
+32bit executables with ghdl -m32.
+%endif
+
+
 
 %prep
 %setup -q -n gcc-%{gccver} -T -b 0 -a 100
@@ -126,6 +160,7 @@ pushd ghdl-%{ghdlver}
 %patch100 -p1
 %patch103 -p0 -b .noruntime
 %patch107 -p0 -b .ieeemathreal
+%patch110 -p0 -b .grtso
 %{__mv} vhdl ../gcc/
 popd
 #patch102 -p1 -b .makeinfo
@@ -217,6 +252,34 @@ popd
 %{__rm} -rf %{buildroot}
 %{__make} -C obj-%{gcc_target_platform} DESTDIR=%{buildroot} install-host
 
+%ifarch %{all_x86}
+pushd obj-%{gcc_target_platform}/gcc/vhdl
+make grt-clean
+make GRT_ADD_FLAGS="-g -O2 -fPIC" GNATVER=4.4 grt-so
+%{__install} -d %{buildroot}%{_libdir}
+%{__install} libghdlgrt.so* %{buildroot}%{_libdir}
+pushd %{buildroot}%{_libdir}
+%{__ln_s} libghdlgrt.so* libghdlgrt.so
+popd
+pushd %{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/vhdl/lib
+%{__sed} -e 's,@/libgrt.a,-lghdlgrt,g' < grt.lst > grt.lst.1
+%{__mv} grt.lst.1 grt.lst
+popd
+popd
+
+%ifarch x86_64
+pushd obj-%{gcc_target_platform}/gcc/vhdl
+make grt-clean
+make GRT_ADD_FLAGS="-g -O2 -fPIC -m32" GNATVER=4.4 GRT_TARGET_OBJS="i386.o linux.o times.o" grt-so
+%{__install} -d %{buildroot}%{_exec_prefix}/lib
+%{__install} libghdlgrt.so* %{buildroot}%{_exec_prefix}/lib
+pushd %{buildroot}%{_exec_prefix}/lib
+%{__ln_s} libghdlgrt.so* libghdlgrt.so
+popd
+popd
+%endif
+%endif
+
 %ifarch x86_64
 pushd obj-%{gcc_target_platform}/gcc/vhdl
 P32=%{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/vhdl/lib/32/
@@ -224,10 +287,11 @@ P32=%{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/vhdl/lib/32/
 make ghdllibs-clean
 %if %{!?_without_mock:0}%{?_without_mock:1}
 make grt-clean
-make GRT_FLAGS=-m32 GRT_TARGET_OBJS="i386.o linux.o times.o" ghdllib
+make GRT_FLAGS="-m32 -O -g" GRT_TARGET_OBJS="i386.o linux.o times.o" ghdllib
 make grt.lst
+%{__sed} -e 's,@/libgrt.a,-lghdlgrt,g' < grt.lst > grt.lst.1
 %{__install} -m 644 libgrt.a ${P32}/libgrt.a
-%{__install} -m 644 grt.lst ${P32}/grt.lst
+%{__install} -m 644 grt.lst.1 ${P32}/grt.lst
 %{__install} -m 644 grt.ver ${P32}/grt.ver
 %endif
 PDIR=`pwd`
@@ -262,7 +326,7 @@ pushd %{buildroot}
         .%{_bindir}/{cpp,gcc,gccbug,gcov} \
         .%{_bindir}/%{gcc_target_platform}-gcc{,-%{gccver}} \
         .%{_includedir}/mf-runtime.h \
-        .%{_libdir}/lib* \
+        .%{_libdir}/libiberty* \
         .%{_infodir}/dir \
         .%{_infodir}/{cpp,cppinternals,gcc,gccinstall,gccint}.info* \
         .%{_datadir}/locale/*/LC_MESSAGES/{gcc,cpplib}.mo \
@@ -321,16 +385,35 @@ P64=%{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/vhdl/lib/
 %{_libexecdir}/gcc/
 %{_mandir}/man1/*
 
-%files grt
+%files devel
 %defattr(-,root,root,-)
 # Need to own directory %{_libdir}/gcc even though we only want the
 # %{gcc_target_platform}/%{gccver} subdirectory
 %{_libdir}/gcc/
+%ifarch %{all_x86}
+%{_libdir}/libghdlgrt.so
+%endif
+%ifarch x86_64
+%{_exec_prefix}/lib/libghdlgrt.so
+%endif
+
+%ifarch %{all_x86}
+%files libs
+%defattr(-,root,root,-)
+%{_libdir}/libghdlgrt.so.*
+%endif
+
+%ifarch x86_64
+%files libs32
+%defattr(-,root,root,-)
+%{_exec_prefix}/lib/libghdlgrt.so.*
+%endif
 
 
 %changelog
 * Wed Dec 16 2009 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.28-0.133svn.0
-- update to svn133, drop upstreamed patches
+- update to svn133
+- drop upstreamed patches
 
 * Mon Dec 14 2009 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.28-0.131svn.2
 - Process Timeout Chain bugfix
