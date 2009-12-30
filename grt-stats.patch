@@ -23,7 +23,7 @@
 -
 -      procedure fprintf (Stream : FILEs; Fmt : Address; A, B : Clock_T);
 -      pragma Import (C, fprintf);
-+      procedure Fprintf_Clock (Stream : FILEs; A, B : Integer);
++      procedure Fprintf_Clock (Stream : FILEs; A, B : Clock_T);
 +      pragma Import (C, Fprintf_Clock, "__ghdl_fprintf_clock");
  
        Sec : Clock_T;
