@@ -1,0 +1,43 @@
+--- gcc/vhdl/grt/grt-cbinding.c.orig	2009-12-30 17:00:41.000000000 +0100
++++ gcc/vhdl/grt/grt-cbinding.c	2009-12-30 17:05:07.000000000 +0100
+@@ -37,6 +37,16 @@
+   return stderr;
+ }
+ 
++int
++__ghdl_snprintf_g (char *buf, unsigned int len, double val)
++{
++  /*
++   * Warning: this assumes a C99 snprintf (ie, it returns the
++   * number of characters).
++   */
++  return snprintf (buf, len, "%g", val);
++}
++
+ void
+ __ghdl_fprintf_g (FILE *stream, double val)
+ {
+--- gcc/vhdl/grt/grt-rtis_utils.adb.orig	2009-12-30 17:00:50.000000000 +0100
++++ gcc/vhdl/grt/grt-rtis_utils.adb	2009-12-30 17:04:26.000000000 +0100
+@@ -450,16 +450,14 @@
+                L : Integer;
+                --  Warning: this assumes a C99 snprintf (ie, it returns the
+                --  number of characters).
+-               function snprintf (Cstr : Address;
+-                                  Size : Natural;
+-                                  Template : Address;
+-                                  Arg : Ghdl_F64)
++               function Snprintf_G (Cstr : Address;
++                                    Size : Natural;
++                                    Arg : Ghdl_F64)
+                  return Integer;
+-               pragma Import (C, snprintf);
++               pragma Import (C, Snprintf_G, "__ghdl_snprintf_g");
+ 
+-               Format : constant String := "%g" & Character'Val (0);
+             begin
+-               L := snprintf (S'Address, S'Length, Format'Address, Value.F64);
++               L := Snprintf_G (S'Address, S'Length, Value.F64);
+                if L < 0 then
+                   --  FIXME.
+                   Append (Str, "?");

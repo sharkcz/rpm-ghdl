@@ -1,6 +1,6 @@
 diff -urN ghdl-0.28/vhdl/errorout.adb ghdl-0.29dev/vhdl/errorout.adb
 --- ghdl-0.28/vhdl/errorout.adb	2008-09-27 03:27:50.000000000 +0200
-+++ ghdl-0.29dev/vhdl/errorout.adb	2009-12-16 14:31:15.000000000 +0100
++++ ghdl-0.29dev/vhdl/errorout.adb	2009-12-30 16:56:08.000000000 +0100
 @@ -893,8 +893,12 @@
        procedure Append_Type (Def : Iir)
        is
@@ -17,7 +17,7 @@ diff -urN ghdl-0.28/vhdl/errorout.adb ghdl-0.29dev/vhdl/errorout.adb
  
 diff -urN ghdl-0.28/vhdl/ghdldrv/ghdllocal.adb ghdl-0.29dev/vhdl/ghdldrv/ghdllocal.adb
 --- ghdl-0.28/vhdl/ghdldrv/ghdllocal.adb	2009-08-13 06:21:29.000000000 +0200
-+++ ghdl-0.29dev/vhdl/ghdldrv/ghdllocal.adb	2009-12-16 14:31:12.000000000 +0100
++++ ghdl-0.29dev/vhdl/ghdldrv/ghdllocal.adb	2009-12-30 16:56:06.000000000 +0100
 @@ -223,7 +223,7 @@
        if Prefix_Path = null then
           Prefix_Path := new String'(Default_Pathes.Prefix);
@@ -27,9 +27,25 @@ diff -urN ghdl-0.28/vhdl/ghdldrv/ghdllocal.adb ghdl-0.29dev/vhdl/ghdldrv/ghdlloc
           Flag_32bit := False;
        end if;
  
+diff -urN ghdl-0.28/vhdl/grt/grt-cbinding.c ghdl-0.29dev/vhdl/grt/grt-cbinding.c
+--- ghdl-0.28/vhdl/grt/grt-cbinding.c	2006-03-09 03:25:44.000000000 +0100
++++ ghdl-0.29dev/vhdl/grt/grt-cbinding.c	2009-12-30 16:56:06.000000000 +0100
+@@ -43,6 +43,12 @@
+   fprintf (stream, "%g", val);
+ }
+ 
++void
++__ghdl_fprintf_clock (FILE *stream, int a, int b)
++{
++  fprintf (stream, "%3d.%03d", a, b);
++}
++
+ #if 1
+ void
+ __gnat_last_chance_handler (void)
 diff -urN ghdl-0.28/vhdl/grt/grt-processes.adb ghdl-0.29dev/vhdl/grt/grt-processes.adb
 --- ghdl-0.28/vhdl/grt/grt-processes.adb	2008-08-29 01:40:50.000000000 +0200
-+++ ghdl-0.29dev/vhdl/grt/grt-processes.adb	2009-12-16 14:31:13.000000000 +0100
++++ ghdl-0.29dev/vhdl/grt/grt-processes.adb	2009-12-30 16:56:06.000000000 +0100
 @@ -36,27 +36,30 @@
  package body Grt.Processes is
     Last_Time : constant Std_Time := Std_Time'Last;
@@ -248,8 +264,6 @@ diff -urN ghdl-0.28/vhdl/grt/grt-processes.adb ghdl-0.29dev/vhdl/grt/grt-process
 +      if Proc.Timeout_Chain_Prev /= null then
 +         Proc.Timeout_Chain_Prev.Timeout_Chain_Next :=
 +           Proc.Timeout_Chain_Next;
-+         --  Be sure a second call won't corrupt the chain.
-+         Proc.Timeout_Chain_Prev := null;
 +      elsif Process_Timeout_Chain = Proc then
 +         --  Only if Proc is in the chain.
 +         Process_Timeout_Chain := Proc.Timeout_Chain_Next;
@@ -259,6 +273,8 @@ diff -urN ghdl-0.28/vhdl/grt/grt-processes.adb ghdl-0.29dev/vhdl/grt/grt-process
 +           Proc.Timeout_Chain_Prev;
 +         Proc.Timeout_Chain_Next := null;
 +      end if;
++      --  Be sure a second call won't corrupt the chain.
++      Proc.Timeout_Chain_Prev := null;
 +   end Remove_Process_From_Timeout_Chain;
 +
     procedure Ghdl_Process_Wait_Set_Timeout (Time : Std_Time)
@@ -747,7 +763,7 @@ diff -urN ghdl-0.28/vhdl/grt/grt-processes.adb ghdl-0.29dev/vhdl/grt/grt-process
        if Status /= Run_Resumed then
 diff -urN ghdl-0.28/vhdl/grt/grt-processes.ads ghdl-0.29dev/vhdl/grt/grt-processes.ads
 --- ghdl-0.28/vhdl/grt/grt-processes.ads	2008-08-28 06:38:08.000000000 +0200
-+++ ghdl-0.29dev/vhdl/grt/grt-processes.ads	2009-12-16 14:31:13.000000000 +0100
++++ ghdl-0.29dev/vhdl/grt/grt-processes.ads	2009-12-30 16:56:06.000000000 +0100
 @@ -42,6 +42,9 @@
     --  If true, the simulation should be stopped.
     Break_Simulation : Boolean;
@@ -832,7 +848,7 @@ diff -urN ghdl-0.28/vhdl/grt/grt-processes.ads ghdl-0.29dev/vhdl/grt/grt-process
     pragma Export (C, Ghdl_Process_Register,
 diff -urN ghdl-0.28/vhdl/grt/grt-rtis_utils.adb ghdl-0.29dev/vhdl/grt/grt-rtis_utils.adb
 --- ghdl-0.28/vhdl/grt/grt-rtis_utils.adb	2008-12-31 05:41:58.000000000 +0100
-+++ ghdl-0.29dev/vhdl/grt/grt-rtis_utils.adb	2009-12-16 14:31:13.000000000 +0100
++++ ghdl-0.29dev/vhdl/grt/grt-rtis_utils.adb	2009-12-30 16:56:06.000000000 +0100
 @@ -502,6 +502,7 @@
     begin
        Rtis_Utils.Get_Value (Name, Value, Type_Rti);
@@ -843,7 +859,7 @@ diff -urN ghdl-0.28/vhdl/grt/grt-rtis_utils.adb ghdl-0.29dev/vhdl/grt/grt-rtis_u
     procedure Get_Enum_Value
 diff -urN ghdl-0.28/vhdl/grt/grt-signals.adb ghdl-0.29dev/vhdl/grt/grt-signals.adb
 --- ghdl-0.28/vhdl/grt/grt-signals.adb	2008-09-12 21:34:38.000000000 +0200
-+++ ghdl-0.29dev/vhdl/grt/grt-signals.adb	2009-12-16 14:31:13.000000000 +0100
++++ ghdl-0.29dev/vhdl/grt/grt-signals.adb	2009-12-30 16:56:06.000000000 +0100
 @@ -266,9 +266,9 @@
                          / System.Storage_Unit);
        end Size;
@@ -940,7 +956,7 @@ diff -urN ghdl-0.28/vhdl/grt/grt-signals.adb ghdl-0.29dev/vhdl/grt/grt-signals.a
        end if;
 diff -urN ghdl-0.28/vhdl/grt/grt-signals.ads ghdl-0.29dev/vhdl/grt/grt-signals.ads
 --- ghdl-0.28/vhdl/grt/grt-signals.ads	2008-08-21 04:50:51.000000000 +0200
-+++ ghdl-0.29dev/vhdl/grt/grt-signals.ads	2009-12-16 14:31:13.000000000 +0100
++++ ghdl-0.29dev/vhdl/grt/grt-signals.ads	2009-12-30 16:56:06.000000000 +0100
 @@ -20,6 +20,7 @@
  with Grt.Table;
  with Grt.Types; use Grt.Types;
@@ -1014,9 +1030,34 @@ diff -urN ghdl-0.28/vhdl/grt/grt-signals.ads ghdl-0.29dev/vhdl/grt/grt-signals.a
  
     procedure Ghdl_Signal_Name_Rti (Sig : Ghdl_Rti_Access;
                                     Ctxt : Ghdl_Rti_Access;
+diff -urN ghdl-0.28/vhdl/grt/grt-stats.adb ghdl-0.29dev/vhdl/grt/grt-stats.adb
+--- ghdl-0.28/vhdl/grt/grt-stats.adb	2008-08-21 04:21:05.000000000 +0200
++++ ghdl-0.29dev/vhdl/grt/grt-stats.adb	2009-12-30 16:56:06.000000000 +0100
+@@ -71,10 +71,8 @@
+ 
+    procedure Put (Stream : FILEs; Val : Clock_T)
+    is
+-      Fmt : constant String := "%3d.%03d" & Character'Val (0);
+-
+-      procedure fprintf (Stream : FILEs; Fmt : Address; A, B : Clock_T);
+-      pragma Import (C, fprintf);
++      procedure Fprintf_Clock (Stream : FILEs; A, B : Clock_T);
++      pragma Import (C, Fprintf_Clock, "__ghdl_fprintf_clock");
+ 
+       Sec : Clock_T;
+       Ms : Clock_T;
+@@ -84,7 +82,7 @@
+       --  Avoid overflow.
+       Ms := ((Val mod One_Second) * 1000) / One_Second;
+ 
+-      fprintf (Stream, Fmt'Address, Sec, Ms);
++      Fprintf_Clock (Stream, Sec, Ms);
+    end Put;
+ 
+    procedure Put (Stream : FILEs; T : Time_Stats) is
 diff -urN ghdl-0.28/vhdl/grt/grt-types.ads ghdl-0.29dev/vhdl/grt/grt-types.ads
 --- ghdl-0.28/vhdl/grt/grt-types.ads	2007-12-02 02:56:05.000000000 +0100
-+++ ghdl-0.29dev/vhdl/grt/grt-types.ads	2009-12-16 14:31:13.000000000 +0100
++++ ghdl-0.29dev/vhdl/grt/grt-types.ads	2009-12-30 16:56:06.000000000 +0100
 @@ -139,10 +139,6 @@
     end record;
     type Ghdl_Location_Ptr is access Ghdl_Location;
@@ -1030,7 +1071,7 @@ diff -urN ghdl-0.28/vhdl/grt/grt-types.ads ghdl-0.29dev/vhdl/grt/grt-types.ads
  
 diff -urN ghdl-0.28/vhdl/grt/grt-unithread.adb ghdl-0.29dev/vhdl/grt/grt-unithread.adb
 --- ghdl-0.28/vhdl/grt/grt-unithread.adb	2008-08-29 02:01:16.000000000 +0200
-+++ ghdl-0.29dev/vhdl/grt/grt-unithread.adb	2009-12-16 14:31:13.000000000 +0100
++++ ghdl-0.29dev/vhdl/grt/grt-unithread.adb	2009-12-30 16:56:06.000000000 +0100
 @@ -52,7 +52,6 @@
     end Atomic_Inc;
  
@@ -1065,7 +1106,7 @@ diff -urN ghdl-0.28/vhdl/grt/grt-unithread.adb ghdl-0.29dev/vhdl/grt/grt-unithre
     function Get_Stack2 return Stack2_Ptr is
 diff -urN ghdl-0.28/vhdl/grt/grt-unithread.ads ghdl-0.29dev/vhdl/grt/grt-unithread.ads
 --- ghdl-0.28/vhdl/grt/grt-unithread.ads	2008-08-21 04:57:53.000000000 +0200
-+++ ghdl-0.29dev/vhdl/grt/grt-unithread.ads	2009-12-16 14:31:13.000000000 +0100
++++ ghdl-0.29dev/vhdl/grt/grt-unithread.ads	2009-12-30 16:56:06.000000000 +0100
 @@ -20,8 +20,6 @@
  with Grt.Signals; use Grt.Signals;
  with Grt.Stack2; use Grt.Stack2;
@@ -1095,7 +1136,7 @@ diff -urN ghdl-0.28/vhdl/grt/grt-unithread.ads ghdl-0.29dev/vhdl/grt/grt-unithre
  end Grt.Unithread;
 diff -urN ghdl-0.28/vhdl/ortho-lang.c ghdl-0.29dev/vhdl/ortho-lang.c
 --- ghdl-0.28/vhdl/ortho-lang.c	2008-08-28 05:29:25.000000000 +0200
-+++ ghdl-0.29dev/vhdl/ortho-lang.c	2009-12-16 14:31:14.000000000 +0100
++++ ghdl-0.29dev/vhdl/ortho-lang.c	2009-12-30 16:56:07.000000000 +0100
 @@ -385,7 +385,7 @@
      filename = in_fnames[0];
  
@@ -1107,7 +1148,7 @@ diff -urN ghdl-0.28/vhdl/ortho-lang.c ghdl-0.29dev/vhdl/ortho-lang.c
      errorcount++;
 diff -urN ghdl-0.28/vhdl/version.ads ghdl-0.29dev/vhdl/version.ads
 --- ghdl-0.28/vhdl/version.ads	2009-09-17 03:31:54.000000000 +0200
-+++ ghdl-0.29dev/vhdl/version.ads	2009-12-16 14:31:15.000000000 +0100
++++ ghdl-0.29dev/vhdl/version.ads	2009-12-30 16:56:08.000000000 +0100
 @@ -1,5 +1,5 @@
  package Version is
     Ghdl_Release : constant String :=

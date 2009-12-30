@@ -1,16 +1,17 @@
 %global gccver 4.3.4
 %global ghdlver 0.28
-%global ghdlsvnver 133
+%global ghdlsvnver 135
 
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-Release: 0.%{ghdlsvnver}svn.2%{?dist}
+Release: 0.%{ghdlsvnver}svn.0%{?dist}
 License: GPLv2+
 Group: Development/Languages
 URL: http://ghdl.free.fr/
 # HOWTO create source files from ghdl SVN at https://gna.org/projects/ghdl/
 # check out the SVN repo
+# svn co svn://svn.gna.org/svn/ghdl/trunk ghdl
 # cd translate/gcc/
 # ./dist.sh sources
 Source0: ftp://gcc.gnu.org/pub/gcc/releases/gcc-%{gccver}/gcc-core-%{gccver}.tar.bz2
@@ -27,10 +28,8 @@ Patch105: ghdl-grtadac.patch
 Patch106: ghdl-ppc64abort.patch
 # https://gna.org/bugs/index.php?13389
 Patch107: ieee-mathreal.patch
-# https://gna.org/bugs/index.php?15015
-Patch108: grt-stats.patch
-# https://gna.org/bugs/index.php?14930                                     
-Patch109: grt-processtimeoutchain.patch                                    
+# https://gna.org/bugs/index.php?xxxxx
+Patch108: grt-sigdisplay.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -60,7 +59,7 @@ BuildRequires: zlib-devel, gettext, bison, flex, texinfo, gawk
 BuildRequires: glibc-devel >= 2.3.90-2
 %ifarch ppc ppc64 s390 s390x sparc sparcv9 alpha
 # Make sure glibc supports TFmode long double
-BuildRequires: glibc >= 2.3.90-35
+ BuildRequires: glibc >= 2.3.90-35
 %endif
 # Ada requires Ada to build
 BuildRequires: gcc-gnat >= 4.3, libgnat >= 4.3
@@ -136,8 +135,7 @@ popd
 %patch104 -p0 -b .libgnat44
 %patch105 -p1 -b .grtadac
 %patch106 -p0 -b .ppc64abort
-%patch108 -p0 -b .grtstats
-%patch109 -p0 -b .processtimeoutchain
+%patch108 -p0 -b .grtdispsig
 
 %build
 %{__rm} -fr obj-%{gcc_target_platform}
@@ -335,6 +333,9 @@ P64=%{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/vhdl/lib/
 
 
 %changelog
+* Wed Dec 30 2009 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.28-0.135svn.0
+- update to svn135
+
 * Wed Dec 30 2009 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.28-0.133svn.2
 - fix the Process Timeout Chain bugfix
 
