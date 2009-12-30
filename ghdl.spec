@@ -27,6 +27,7 @@ Patch105: ghdl-grtadac.patch
 Patch106: ghdl-ppc64abort.patch
 # https://gna.org/bugs/index.php?13389
 Patch107: ieee-mathreal.patch
+# https://gna.org/bugs/index.php?15015
 Patch108: grt-stats.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(post): /sbin/install-info
