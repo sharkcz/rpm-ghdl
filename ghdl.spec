@@ -1,11 +1,12 @@
 %global gccver 4.3.4
-%global ghdlver 0.28
+%global ghdlver 0.29
 %global ghdlsvnver 135
 
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-Release: 0.%{ghdlsvnver}svn.0%{?dist}
+#Release: 0.%{ghdlsvnver}svn.0%{?dist}
+Release: 1%{?dist}
 License: GPLv2+
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -16,7 +17,7 @@ URL: http://ghdl.free.fr/
 # ./dist.sh sources
 Source0: ftp://gcc.gnu.org/pub/gcc/releases/gcc-%{gccver}/gcc-core-%{gccver}.tar.bz2
 Source100: http://ghdl.free.fr/ghdl-%{ghdlver}.tar.bz2
-Patch100: ghdl-svn%{ghdlsvnver}.patch
+#Patch100: ghdl-svn%{ghdlsvnver}.patch
 Patch103: ghdl-noruntime.patch
 Patch104: ghdl-svn110-libgnat44.patch
 Patch105: ghdl-grtadac.patch
@@ -28,8 +29,6 @@ Patch105: ghdl-grtadac.patch
 Patch106: ghdl-ppc64abort.patch
 # https://gna.org/bugs/index.php?13389
 Patch107: ieee-mathreal.patch
-# https://gna.org/bugs/index.php?xxxxx
-Patch108: grt-sigdisplay.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -126,7 +125,7 @@ that tracks signal updates and schedules processes.
 %prep
 %setup -q -n gcc-%{gccver} -T -b 0 -a 100
 pushd ghdl-%{ghdlver}
-%patch100 -p1
+#patch100 -p1
 %patch103 -p0 -b .noruntime
 %patch107 -p0 -b .ieeemathreal
 %{__mv} vhdl ../gcc/
@@ -135,7 +134,6 @@ popd
 %patch104 -p0 -b .libgnat44
 %patch105 -p1 -b .grtadac
 %patch106 -p0 -b .ppc64abort
-%patch108 -p0 -b .grtdispsig
 
 %build
 %{__rm} -fr obj-%{gcc_target_platform}
@@ -192,6 +190,7 @@ export TCFLAGS="$OPT_FLAGS"
         --enable-checking=release \
         --with-system-zlib \
         --enable-__cxa_atexit \
+        --disable-bootstrap \
         --disable-libunwind-exceptions \
         --disable-libgcj \
 %ifarch sparc
@@ -333,6 +332,9 @@ P64=%{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/vhdl/lib/
 
 
 %changelog
+* Fri Jan 15 2010 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.29-1
+- update to 0.29
+
 * Wed Dec 30 2009 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.28-0.135svn.0
 - update to svn135
 
