@@ -1,12 +1,12 @@
 %global gccver 4.3.4
 %global ghdlver 0.29
-%global ghdlsvnver 135
+%global ghdlsvnver 138
 
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-#Release: 0.%{ghdlsvnver}svn.0%{?dist}
-Release: 1%{?dist}
+Release: 1.%{ghdlsvnver}svn.0%{?dist}
+#Release: 1%{?dist}
 License: GPLv2+
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -17,7 +17,7 @@ URL: http://ghdl.free.fr/
 # ./dist.sh sources
 Source0: ftp://gcc.gnu.org/pub/gcc/releases/gcc-%{gccver}/gcc-core-%{gccver}.tar.bz2
 Source100: http://ghdl.free.fr/ghdl-%{ghdlver}.tar.bz2
-#Patch100: ghdl-svn%{ghdlsvnver}.patch
+Patch100: ghdl-svn%{ghdlsvnver}.patch
 Patch103: ghdl-noruntime.patch
 Patch104: ghdl-svn110-libgnat44.patch
 Patch105: ghdl-grtadac.patch
@@ -125,7 +125,7 @@ that tracks signal updates and schedules processes.
 %prep
 %setup -q -n gcc-%{gccver} -T -b 0 -a 100
 pushd ghdl-%{ghdlver}
-#patch100 -p1
+%patch100 -p1
 %patch103 -p0 -b .noruntime
 %patch107 -p0 -b .ieeemathreal
 %{__mv} vhdl ../gcc/
@@ -332,6 +332,9 @@ P64=%{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/vhdl/lib/
 
 
 %changelog
+* Fri Jan 29 2010 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.29-1.138svn.0
+- update to svn138
+
 * Fri Jan 15 2010 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.29-1
 - update to 0.29
 

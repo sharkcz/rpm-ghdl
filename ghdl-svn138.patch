@@ -1,0 +1,147 @@
+diff -urN ghdl-0.29-orig/vhdl/ghdl.texi ghdl-0.29/vhdl/ghdl.texi
+--- ghdl-0.29-orig/vhdl/ghdl.texi	2010-01-09 15:11:15.000000000 +0100
++++ ghdl-0.29/vhdl/ghdl.texi	2010-01-29 12:45:20.000000000 +0100
+@@ -1931,7 +1931,8 @@
+ @node PSL implementation, Source representation, VHDL standards, GHDL implementation of VHDL
+ @comment  node-name,  next,  previous,  up
+ @section PSL implementation
+-GHDL understands embedded PSL annotations in VHDL files, but in separate files.
++GHDL understands embedded PSL annotations in VHDL files, but not in
++separate files.
+ 
+ As PSL annotations are embedded within comments, you must analyze and elaborate
+ your design with option @option{-fpsl} to enable PSL annotations.
+@@ -1941,8 +1942,8 @@
+ same line) by a PSL keyword such as @code{assert} or @code{default}.
+ To continue a PSL statement on the next line, just start a new comment.
+ 
+-A PSL statement is considered as a concurrent statement, and therefore is
+-allowed only where processes are.
++A PSL statement is considered as a process.  So it is not allowed within
++a process.
+ 
+ All PSL assertions must be clocked (GHDL doesn't support unclocked assertion).
+ Furthermore only one clock per assertion is allowed.
+diff -urN ghdl-0.29-orig/vhdl/grt/grt-processes.ads ghdl-0.29/vhdl/grt/grt-processes.ads
+--- ghdl-0.29-orig/vhdl/grt/grt-processes.ads	2010-01-06 04:55:54.000000000 +0100
++++ ghdl-0.29/vhdl/grt/grt-processes.ads	2010-01-29 12:45:22.000000000 +0100
+@@ -127,6 +127,7 @@
+ private
+    --  Access to a process subprogram.
+    type Proc_Acc is access procedure (Self : System.Address);
++   pragma Convention (C, Proc_Acc);
+ 
+    --  State of a process.
+    type Process_State is
+diff -urN ghdl-0.29-orig/vhdl/grt/grt-signals.adb ghdl-0.29/vhdl/grt/grt-signals.adb
+--- ghdl-0.29-orig/vhdl/grt/grt-signals.adb	2009-12-29 08:07:07.000000000 +0100
++++ ghdl-0.29/vhdl/grt/grt-signals.adb	2010-01-29 12:45:22.000000000 +0100
+@@ -1804,6 +1804,7 @@
+    end Compute_Resolved_Signal;
+ 
+    type Conversion_Func_Acc is access procedure (Instance : System.Address);
++   pragma Convention (C, Conversion_Func_Acc);
+    function To_Conversion_Func_Acc is new Ada.Unchecked_Conversion
+      (Source => System.Address, Target => Conversion_Func_Acc);
+ 
+diff -urN ghdl-0.29-orig/vhdl/grt/grt-signals.ads ghdl-0.29/vhdl/grt/grt-signals.ads
+--- ghdl-0.29-orig/vhdl/grt/grt-signals.ads	2009-12-29 08:07:07.000000000 +0100
++++ ghdl-0.29/vhdl/grt/grt-signals.ads	2010-01-29 12:45:22.000000000 +0100
+@@ -76,7 +76,8 @@
+ 
+    --  Function access type used to evaluate the guard expression.
+    type Guard_Func_Acc is access function (This : System.Address)
+-     return Ghdl_B2;
++                                          return Ghdl_B2;
++   pragma Convention (C, Guard_Func_Acc);
+ 
+    --  Simply linked list of processes to be resumed in case of events.
+ 
+diff -urN ghdl-0.29-orig/vhdl/grt/grt-vpi.ads ghdl-0.29/vhdl/grt/grt-vpi.ads
+--- ghdl-0.29-orig/vhdl/grt/grt-vpi.ads	2009-12-29 08:07:07.000000000 +0100
++++ ghdl-0.29/vhdl/grt/grt-vpi.ads	2010-01-29 12:45:22.000000000 +0100
+@@ -137,6 +137,7 @@
+      (Source => Address, Target => p_cb_data);
+ 
+    type cb_rtn_type is access function (Cb : p_cb_data) return Integer;
++   pragma Convention (C, cb_rtn_type);
+ 
+    type s_cb_data is record
+       Reason : Integer;
+diff -urN ghdl-0.29-orig/vhdl/sa_bools.adb ghdl-0.29/vhdl/sa_bools.adb
+--- ghdl-0.29-orig/vhdl/sa_bools.adb	2009-12-29 08:07:07.000000000 +0100
++++ ghdl-0.29/vhdl/sa_bools.adb	1970-01-01 01:00:00.000000000 +0100
+@@ -1,42 +0,0 @@
+-with PSL.Errors; use PSL.Errors;
+-with Name_Table;
+-with Types; use Types;
+-with Ada.Text_IO;
+-
+-package body Sa_Bools is
+-   function Sem (N : Node) return Node is
+-   begin
+-      case Get_Kind (N) is
+-         when N_Or_Bool
+-           | N_And_Bool =>
+-            Set_Left (N, Sem (Get_Left (N)));
+-            Set_Right (N, Sem (Get_Right (N)));
+-            return N;
+-         when N_Not_Bool =>
+-            Set_Boolean (N, Sem (Get_Boolean (N)));
+-            return N;
+-         when N_Name =>
+-            declare
+-               use Name_Table;
+-               Id : constant Name_Id := Get_Identifier (N);
+-               Name : Node;
+-            begin
+-               Name := Node (Get_Info (Id));
+-               if Name /= Null_Node then
+-                  return Name;
+-               end if;
+-               Name := Create_Node (N_HDL_Expr);
+-               Set_HDL_Node (Name, Int32 (Id));
+-               Set_Info (Id, Int32 (Name));
+-               return Name;
+-            end;
+-         when others =>
+-            Error_Kind ("sem", N);
+-      end case;
+-   end Sem;
+-
+-   procedure Print_HDL_Expr (N : Node) is
+-   begin
+-      Ada.Text_IO.Put (Image (Name_Id (Get_HDL_Node (N))));
+-   end Print_HDL_Expr;
+-end Sa_Bools;
+diff -urN ghdl-0.29-orig/vhdl/sa_bools.ads ghdl-0.29/vhdl/sa_bools.ads
+--- ghdl-0.29-orig/vhdl/sa_bools.ads	2009-12-29 08:07:07.000000000 +0100
++++ ghdl-0.29/vhdl/sa_bools.ads	1970-01-01 01:00:00.000000000 +0100
+@@ -1,8 +0,0 @@
+-with PSL.Nodes; use PSL.Nodes;
+-
+-package Sa_Bools is
+-   function Sem (N : Node) return Node;
+-
+-   procedure Print_HDL_Expr (N : Node);
+-end Sa_Bools;
+-
+diff -urN ghdl-0.29-orig/vhdl/sem_assocs.adb ghdl-0.29/vhdl/sem_assocs.adb
+--- ghdl-0.29-orig/vhdl/sem_assocs.adb	2009-12-29 08:07:07.000000000 +0100
++++ ghdl-0.29/vhdl/sem_assocs.adb	2010-01-29 12:45:24.000000000 +0100
+@@ -467,6 +467,7 @@
+       Sub : Iir;
+       Formal_Object : Iir;
+    begin
++      --  Recurse.
+       Formal_Object := Name_To_Object (Formal);
+       case Get_Kind (Formal_Object) is
+          when Iir_Kind_Indexed_Name
+@@ -518,6 +519,7 @@
+       end case;
+    end Add_Individual_Association_1;
+ 
++   --  Insert ASSOC into the tree of individual assoc rooted by IASSOC.
+    procedure Add_Individual_Association (Iassoc : Iir; Assoc : Iir)
+    is
+       Formal : Iir;
