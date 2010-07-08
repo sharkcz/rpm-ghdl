@@ -1,6 +1,6 @@
 %global gccver 4.3.4
 %global ghdlver 0.29
-%global ghdlsvnver 138
+%global ghdlsvnver 143
 
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
@@ -316,7 +316,6 @@ P64=%{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/vhdl/lib/
 
 %files
 %defattr(-,root,root,-)
-%doc ghdl-%{ghdlver}/COPYING
 %{_bindir}/ghdl
 %{_infodir}/ghdl.info.gz
 # Need to own directory %{_libexecdir}/gcc even though we only want the
@@ -326,12 +325,17 @@ P64=%{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/vhdl/lib/
 
 %files grt
 %defattr(-,root,root,-)
+%doc ghdl-%{ghdlver}/COPYING
 # Need to own directory %{_libdir}/gcc even though we only want the
 # %{gcc_target_platform}/%{gccver} subdirectory
 %{_libdir}/gcc/
 
 
 %changelog
+* Thu Jul  8 2010 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.29-1.143svn.0
+- update to svn143
+- move license text to grt subpackage
+
 * Fri Jan 29 2010 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.29-1.138svn.0
 - update to svn138
 
