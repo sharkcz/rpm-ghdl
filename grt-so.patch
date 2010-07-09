@@ -11,7 +11,7 @@
 +GRT_SO_MAJOR?=1
 +GRT_SO_MINOR?=0
 +GRT_SO_PL?=0
-+GNATVER?=4.4
++GNATVER?=4.5
 +
  # Set target files.
  ifeq ($(filter-out i%86 linux,$(arch) $(osys)),)

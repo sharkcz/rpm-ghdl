@@ -5,7 +5,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-Release: 1.%{ghdlsvnver}svn.0%{?dist}
+Release: 1.%{ghdlsvnver}svn.1%{?dist}
 #Release: 1%{?dist}
 License: GPLv2+
 Group: Development/Languages
@@ -19,7 +19,7 @@ Source0: ftp://gcc.gnu.org/pub/gcc/releases/gcc-%{gccver}/gcc-core-%{gccver}.tar
 Source100: http://ghdl.free.fr/ghdl-%{ghdlver}.tar.bz2
 Patch100: ghdl-svn%{ghdlsvnver}.patch
 Patch103: ghdl-noruntime.patch
-Patch104: ghdl-svn110-libgnat44.patch
+Patch104: ghdl-svn143-libgnat45.patch
 Patch105: ghdl-grtadac.patch
 # Both following patches have been sent to upstream mailing list:
 # From: Thomas Sailer <t.sailer@alumni.ethz.ch>
@@ -332,6 +332,9 @@ P64=%{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/vhdl/lib/
 
 
 %changelog
+* Fri Jul  9 2010 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.29-1.143svn.1
+- update to gnat 4.5
+
 * Thu Jul  8 2010 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.29-1.143svn.0
 - update to svn143
 - move license text to grt subpackage
