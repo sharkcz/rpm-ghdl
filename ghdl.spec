@@ -5,7 +5,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-Release: 1.%{ghdlsvnver}svn.2%{?dist}
+Release: 1.%{ghdlsvnver}svn.3%{?dist}
 #Release: 1%{?dist}
 License: GPLv2+
 Group: Development/Languages
@@ -58,7 +58,7 @@ BuildRequires: zlib-devel, gettext, bison, flex, texinfo, gawk
 BuildRequires: glibc-devel >= 2.3.90-2
 %ifarch ppc ppc64 s390 s390x sparc sparcv9 alpha
 # Make sure glibc supports TFmode long double
- BuildRequires: glibc >= 2.3.90-35
+BuildRequires: glibc >= 2.3.90-35
 %endif
 # Ada requires Ada to build
 BuildRequires: gcc-gnat >= 4.3, libgnat >= 4.3
@@ -81,6 +81,9 @@ Requires: glibc >= 2.3.90-35
 %endif
 
 Requires: ghdl-grt = %{version}-%{release}
+
+# gcc-gnat only available on these:
+ExclusiveArch: %{ix86} x86_64 ia64 ppc ppc64 alpha
 
 # Make sure we don't use clashing namespaces
 %global _vendor fedora_ghdl
@@ -332,6 +335,10 @@ P64=%{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/vhdl/lib/
 
 
 %changelog
+* Tue Feb  1 2011 Dan Horák <dan[at]danny.cz> - 0.29-1.143svn.3
+- updated the supported arch list
+- remove the offending space in BR: glibc
+
 * Sun Jan 23 2011 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.29-1.143svn.2
 - rebuild
 
