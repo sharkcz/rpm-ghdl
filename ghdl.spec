@@ -5,7 +5,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-Release: 2.%{ghdlsvnver}svn.3%{?dist}
+Release: 2.%{ghdlsvnver}svn.4%{?dist}
 #Release: 1%{?dist}
 License: GPLv2+
 Group: Development/Languages
@@ -19,7 +19,7 @@ Source0: ftp://gcc.gnu.org/pub/gcc/releases/gcc-%{gccver}/gcc-core-%{gccver}.tar
 Source100: http://ghdl.free.fr/ghdl-%{ghdlver}.tar.bz2
 Patch100: ghdl-svn%{ghdlsvnver}.patch
 Patch103: ghdl-noruntime.patch
-Patch104: ghdl-svn143-libgnat45.patch
+Patch104: ghdl-svn143-libgnat46.patch
 Patch105: ghdl-grtadac.patch
 # Both following patches have been sent to upstream mailing list:
 # From: Thomas Sailer <t.sailer@alumni.ethz.ch>
@@ -335,6 +335,9 @@ P64=%{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/vhdl/lib/
 
 
 %changelog
+* Tue Feb 22 2011 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.29-2.143svn.4
+- rebuild for gnat 4.6
+
 * Tue Feb 08 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.29-2.143svn.3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 
