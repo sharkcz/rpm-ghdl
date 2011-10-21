@@ -5,7 +5,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-Release: 2.%{ghdlsvnver}svn.4%{?dist}.1
+Release: 2.%{ghdlsvnver}svn.4%{?dist}.2
 #Release: 1%{?dist}
 License: GPLv2+
 Group: Development/Languages
@@ -335,6 +335,9 @@ P64=%{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/vhdl/lib/
 
 
 %changelog
+* Fri Oct 21 2011 Marcela Mašláňová <mmaslano@redhat.com> - 0.29-2.143svn.4.2
+- rebuild with new gmp without compat lib
+
 * Tue Oct 11 2011 Peter Schiffer <pschiffe@redhat.com> - 0.29-2.143svn.4.1
 - rebuild with new gmp
 
