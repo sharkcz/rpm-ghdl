@@ -1,41 +1,32 @@
-There is one usage in boehm-gc/os_dep.c, but it is only used if
-SUNOS5SIGS is defined, which it is only if one of SUNOS5, DRSNX, HPUX, or
-FREEBSD is defined, which are all not using Linux-based glibc ports.
-
-Likewise, gcc/ada/init.c has a struct __siginfo occurence, but only for
-__FreeBSD__.
-
-config/rs6000/linux-unwind.h uses ``char siginfo[128]'', and
-config/s390/linux-unwind.h also uses a constant.
-
-I tested the following patch for sh-linux-gnu.  This only covers one
-configuration, but the change is pretty mechanic anyway and every place
-that used to refer to struct siginfo already must have had <signal.h> in
-its include path, which is the same file that declares siginfo_t.
-
-OK to commit?  This should probably also go into any active release
-branches, to keep them buildable once this glibc change ripples through?
-
-libgcc/
-	* config/alpha/linux-unwind.h (alpha_fallback_frame_state): Use
-	siginfo_t instead of struct siginfo.
-	* config/bfin/linux-unwind.h (bfin_fallback_frame_state): Likewise.
-	* config/i386/linux-unwind.h (x86_fallback_frame_state): Likewise.
-	* config/ia64/linux-unwind.h (ia64_fallback_frame_state)
-	(ia64_handle_unwabi): Likewise.
-	* config/mips/linux-unwind.h (mips_fallback_frame_state): Likewise.
-	* config/pa/linux-unwind.h (pa32_fallback_frame_state): Likewise.
-	* config/sh/linux-unwind.h (shmedia_fallback_frame_state)
-	(sh_fallback_frame_state): Likewise.
-	* config/tilepro/linux-unwind.h (tile_fallback_frame_state): Likewise.
-	* config/xtensa/linux-unwind.h (xtensa_fallback_frame_state): Likewise.
-
-diff --git a/libgcc/config/alpha/linux-unwind.h b/libgcc/config/alpha/linux-unwind.h
-index 4c811dc..f747053 100644
---- a/libgcc/config/alpha/linux-unwind.h
-+++ b/libgcc/config/alpha/linux-unwind.h
-@@ -49,7 +49,7 @@ alpha_fallback_frame_state (struct _Unwind_Context *context,
-   else if (pc[1] == 0x201f015f)		/* lda $0,NR_rt_sigreturn */
+--- gcc-4.3.4/gcc/config/i386/linux-unwind.h.siginfo	2006-10-26 21:31:09.000000000 +0200
++++ gcc-4.3.4/gcc/config/i386/linux-unwind.h	2012-07-25 21:06:35.687182719 +0200
+@@ -137,9 +137,9 @@
+     {
+       struct rt_sigframe {
+ 	int sig;
+-	struct siginfo *pinfo;
++	siginfo_t *pinfo;
+ 	void *puc;
+-	struct siginfo info;
++	siginfo_t info;
+ 	struct ucontext uc;
+       } *rt_ = context->cfa;
+       /* The void * cast is necessary to avoid an aliasing warning.
+--- gcc-4.3.4/gcc/config/xtensa/linux-unwind.h.siginfo	2008-01-18 02:37:53.000000000 +0100
++++ gcc-4.3.4/gcc/config/xtensa/linux-unwind.h	2012-07-25 21:06:42.587806680 +0200
+@@ -66,7 +66,7 @@
+   struct sigcontext *sc;
+ 
+   struct rt_sigframe {
+-    struct siginfo info;
++    siginfo_t info;
+     struct ucontext uc;
+   } *rt_;
+ 
+--- gcc-4.3.4/gcc/config/alpha/linux-unwind.h.siginfo	2006-10-26 21:31:09.000000000 +0200
++++ gcc-4.3.4/gcc/config/alpha/linux-unwind.h	2012-07-25 21:06:35.686182628 +0200
+@@ -52,7 +52,7 @@
+   else if (pc[1] == 0x201f015f)	/* lda $0,NR_rt_sigreturn */
      {
        struct rt_sigframe {
 -	struct siginfo info;
@@ -43,11 +34,9 @@ index 4c811dc..f747053 100644
  	struct ucontext uc;
        } *rt_ = context->cfa;
        sc = &rt_->uc.uc_mcontext;
-diff --git a/libgcc/config/bfin/linux-unwind.h b/libgcc/config/bfin/linux-unwind.h
-index 88c8285..6e8f1ad 100644
---- a/libgcc/config/bfin/linux-unwind.h
-+++ b/libgcc/config/bfin/linux-unwind.h
-@@ -48,10 +48,10 @@ bfin_fallback_frame_state (struct _Unwind_Context *context,
+--- gcc-4.3.4/gcc/config/bfin/linux-unwind.h.siginfo	2007-09-05 18:23:42.000000000 +0200
++++ gcc-4.3.4/gcc/config/bfin/linux-unwind.h	2012-07-25 21:06:35.686182628 +0200
+@@ -52,10 +52,10 @@
      {
        struct rt_sigframe {
  	int sig;
@@ -60,27 +49,9 @@ index 88c8285..6e8f1ad 100644
  	struct ucontext uc;
        } *rt_ = context->cfa;
  
-diff --git a/libgcc/config/i386/linux-unwind.h b/libgcc/config/i386/linux-unwind.h
-index f17a46c..33810c5 100644
---- a/libgcc/config/i386/linux-unwind.h
-+++ b/libgcc/config/i386/linux-unwind.h
-@@ -139,9 +139,9 @@ x86_fallback_frame_state (struct _Unwind_Context *context,
-     {
-       struct rt_sigframe {
- 	int sig;
--	struct siginfo *pinfo;
-+	siginfo_t *pinfo;
- 	void *puc;
--	struct siginfo info;
-+	siginfo_t info;
- 	struct ucontext uc;
-       } *rt_ = context->cfa;
-       /* The void * cast is necessary to avoid an aliasing warning.
-diff --git a/libgcc/config/ia64/linux-unwind.h b/libgcc/config/ia64/linux-unwind.h
-index 93f762d..baf80ee 100644
---- a/libgcc/config/ia64/linux-unwind.h
-+++ b/libgcc/config/ia64/linux-unwind.h
-@@ -47,7 +47,7 @@ ia64_fallback_frame_state (struct _Unwind_Context *context,
+--- gcc-4.3.4/gcc/config/ia64/linux-unwind.h.siginfo	2005-06-25 03:22:41.000000000 +0200
++++ gcc-4.3.4/gcc/config/ia64/linux-unwind.h	2012-07-25 21:06:35.687182719 +0200
+@@ -51,7 +51,7 @@
        struct sigframe {
  	char scratch[16];
  	unsigned long sig_number;
@@ -89,7 +60,7 @@ index 93f762d..baf80ee 100644
  	struct sigcontext *sc;
        } *frame_ = (struct sigframe *)context->psp;
        struct sigcontext *sc = frame_->sc;
-@@ -137,7 +137,7 @@ ia64_handle_unwabi (struct _Unwind_Context *context, _Unwind_FrameState *fs)
+@@ -130,7 +130,7 @@
        struct sigframe {
  	char scratch[16];
  	unsigned long sig_number;
@@ -98,11 +69,9 @@ index 93f762d..baf80ee 100644
  	struct sigcontext *sc;
        } *frame = (struct sigframe *)context->psp;
        struct sigcontext *sc = frame->sc;
-diff --git a/libgcc/config/mips/linux-unwind.h b/libgcc/config/mips/linux-unwind.h
-index 02f7cd5..69d96f1 100644
---- a/libgcc/config/mips/linux-unwind.h
-+++ b/libgcc/config/mips/linux-unwind.h
-@@ -75,7 +75,7 @@ mips_fallback_frame_state (struct _Unwind_Context *context,
+--- gcc-4.3.4/gcc/config/mips/linux-unwind.h.siginfo	2007-11-15 06:33:28.000000000 +0100
++++ gcc-4.3.4/gcc/config/mips/linux-unwind.h	2012-07-25 21:06:35.687182719 +0200
+@@ -79,7 +79,7 @@
        struct rt_sigframe {
  	u_int32_t ass[4];  /* Argument save space for o32.  */
  	u_int32_t trampoline[2];
@@ -111,11 +80,9 @@ index 02f7cd5..69d96f1 100644
  	_sig_ucontext_t uc;
        } *rt_ = context->cfa;
        sc = &rt_->uc.uc_mcontext;
-diff --git a/libgcc/config/pa/linux-unwind.h b/libgcc/config/pa/linux-unwind.h
-index a0560e9..dd8f590 100644
---- a/libgcc/config/pa/linux-unwind.h
-+++ b/libgcc/config/pa/linux-unwind.h
-@@ -63,7 +63,7 @@ pa32_fallback_frame_state (struct _Unwind_Context *context,
+--- gcc-4.3.4/gcc/config/pa/linux-unwind.h.siginfo	2007-09-12 01:16:01.000000000 +0200
++++ gcc-4.3.4/gcc/config/pa/linux-unwind.h	2012-07-25 21:06:35.688182809 +0200
+@@ -66,7 +66,7 @@
    int i;
    struct sigcontext *sc;
    struct rt_sigframe {
@@ -124,58 +91,3 @@ index a0560e9..dd8f590 100644
      struct ucontext uc;
    } *frame;
  
-diff --git a/libgcc/config/sh/linux-unwind.h b/libgcc/config/sh/linux-unwind.h
-index 94ed95d..c1e1adb 100644
---- a/libgcc/config/sh/linux-unwind.h
-+++ b/libgcc/config/sh/linux-unwind.h
-@@ -80,9 +80,9 @@ shmedia_fallback_frame_state (struct _Unwind_Context *context,
- 	   && (*(unsigned long *) (pc+11)  == 0x6ff0fff0))
-     {
-       struct rt_sigframe {
--	struct siginfo *pinfo;
-+	siginfo_t *pinfo;
- 	void *puc;
--	struct siginfo info;
-+	siginfo_t info;
- 	struct ucontext uc;
-       } *rt_ = context->cfa;
-       /* The void * cast is necessary to avoid an aliasing warning.
-@@ -179,7 +179,7 @@ sh_fallback_frame_state (struct _Unwind_Context *context,
- 		&& (*(unsigned short *) (pc+14)  == 0x00ad))))
-     {
-       struct rt_sigframe {
--	struct siginfo info;
-+	siginfo_t info;
- 	struct ucontext uc;
-       } *rt_ = context->cfa;
-       /* The void * cast is necessary to avoid an aliasing warning.
-diff --git a/libgcc/config/tilepro/linux-unwind.h b/libgcc/config/tilepro/linux-unwind.h
-index 0ed662c..27a6c43 100644
---- a/libgcc/config/tilepro/linux-unwind.h
-+++ b/libgcc/config/tilepro/linux-unwind.h
-@@ -61,7 +61,7 @@ tile_fallback_frame_state (struct _Unwind_Context *context,
- 
-   struct rt_sigframe {
-     unsigned char save_area[C_ABI_SAVE_AREA_SIZE];
--    struct siginfo info;
-+    siginfo_t info;
-     struct ucontext uc;
-   } *rt_;
- 
-diff --git a/libgcc/config/xtensa/linux-unwind.h b/libgcc/config/xtensa/linux-unwind.h
-index 32e9349..dda1f29 100644
---- a/libgcc/config/xtensa/linux-unwind.h
-+++ b/libgcc/config/xtensa/linux-unwind.h
-@@ -62,7 +62,7 @@ xtensa_fallback_frame_state (struct _Unwind_Context *context,
-   struct sigcontext *sc;
- 
-   struct rt_sigframe {
--    struct siginfo info;
-+    siginfo_t info;
-     struct ucontext uc;
-   } *rt_;
- 
-
-
-Gruesse,
- Thomas
