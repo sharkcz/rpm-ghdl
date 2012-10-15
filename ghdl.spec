@@ -5,7 +5,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-Release: 2.%{ghdlsvnver}svn.7%{?dist}
+Release: 3.%{ghdlsvnver}svn.7%{?dist}
 #Release: 1%{?dist}
 License: GPLv2+
 Group: Development/Languages
@@ -82,6 +82,7 @@ Requires: glibc >= 2.3.90-35
 %endif
 
 Requires: ghdl-grt = %{version}-%{release}
+Provides: bundled(libiberty)
 
 # gcc-gnat only available on these:
 ExclusiveArch: %{ix86} x86_64 ia64 ppc ppc64 alpha
@@ -337,6 +338,9 @@ P64=%{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/vhdl/lib/
 
 
 %changelog
+* Mon Oct 15 2012 Jon Ciesls <limburgher@gmail.com> - 0.29-3.143svn.7
+- Provides: bundled(libiberty)
+
 * Wed Jul 25 2012 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.29-2.143svn.7
 - fix siginfo build failure
 
