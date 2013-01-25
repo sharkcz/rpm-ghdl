@@ -5,7 +5,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-Release: 3.%{ghdlsvnver}svn.7%{?dist}
+Release: 3.%{ghdlsvnver}svn.8%{?dist}
 #Release: 1%{?dist}
 License: GPLv2+
 Group: Development/Languages
@@ -338,6 +338,9 @@ P64=%{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/vhdl/lib/
 
 
 %changelog
+* Fri Jan 25 2013 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.29-3.143svn.8
+- rebuild for gnat 4.8
+
 * Mon Oct 15 2012 Jon Ciesls <limburgher@gmail.com> - 0.29-3.143svn.7
 - Provides: bundled(libiberty)
 
