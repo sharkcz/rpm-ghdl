@@ -216,7 +216,9 @@ popd
 %patch105 -p1 -b .grtadac
 %patch106 -p0 -b .ppc64abort
 %patch108 -p0 -b .libgomp
+%ifarch x86_64
 %patch109 -p0 -b .typeforsize
+%endif
 %patch110 -p0 -b .ghdlmake
 
 %if 0%{?fedora} >= 16 || 0%{?rhel} >= 7
@@ -442,6 +444,9 @@ P64=%{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccinstver}/vhdl/lib/
 
 
 %changelog
+* Fri Feb  1 2013 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.29-3.150svn.0
+- update to svn150 (based on gcc 4.7.2)
+
 * Fri Jan 25 2013 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.29-3.143svn.8
 - rebuild for gnat 4.8
 
@@ -530,7 +535,7 @@ P64=%{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccinstver}/vhdl/lib/
 * Tue May 26 2009 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.27-0.110svn.7
 - fix bug in std.textio.read (string)
 
-* Wed Apr  2 2009 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.27-0.110svn.6
+* Thu Apr  2 2009 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.27-0.110svn.6
 - actually add the patch
 
 * Wed Apr  1 2009 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.27-0.110svn.5
@@ -640,7 +645,7 @@ P64=%{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccinstver}/vhdl/lib/
 - update to svn40, to fix an array bounds checking bug apparently
   introduced in svn39
 
-* Thu Feb 16 2006 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.22-0.39svn.0
+* Fri Feb 16 2006 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.22-0.39svn.0
 - update to svn39, to fix some constant bugs
 
 * Wed Feb 14 2006 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.22-0.38svn.1
