@@ -1,11 +1,18 @@
-%global gccver 4.3.4
+%global gccver 4.7.2
+%global gccdate 20121109
+%global gccinstver 4.7.3
 %global ghdlver 0.29
-%global ghdlsvnver 143
+%global ghdlsvnver 150
+%if 0%{?rhel} >= 7
+%global build_cloog 0
+%else
+%global build_cloog 1
+%endif
 
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-Release: 3.%{ghdlsvnver}svn.8%{?dist}
+Release: 3.%{ghdlsvnver}svn.0%{?dist}
 #Release: 1%{?dist}
 License: GPLv2+
 Group: Development/Languages
@@ -15,7 +22,33 @@ URL: http://ghdl.free.fr/
 # svn co svn://svn.gna.org/svn/ghdl/trunk ghdl
 # cd translate/gcc/
 # ./dist.sh sources
-Source0: ftp://gcc.gnu.org/pub/gcc/releases/gcc-%{gccver}/gcc-core-%{gccver}.tar.bz2
+# The source for this package was pulled from upstream's vcs.  Use the
+# following commands to generate the tarball:
+# svn export svn://gcc.gnu.org/svn/gcc/branches/redhat/gcc-4_7-branch@%{SVNREV} gcc-%{gccver}-%{gccdate}
+# tar cf - gcc-%{gccver}-%{gccdate} | bzip2 -9 > gcc-%{gccver}-%{gccdate}.tar.bz2
+%if 0%{?gccdate}
+Source0: gcc-%{gccver}-%{gccdate}.tar.bz2
+%else
+Source0: ftp://ftp.gwdg.de/pub/misc/gcc/releases/gcc-%{gccver}/gcc-%{gccver}.tar.bz2
+%endif
+Patch0: gcc47-hack.patch
+Patch1: gcc47-c++-builtin-redecl.patch
+Patch2: gcc47-java-nomulti.patch
+Patch3: gcc47-ppc32-retaddr.patch
+Patch5: gcc47-rh330771.patch
+Patch6: gcc47-i386-libgomp.patch
+Patch7: gcc47-sparc-config-detection.patch
+Patch8: gcc47-libgomp-omp_h-multilib.patch
+Patch9: gcc47-libtool-no-rpath.patch
+Patch10: gcc47-cloog-dl.patch
+Patch11: gcc47-pr38757.patch
+Patch13: gcc47-no-add-needed.patch
+Patch14: gcc47-ppl-0.10.patch
+Patch15: gcc47-libitm-fno-exceptions.patch
+Patch16: gcc47-rh837630.patch
+Patch17: gcc47-arm-hfp-ldso.patch
+Patch18: gcc47-pr55137.patch
+Patch19: gcc47-pr55236.patch
 Source100: http://ghdl.free.fr/ghdl-%{ghdlver}.tar.bz2
 Patch100: ghdl-svn%{ghdlsvnver}.patch
 Patch103: ghdl-noruntime.patch
@@ -29,7 +62,9 @@ Patch105: ghdl-grtadac.patch
 Patch106: ghdl-ppc64abort.patch
 # https://gna.org/bugs/index.php?13389
 Patch107: ieee-mathreal.patch
-Patch108: ghdl-siginfo.patch
+Patch108: ghdl-libgomp.patch
+Patch109: ghdl-typeforsize.patch
+Patch110: ghdl-make.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -64,7 +99,7 @@ BuildRequires: glibc >= 2.3.90-35
 # Ada requires Ada to build
 BuildRequires: gcc-gnat >= 4.3, libgnat >= 4.3
 # GCC build requirements
-BuildRequires: gmp-devel >= 4.1, mpfr-devel >= 2.3.0
+BuildRequires: gmp-devel >= 4.1.2-8, mpfr-devel >= 2.2.1, libmpc-devel >= 0.8.1
 # Need .eh_frame ld optimizations
 # Need proper visibility support
 # Need -pie support
@@ -79,6 +114,17 @@ Requires: glibc-devel >= 2.2.90-12
 %ifarch ppc ppc64 s390 s390x sparc sparcv9 alpha
 # Make sure glibc supports TFmode long double
 Requires: glibc >= 2.3.90-35
+%endif
+%ifarch ia64
+BuildRequires: libunwind >= 0.98
+%endif
+%if %{build_cloog}
+%if 0%{?fedora} >= 15 || 0%{?rhel} >= 7
+BuildRequires: ppl >= 0.11.2, ppl-devel >= 0.11.2
+%else
+BuildRequires: ppl >= 0.10, ppl-devel >= 0.10
+%endif
+BuildRequires: cloog-ppl >= 0.15, cloog-ppl-devel >= 0.15
 %endif
 
 Requires: ghdl-grt = %{version}-%{release}
@@ -128,7 +174,37 @@ object files into simulator executables. grt contains the simulator kernel
 that tracks signal updates and schedules processes.
 
 %prep
+%if 0%{?gccdate}
+%setup -q -n gcc-%{gccver}-%{gccdate} -T -b 0 -a 100
+%else
 %setup -q -n gcc-%{gccver} -T -b 0 -a 100
+%endif
+%patch0 -p0 -b .hack~
+%patch1 -p0 -b .c++-builtin-redecl~
+%patch2 -p0 -b .java-nomulti~
+%patch3 -p0 -b .ppc32-retaddr~
+%patch5 -p0 -b .rh330771~
+%patch6 -p0 -b .i386-libgomp~
+%if 0%{?gccdate}
+%patch7 -p0 -b .sparc-config-detection~
+%endif
+%patch8 -p0 -b .libgomp-omp_h-multilib~
+%patch9 -p0 -b .libtool-no-rpath~
+%if %{build_cloog}
+%patch10 -p0 -b .cloog-dl~
+%endif
+%patch11 -p0 -b .pr38757~
+%patch13 -p0 -b .no-add-needed~
+%if 0%{?fedora} < 15 && 0%{?rhel} < 7
+%patch14 -p0 -b .ppl-0.10~
+%endif
+%patch15 -p0 -b .libitm-fno-exceptions~
+%patch16 -p0 -b .rh837630~
+%if 0%{?fedora} >= 18 || 0%{?rhel} >= 7
+%patch17 -p0 -b .arm-hfp-ldso~
+%endif
+%patch18 -p0 -b .pr55137~
+%patch19 -p0 -b .pr55236~
 pushd ghdl-%{ghdlver}
 %patch100 -p1
 %patch103 -p0 -b .noruntime
@@ -139,7 +215,26 @@ popd
 %patch104 -p0 -b .libgnat44
 %patch105 -p1 -b .grtadac
 %patch106 -p0 -b .ppc64abort
-%patch108 -p1 -b .siginfo
+%patch108 -p0 -b .libgomp
+%patch109 -p0 -b .typeforsize
+%patch110 -p0 -b .ghdlmake
+
+%if 0%{?fedora} >= 16 || 0%{?rhel} >= 7
+# Default to -gdwarf-4 -fno-debug-types-section rather than -gdwarf-2
+sed -i '/UInteger Var(dwarf_version)/s/Init(2)/Init(4)/' gcc/common.opt
+sed -i '/flag_debug_types_section/s/Init(1)/Init(0)/' gcc/common.opt
+sed -i '/dwarf_record_gcc_switches/s/Init(0)/Init(1)/' gcc/common.opt
+sed -i 's/\(may be either 2, 3 or 4; the default version is \)2\./\14./' gcc/doc/invoke.texi
+%else
+# Default to -gdwarf-3 rather than -gdwarf-2
+sed -i '/UInteger Var(dwarf_version)/s/Init(2)/Init(3)/' gcc/common.opt
+sed -i 's/\(may be either 2, 3 or 4; the default version is \)2\./\13./' gcc/doc/invoke.texi
+sed -i 's/#define[[:blank:]]*EMIT_ENTRY_VALUE[[:blank:]].*$/#define EMIT_ENTRY_VALUE 0/' gcc/{var-tracking,dwarf2out}.c
+sed -i 's/#define[[:blank:]]*EMIT_TYPED_DWARF_STACK[[:blank:]].*$/#define EMIT_TYPED_DWARF_STACK 0/' gcc/dwarf2out.c
+sed -i 's/#define[[:blank:]]*EMIT_DEBUG_MACRO[[:blank:]].*$/#define EMIT_DEBUG_MACRO 0/' gcc/dwarf2out.c
+%endif
+
+cp -a libstdc++-v3/config/cpu/i{4,3}86/atomicity.h
 
 %build
 %{__rm} -fr obj-%{gcc_target_platform}
@@ -199,6 +294,13 @@ export TCFLAGS="$OPT_FLAGS"
         --disable-bootstrap \
         --disable-libunwind-exceptions \
         --disable-libgcj \
+	--disable-build-with-cxx \
+	--disable-build-poststage1-with-cxx \
+%if %{build_cloog}
+	--with-ppl --with-cloog \
+%else
+	--without-ppl --without-cloog \
+%endif
 %ifarch sparc
         --host=%{gcc_target_platform} \
         --build=%{gcc_target_platform} \
@@ -226,9 +328,11 @@ popd
 %{__rm} -rf %{buildroot}
 %{__make} -C obj-%{gcc_target_platform} DESTDIR=%{buildroot} install-host
 
+rm -f %{buildroot}/%{_bindir}/{,%{gcc_target_platform}-}gcc-{ar,nm,ranlib}
+
 %ifarch x86_64
 pushd obj-%{gcc_target_platform}/gcc/vhdl
-P32=%{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/vhdl/lib/32/
+P32=%{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccinstver}/vhdl/lib/32/
 %{__install} -d ${P32}
 make ghdllibs-clean
 %if %{!?_without_mock:0}%{?_without_mock:1}
@@ -263,13 +367,13 @@ echo "-lm"
 %ifarch x86_64
 echo "-ldl"
 %endif
-) >> %{buildroot}%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/vhdl/lib/grt.lst
+) >> %{buildroot}%{_libdir}/gcc/%{gcc_target_platform}/%{gccinstver}/vhdl/lib/grt.lst
 
 # Remove files not to be packaged
 pushd %{buildroot}
 %{__rm} -f \
         .%{_bindir}/{cpp,gcc,gccbug,gcov} \
-        .%{_bindir}/%{gcc_target_platform}-gcc{,-%{gccver}} \
+        .%{_bindir}/%{gcc_target_platform}-gcc{,-%{gccinstver}} \
         .%{_includedir}/mf-runtime.h \
         .%{_libdir}/lib* \
         .%{_infodir}/dir \
@@ -283,19 +387,19 @@ pushd %{buildroot}
         .%{_libdir}/32/libiberty.a
 # Remove crt/libgcc, as ghdl invokes the native gcc to perform the linking
 %{__rm} -f \
-        .%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/crt* \
-        .%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/libgc* \
-        .%{_libexecdir}/gcc/%{gcc_target_platform}/%{gccver}/{cc1,collect2}
+        .%{_libdir}/gcc/%{gcc_target_platform}/%{gccinstver}/crt* \
+        .%{_libdir}/gcc/%{gcc_target_platform}/%{gccinstver}/libgc* \
+        .%{_libexecdir}/gcc/%{gcc_target_platform}/%{gccinstver}/{cc1,collect2}
 
 # Remove directory hierarchies not to be packaged
 %{__rm} -rf \
-        .%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/{include,install-tools} \
-        .%{_libexecdir}/gcc/%{gcc_target_platform}/%{gccver}/install-tools
+        .%{_libdir}/gcc/%{gcc_target_platform}/%{gccinstver}/{include,install-tools} \
+        .%{_libexecdir}/gcc/%{gcc_target_platform}/%{gccinstver}/install-tools
 
 popd
 
 # copy v08 libraries from v93 for now
-P64=%{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/vhdl/lib/
+P64=%{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccinstver}/vhdl/lib/
 %{__cp} -rv ${P64}v93 ${P64}v08
 %{__mv} ${P64}v08/std/std-obj93.cf ${P64}v08/std/std-obj08.cf
 %{__mv} ${P64}v08/ieee/ieee-obj93.cf ${P64}v08/ieee/ieee-obj08.cf
@@ -325,7 +429,7 @@ P64=%{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/vhdl/lib/
 %{_bindir}/ghdl
 %{_infodir}/ghdl.info.gz
 # Need to own directory %{_libexecdir}/gcc even though we only want the
-# %{gcc_target_platform}/%{gccver} subdirectory
+# %{gcc_target_platform}/%{gccinstver} subdirectory
 %{_libexecdir}/gcc/
 %{_mandir}/man1/*
 
@@ -333,7 +437,7 @@ P64=%{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccver}/vhdl/lib/
 %defattr(-,root,root,-)
 %doc ghdl-%{ghdlver}/COPYING
 # Need to own directory %{_libdir}/gcc even though we only want the
-# %{gcc_target_platform}/%{gccver} subdirectory
+# %{gcc_target_platform}/%{gccinstver} subdirectory
 %{_libdir}/gcc/
 
 

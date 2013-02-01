@@ -1,0 +1,13 @@
+--- gcc/vhdl/ortho-lang.c.orig	2013-02-01 11:27:40.199726632 +0100
++++ gcc/vhdl/ortho-lang.c	2013-02-01 11:29:00.272327562 +0100
+@@ -629,6 +629,10 @@
+ 
+   if (precision <= MAX_BITS_PER_WORD)
+     signed_and_unsigned_types[precision][unsignedp] = t;
++  else 
++    // Handle larger requests by returning a NULL tree and letting 
++    // the back end default to another approach.
++    t = NULL_TREE;
+ 
+   return t;
+ }
