@@ -3,11 +3,11 @@
 %global gccinstver 4.7.3
 %global ghdlver 0.29
 %global ghdlsvnver 150
-%if 0%{?rhel} >= 7
+#if 0%{?rhel} >= 7
 %global build_cloog 0
-%else
-%global build_cloog 1
-%endif
+#else
+#global build_cloog 1
+#endif
 
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
