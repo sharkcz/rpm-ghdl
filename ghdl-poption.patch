@@ -1,0 +1,11 @@
+--- gcc/vhdl/lang.opt.orig	2013-02-02 22:04:47.333216128 +0000
++++ gcc/vhdl/lang.opt	2013-02-02 21:53:58.701198684 +0000
+@@ -22,7 +22,7 @@
+ Set the directory of the work library
+ 
+ P
+-vhdl Joined
++vhdl JoinedOrMissing
+ -P<dir>	Add <dir> to the end of the vhdl library path
+ 
+ -elab
