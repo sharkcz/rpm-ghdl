@@ -222,6 +222,7 @@ popd
 %patch109 -p0 -b .typeforsize
 %endif
 %patch110 -p0 -b .ghdlmake
+%patch111 -p0 -b .texinfo
 
 %if 0%{?fedora} >= 16 || 0%{?rhel} >= 7
 # Default to -gdwarf-4 -fno-debug-types-section rather than -gdwarf-2
