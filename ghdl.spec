@@ -52,7 +52,7 @@ Patch19: gcc47-pr55236.patch
 Source100: http://ghdl.free.fr/ghdl-%{ghdlver}.tar.bz2
 Patch100: ghdl-svn%{ghdlsvnver}.patch
 Patch103: ghdl-noruntime.patch
-Patch104: ghdl-svn143-libgnat47.patch
+Patch104: ghdl-svn143-libgnat48.patch
 Patch105: ghdl-grtadac.patch
 # Both following patches have been sent to upstream mailing list:
 # From: Thomas Sailer <t.sailer@alumni.ethz.ch>
