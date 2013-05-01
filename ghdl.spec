@@ -648,10 +648,10 @@ P64=%{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccinstver}/vhdl/lib/
 - update to svn40, to fix an array bounds checking bug apparently
   introduced in svn39
 
-* Fri Feb 16 2006 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.22-0.39svn.0
+* Thu Feb 16 2006 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.22-0.39svn.0
 - update to svn39, to fix some constant bugs
 
-* Wed Feb 14 2006 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.22-0.38svn.1
+* Tue Feb 14 2006 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.22-0.38svn.1
 - rebuild with new compiler for FC5
 
 * Wed Dec 21 2005 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.22-0.38svn.0
