@@ -65,6 +65,8 @@ Patch107: ieee-mathreal.patch
 Patch108: ghdl-poption.patch
 Patch109: ghdl-typeforsize.patch
 Patch110: ghdl-make.patch
+# http://gcc.gnu.org/ml/gcc-patches/2012-10/msg02505.html
+Patch111: gcc47-texinfo.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -446,6 +448,7 @@ P64=%{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccinstver}/vhdl/lib/
 %changelog
 * Wed May  1 2013 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.29-3.150svn.1
 - update for gnat 4.8
+- texinfo build fix
 
 * Fri Feb  1 2013 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.29-3.150svn.0
 - update to svn150 (based on gcc 4.7.2)
