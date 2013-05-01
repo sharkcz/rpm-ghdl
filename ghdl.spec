@@ -62,7 +62,7 @@ Patch105: ghdl-grtadac.patch
 Patch106: ghdl-ppc64abort.patch
 # https://gna.org/bugs/index.php?13389
 Patch107: ieee-mathreal.patch
-Patch108: ghdl-libgomp.patch
+Patch108: ghdl-poption.patch
 Patch109: ghdl-typeforsize.patch
 Patch110: ghdl-make.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
