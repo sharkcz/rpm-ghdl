@@ -589,15 +589,3 @@
  v16hi __builtin_ia32_pavgw256 (v16hi,v16hi)
  v32qi __builtin_ia32_pblendvb256 (v32qi,v32qi,v32qi)
  v16hi __builtin_ia32_pblendw256 (v16hi,v16hi,int)
---- ./gcc/doc/tm.texi.in	2012-08-13 16:13:33.000000000 +0200
-+++ ./gcc/doc/tm.texi.in	2012-08-10 15:21:31.000000000 +0200
-@@ -11240,9 +11240,4 @@
- @code{TARGET_CONST_ANCHOR} is set to @samp{0x8000}.  The default value
- is zero, which disables this optimization.  @end deftypevr
- 
--@hook TARGET_MEMMODEL_CHECK
--Validate target specific memory model mask bits. When NULL no target specific
--memory model bits are allowed.
--@end deftypefn
--
- @hook TARGET_ATOMIC_TEST_AND_SET_TRUEVAL
