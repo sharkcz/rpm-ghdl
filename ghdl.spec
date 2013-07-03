@@ -1,5 +1,5 @@
 %global gccver 4.7.2
-%global gccdate 20121109
+%global gccdate 20121110
 %global gccinstver 4.7.3
 %global ghdlver 0.29
 %global ghdlsvnver 150
@@ -12,7 +12,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-Release: 3.%{ghdlsvnver}svn.1%{?dist}
+Release: 3.%{ghdlsvnver}svn.2%{?dist}
 #Release: 1%{?dist}
 License: GPLv2+
 Group: Development/Languages
@@ -24,10 +24,10 @@ URL: http://ghdl.free.fr/
 # ./dist.sh sources
 # The source for this package was pulled from upstream's vcs.  Use the
 # following commands to generate the tarball:
-# svn export svn://gcc.gnu.org/svn/gcc/branches/redhat/gcc-4_7-branch@%{SVNREV} gcc-%{gccver}-%{gccdate}
-# tar cf - gcc-%{gccver}-%{gccdate} | bzip2 -9 > gcc-%{gccver}-%{gccdate}.tar.bz2
+# svn export 'svn://gcc.gnu.org/svn/gcc/branches/redhat/gcc-4_7-branch@{%{gccdate}}' gcc-%{gccver}-%{gccdate}
+# tar cf - gcc-%{gccver}-%{gccdate} | xz > gcc-%{gccver}-%{gccdate}.tar.xz
 %if 0%{?gccdate}
-Source0: gcc-%{gccver}-%{gccdate}.tar.bz2
+Source0: gcc-%{gccver}-%{gccdate}.tar.xz
 %else
 Source0: ftp://ftp.gwdg.de/pub/misc/gcc/releases/gcc-%{gccver}/gcc-%{gccver}.tar.bz2
 %endif
@@ -447,6 +447,9 @@ P64=%{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccinstver}/vhdl/lib/
 
 
 %changelog
+* Tue Jul  2 2013 Ville Skyttä <ville.skytta@iki.fi> - 0.29-3.150svn.2
+- Compress gcc tarball with xz.
+
 * Wed May  1 2013 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.29-3.150svn.1
 - update for gnat 4.8
 - texinfo build fix
