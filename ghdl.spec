@@ -264,7 +264,8 @@ OPT_FLAGS=$(echo $OPT_FLAGS | %{__sed} \
         -e 's/-mtune=generic/-mtune=nocona/g' \
 %endif
         -e 's/-fstack-protector//g ' \
-        -e 's/--param=ssp-buffer-size=[0-9]*//g')
+        -e 's/--param=ssp-buffer-size=[0-9]*//g ' \
+        -e 's/-strong//g')
 
 # gcc -m32 fails, so we disable multilibbing.
 # so far multilib isn't very valuable, as the VHDL libraries aren't multilibbed
@@ -447,6 +448,9 @@ P64=%{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccinstver}/vhdl/lib/
 
 
 %changelog
+* Wed May  1 2013 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.29-4.150svn.2
+- fix FTBFS
+
 * Sat Aug 03 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.29-4.150svn.2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 
