@@ -12,7 +12,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-Release: 4.%{ghdlsvnver}svn.2%{?dist}
+Release: 4.%{ghdlsvnver}svn.3%{?dist}
 #Release: 1%{?dist}
 License: GPLv2+
 Group: Development/Languages
@@ -67,6 +67,7 @@ Patch109: ghdl-typeforsize.patch
 Patch110: ghdl-make.patch
 # http://gcc.gnu.org/ml/gcc-patches/2012-10/msg02505.html
 Patch111: gcc47-texinfo.patch
+Patch112: gcc47-fmtstring.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -223,6 +224,7 @@ popd
 %endif
 %patch110 -p0 -b .ghdlmake
 %patch111 -p0 -b .texinfo
+%patch112 -p0 -b .fmtstring
 
 %if 0%{?fedora} >= 16 || 0%{?rhel} >= 7
 # Default to -gdwarf-4 -fno-debug-types-section rather than -gdwarf-2
@@ -448,6 +450,9 @@ P64=%{buildroot}/%{_libdir}/gcc/%{gcc_target_platform}/%{gccinstver}/vhdl/lib/
 
 
 %changelog
+* Tue Dec  3 2013 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.29-4.150svn.3
+- prevent format-security warning
+
 * Mon Aug  5 2013 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.29-4.150svn.2
 - fix FTBFS
 
