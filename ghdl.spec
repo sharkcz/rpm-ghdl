@@ -100,11 +100,12 @@ Requires: glibc-devel >= 2.2.90-12
 # Make sure glibc supports TFmode long double
 Requires: glibc >= 2.3.90-35
 %endif
+%ifarch %{multilib_64_archs} sparcv9 ppc
+# Ensure glibc{,-devel} is installed for both multilib arches
+BuildRequires: /lib/libc.so.6 /usr/lib/libc.so /lib64/libc.so.6 /usr/lib64/libc.so
+%endif
 %ifarch ia64
 BuildRequires: libunwind >= 0.98
-%endif
-%ifarch x86_64
-BuildRequires: glibc-devel(x86-32)
 %endif
 
 Requires: ghdl-grt = %{version}-%{release}
