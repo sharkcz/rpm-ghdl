@@ -104,7 +104,7 @@ Requires: glibc >= 2.3.90-35
 BuildRequires: libunwind >= 0.98
 %endif
 %ifarch x86_64
-BuildRequires: glibc-devel.i686
+BuildRequires: glibc-devel(x86-32)
 %endif
 
 Requires: ghdl-grt = %{version}-%{release}
