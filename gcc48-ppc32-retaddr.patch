@@ -8,7 +8,7 @@
 
 --- gcc/config/rs6000/rs6000.c.jj	2005-11-26 14:38:01.000000000 +0100
 +++ gcc/config/rs6000/rs6000.c	2005-11-28 20:32:18.000000000 +0100
-@@ -13166,17 +13166,22 @@ rs6000_return_addr (int count, rtx frame
+@@ -18325,18 +18325,22 @@ rs6000_return_addr (int count, rtx frame
       don't try to be too clever here.  */
    if (count != 0 || (DEFAULT_ABI != ABI_AIX && flag_pic))
      {
@@ -20,7 +20,8 @@
 -	  (Pmode,
 -	   memory_address
 -	   (Pmode,
--	    plus_constant (copy_to_reg
+-	    plus_constant (Pmode,
+-			   copy_to_reg
 -			   (gen_rtx_MEM (Pmode,
 -					 memory_address (Pmode, frame))),
 -			   RETURN_ADDRESS_OFFSET)));
@@ -35,7 +36,7 @@
 +	  x = copy_to_reg (gen_rtx_MEM (Pmode, x));
 +	}
 +
-+      x = plus_constant (x, RETURN_ADDRESS_OFFSET);
++      x = plus_constant (Pmode, x, RETURN_ADDRESS_OFFSET);
 +      return gen_rtx_MEM (Pmode, memory_address (Pmode, x));
      }
  
