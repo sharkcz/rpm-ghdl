@@ -103,6 +103,9 @@ Requires: glibc >= 2.3.90-35
 %ifarch ia64
 BuildRequires: libunwind >= 0.98
 %endif
+%ifarch x86_64
+BuildRequires: glibc-devel.i686
+%endif
 
 Requires: ghdl-grt = %{version}-%{release}
 Provides: bundled(libiberty)
