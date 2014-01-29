@@ -49,9 +49,6 @@ Patch106: ghdl-ppc64abort.patch
 Patch107: ieee-mathreal.patch
 # http://gcc.gnu.org/ml/gcc-patches/2012-10/msg02505.html
 Patch111: gcc47-texinfo.patch
-# https://bugzilla.redhat.com/show_bug.cgi?id=1059364
-# http://gcc.gnu.org/viewcvs/gcc/trunk/libiberty/objalloc.c?r1=184997&r2=191413&view=patch
-Patch1000: objalloc.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -192,7 +189,6 @@ popd
 %patch105 -p1 -b .grtadac
 %patch106 -p0 -b .ppc64abort
 #patch111 -p0 -b .texinfo
-%patch1000 -p1 -b .objalloc~
 
 sed -i -e 's/4\.8\.3/4.8.2/' gcc/BASE-VER
 echo 'Red Hat %{version}-%{gcc_release}' > gcc/DEV-PHASE
