@@ -7,7 +7,7 @@ Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
 #Release: 4.%{ghdlsvnver}svn.3%{?dist}
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2+
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -459,6 +459,9 @@ P64=%{buildroot}/%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/vhdl/l
 
 
 %changelog
+* Wed Jan 29 2014 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.31-2
+- BZ#1059364
+
 * Wed Dec 18 2013 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.31-1
 - change to sourceforge repository
 
