@@ -7,7 +7,7 @@ Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
 #Release: 4.%{ghdlsvnver}svn.3%{?dist}
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2+
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -35,7 +35,7 @@ Patch13: gcc48-pr56564.patch
 Patch14: gcc48-pr56493.patch
 Patch15: gcc48-color-auto.patch
 Patch16: gcc48-pr58956.patch
-Source100: http://downloads.sourceforge.net/project/ghdl-updates/Source/ghdl_%{ghdlver}dev.zip
+Source100: http://downloads.sourceforge.net/project/ghdl-updates/Source/ghdl-%{ghdlver}.tar.gz
 Patch103: ghdl-noruntime.patch
 Patch104: ghdl-svn143-libgnat48.patch
 Patch105: ghdl-grtadac.patch
@@ -45,8 +45,6 @@ Patch105: ghdl-grtadac.patch
 # Date: Thu, 02 Apr 2009 15:36:00 +0200
 # https://gna.org/bugs/index.php?13390
 Patch106: ghdl-ppc64abort.patch
-# https://gna.org/bugs/index.php?13389
-Patch107: ieee-mathreal.patch
 # http://gcc.gnu.org/ml/gcc-patches/2012-10/msg02505.html
 Patch111: gcc47-texinfo.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -155,7 +153,7 @@ object files into simulator executables. grt contains the simulator kernel
 that tracks signal updates and schedules processes.
 
 %prep
-%setup -q -n gcc-%{gcc_version}-%{DATE} -a 100
+%setup -q -n gcc-%{gcc_version}-%{DATE}
 %patch0 -p0 -b .hack~
 %patch1 -p0 -b .java-nomulti~
 %patch2 -p0 -b .ppc32-retaddr~
@@ -173,15 +171,18 @@ that tracks signal updates and schedules processes.
 %endif
 %patch16 -p0 -b .pr58956~
 
+mkdir ghdl_%{ghdlver}dev
+pushd ghdl_%{ghdlver}dev
+tar xzf %{SOURCE100}
+popd
 pushd ghdl_%{ghdlver}dev/translate/gcc
 ./dist.sh sources
-mv ghdl-%{ghdlver}dev.tar.bz2 ../../../
+mv ghdl-%{ghdlver}dev.bz2 ../../../
 popd
 #rm -rf ghdl_%{ghdlver}dev
-tar xjf ghdl-%{ghdlver}dev.tar.bz2
-pushd ghdl-%{ghdlver}dev
+tar xjf ghdl-%{ghdlver}.tar.bz2
+pushd ghdl-%{ghdlver}
 %patch103 -p0 -b .noruntime
-%patch107 -p0 -b .ieeemathreal
 %{__mv} vhdl ../gcc/
 popd
 #patch102 -p1 -b .makeinfo
