@@ -456,6 +456,9 @@ P64=%{buildroot}/%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/vhdl/l
 
 
 %changelog
+* Sat Feb  1 2014 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.31-2
+- update to release 0.31
+
 * Wed Dec 18 2013 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.31-1
 - change to sourceforge repository
 
