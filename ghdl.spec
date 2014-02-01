@@ -177,7 +177,7 @@ tar xzf %{SOURCE100}
 popd
 pushd ghdl_%{ghdlver}dev/translate/gcc
 ./dist.sh sources
-mv ghdl-%{ghdlver}dev.bz2 ../../../
+mv ghdl-%{ghdlver}.bz2 ../../../
 popd
 #rm -rf ghdl_%{ghdlver}dev
 tar xjf ghdl-%{ghdlver}.tar.bz2
