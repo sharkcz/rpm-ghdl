@@ -7,7 +7,7 @@ Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
 #Release: 4.%{ghdlsvnver}svn.3%{?dist}
-Release: 2%{?dist}
+Release: 3%{?dist}
 License: GPLv2+
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -37,7 +37,7 @@ Patch15: gcc48-color-auto.patch
 Patch16: gcc48-pr58956.patch
 Source100: http://downloads.sourceforge.net/project/ghdl-updates/Source/ghdl-%{ghdlver}.tar.gz
 Patch103: ghdl-noruntime.patch
-Patch104: ghdl-svn143-libgnat48.patch
+Patch104: ghdl-svn143-libgnat49.patch
 Patch105: ghdl-grtadac.patch
 # Both following patches have been sent to upstream mailing list:
 # From: Thomas Sailer <t.sailer@alumni.ethz.ch>
@@ -456,6 +456,9 @@ P64=%{buildroot}/%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/vhdl/l
 
 
 %changelog
+* Wed Apr 30 2014 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.31-3
+- rebuild for gnat 4.9
+
 * Sat Feb  1 2014 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.31-2
 - update to release 0.31
 

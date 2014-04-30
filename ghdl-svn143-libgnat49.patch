@@ -4,7 +4,7 @@
   GRT_EXTRA_LIB+=-lpthread
  endif
  
-+GRT_EXTRA_LIB+=-lgnat-4.8
++GRT_EXTRA_LIB+=-lgnat-4.9
 +
  GRT_ARCH?=None
  
