@@ -7,7 +7,7 @@ Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
 #Release: 4.%{ghdlsvnver}svn.3%{?dist}
-Release: 3%{?dist}
+Release: 4%{?dist}
 License: GPLv2+
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -110,7 +110,7 @@ Requires: ghdl-grt = %{version}-%{release}
 Provides: bundled(libiberty)
 
 # gcc-gnat only available on these:
-ExclusiveArch: %{ix86} x86_64 ia64 ppc ppc64 alpha
+ExclusiveArch: %{GNAT_arches}
 
 # Make sure we don't use clashing namespaces
 %global _vendor fedora_ghdl
@@ -456,6 +456,9 @@ P64=%{buildroot}/%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/vhdl/l
 
 
 %changelog
+* Tue May 13 2014 Peter Robinson <pbrobinson@fedoraproject.org> 0.31-4
+- Use GNAT_arches rather than an explicit list
+
 * Wed Apr 30 2014 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.31-3
 - rebuild for gnat 4.9
 
