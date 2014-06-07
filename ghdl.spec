@@ -7,7 +7,7 @@ Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
 #Release: 4.%{ghdlsvnver}svn.3%{?dist}
-Release: 4%{?dist}
+Release: 5%{?dist}
 License: GPLv2+
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -456,6 +456,9 @@ P64=%{buildroot}/%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/vhdl/l
 
 
 %changelog
+* Sat Jun 07 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.31-5
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
+
 * Tue May 13 2014 Peter Robinson <pbrobinson@fedoraproject.org> 0.31-4
 - Use GNAT_arches rather than an explicit list
 
