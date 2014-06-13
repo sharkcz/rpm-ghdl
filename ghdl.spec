@@ -112,6 +112,9 @@ Provides: bundled(libiberty)
 # gcc-gnat only available on these:
 ExclusiveArch: %{GNAT_arches}
 
+# the following arches are not supported by the base compiler:
+ExcludeArch: armv7hl
+
 # Make sure we don't use clashing namespaces
 %global _vendor fedora_ghdl
 
