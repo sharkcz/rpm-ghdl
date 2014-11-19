@@ -1,13 +1,14 @@
-%global DATE 20131212
-%global SVNREV 205936
-%global gcc_version 4.8.2
-%global ghdlver 0.31
+%global DATE 20141101
+%global SVNREV 216995
+%global gcc_version 4.9.2
+%global ghdlver 0.32rc1
+%global ghdlhgrev .hg484
 
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
 #Release: 4.%{ghdlsvnver}svn.3%{?dist}
-Release: 6%{?dist}
+Release: 0%{ghdlhgrev}.0%{?dist}
 License: GPLv2+
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -21,21 +22,31 @@ URL: http://ghdl.free.fr/
 # svn export svn://gcc.gnu.org/svn/gcc/branches/redhat/gcc-4_7-branch@%{SVNREV} gcc-%{version}-%{DATE}
 # tar cf - gcc-%{version}-%{DATE} | bzip2 -9 > gcc-%{version}-%{DATE}.tar.bz2
 Source0: gcc-%{gcc_version}-%{DATE}.tar.bz2
-Patch0: gcc48-hack.patch
-Patch1: gcc48-java-nomulti.patch
-Patch2: gcc48-ppc32-retaddr.patch
-Patch3: gcc48-rh330771.patch
-Patch4: gcc48-i386-libgomp.patch
-Patch5: gcc48-sparc-config-detection.patch
-Patch6: gcc48-libgomp-omp_h-multilib.patch
-Patch7: gcc48-libtool-no-rpath.patch
-Patch10: gcc48-pr38757.patch
-Patch12: gcc48-no-add-needed.patch
-Patch13: gcc48-pr56564.patch
-Patch14: gcc48-pr56493.patch
-Patch15: gcc48-color-auto.patch
-Patch16: gcc48-pr58956.patch
-Source100: http://downloads.sourceforge.net/project/ghdl-updates/Source/ghdl-%{ghdlver}.tar.gz
+%global isl_version 0.12.2
+Source1: ftp://gcc.gnu.org/pub/gcc/infrastructure/isl-%{isl_version}.tar.bz2
+%global cloog_version 0.18.1
+Source2: ftp://gcc.gnu.org/pub/gcc/infrastructure/cloog-%{cloog_version}.tar.gz
+Patch0: gcc49-hack.patch
+Patch1: gcc49-java-nomulti.patch
+Patch2: gcc49-ppc32-retaddr.patch
+Patch3: gcc49-rh330771.patch
+Patch4: gcc49-i386-libgomp.patch
+Patch5: gcc49-sparc-config-detection.patch
+Patch6: gcc49-libgomp-omp_h-multilib.patch
+Patch7: gcc49-libtool-no-rpath.patch
+Patch8: gcc49-cloog-dl.patch
+Patch9: gcc49-cloog-dl2.patch
+Patch10: gcc49-pr38757.patch
+Patch11: gcc49-libstdc++-docs.patch
+Patch12: gcc49-no-add-needed.patch
+Patch14: gcc49-pr56493.patch
+Patch15: gcc49-color-auto.patch
+Patch16: gcc49-libgo-p224.patch
+Patch17: gcc49-aarch64-async-unw-tables.patch
+Patch18: gcc49-aarch64-unwind-opt.patch
+Patch19: gcc49-pr63659.patch
+Patch1100: cloog-%{cloog_version}-ppc64le-config.patch
+Source100: http://downloads.sourceforge.net/project/ghdl-updates/Source/ghdl-%{ghdlver}%{ghdlhgrev}.tar.bz2
 Patch103: ghdl-noruntime.patch
 Patch104: ghdl-svn143-libgnat49.patch
 Patch105: ghdl-grtadac.patch
@@ -65,15 +76,25 @@ Requires: gcc
 %ifarch x86_64
 %global multilib_32_arch i386
 %endif
+%global build_cloog 1
+%global build_libstdcxx_docs 1
+%ifarch %{ix86} x86_64 ppc ppc64 ppc64le ppc64p7 s390 s390x %{arm} aarch64
+%global attr_ifunc 1
+%else
+%global attr_ifunc 0
+%endif
 # Need binutils with -pie support >= 2.14.90.0.4-4
 # Need binutils which can omit dot symbols and overlap .opd on ppc64 >= 2.15.91.0.2-4
 # Need binutils which handle -msecure-plt on ppc >= 2.16.91.0.2-2
 # Need binutils which support .weakref >= 2.16.91.0.3-1
-BuildRequires: binutils >= 2.16.91.0.3-1
-BuildRequires: zlib-devel, gettext, bison, flex, texinfo, gawk
+BuildRequires: binutils
+#BuildRequires: binutils >= 2.24
+BuildRequires: zlib-devel, gettext, bison, flex, sharutils, texinfo, texinfo-tex, gawk, /usr/bin/pod2man
 # Make sure pthread.h doesn't contain __thread tokens
 # Make sure glibc supports stack protector
-BuildRequires: glibc-devel >= 2.3.90-2
+BuildRequires: glibc-devel >= 2.4.90-13
+BuildRequires: elfutils-devel >= 0.147
+BuildRequires: elfutils-libelf-devel >= 0.147
 %ifarch ppc ppc64 s390 s390x sparc sparcv9 alpha
 # Make sure glibc supports TFmode long double
 BuildRequires: glibc >= 2.3.90-35
@@ -156,7 +177,7 @@ object files into simulator executables. grt contains the simulator kernel
 that tracks signal updates and schedules processes.
 
 %prep
-%setup -q -n gcc-%{gcc_version}-%{DATE}
+%setup -q -n gcc-%{gcc_version}-%{DATE} -a 1 -a 2
 %patch0 -p0 -b .hack~
 %patch1 -p0 -b .java-nomulti~
 %patch2 -p0 -b .ppc32-retaddr~
@@ -165,25 +186,26 @@ that tracks signal updates and schedules processes.
 %patch5 -p0 -b .sparc-config-detection~
 %patch6 -p0 -b .libgomp-omp_h-multilib~
 %patch7 -p0 -b .libtool-no-rpath~
+%if %{build_cloog}
+%patch8 -p0 -b .cloog-dl~
+%patch9 -p0 -b .cloog-dl2~
+%endif
 %patch10 -p0 -b .pr38757~
+%if %{build_libstdcxx_docs}
+%patch11 -p0 -b .libstdc++-docs~
+%endif
 %patch12 -p0 -b .no-add-needed~
-%patch13 -p0 -b .pr56564~
 %patch14 -p0 -b .pr56493~
 %if 0%{?fedora} >= 20 || 0%{?rhel} >= 7
 %patch15 -p0 -b .color-auto~
 %endif
-%patch16 -p0 -b .pr58956~
+%patch16 -p0 -b .libgo-p224~
+rm -f libgo/go/crypto/elliptic/p224{,_test}.go
+%patch17 -p0 -b .aarch64-async-unw-tables~
+%patch18 -p0 -b .aarch64-unwind-opt~
+%patch19 -p0 -b .pr63659~
 
-mkdir ghdl_%{ghdlver}dev
-pushd ghdl_%{ghdlver}dev
-tar xzf %{SOURCE100}
-popd
-pushd ghdl_%{ghdlver}dev/translate/gcc
-./dist.sh sources
-mv ghdl-%{ghdlver}.tar.bz2 ../../../
-popd
-#rm -rf ghdl_%{ghdlver}dev
-tar xjf ghdl-%{ghdlver}.tar.bz2
+tar xjf %{SOURCE100}
 pushd ghdl-%{ghdlver}
 %patch103 -p0 -b .noruntime
 %{__mv} vhdl ../gcc/
@@ -194,7 +216,9 @@ popd
 %patch106 -p0 -b .ppc64abort
 #patch111 -p0 -b .texinfo
 
-sed -i -e 's/4\.8\.3/4.8.2/' gcc/BASE-VER
+%patch1100 -p0 -b .cloog-ppc64le-config~
+
+sed -i -e 's/4\.9\.3/4.9.2/' gcc/BASE-VER
 echo 'Red Hat %{version}-%{gcc_release}' > gcc/DEV-PHASE
 
 %if 0%{?fedora} >= 16 || 0%{?rhel} >= 7
@@ -215,12 +239,55 @@ sed -i 's/#define[[:blank:]]*EMIT_DEBUG_MACRO[[:blank:]].*$/#define EMIT_DEBUG_M
 cp -a libstdc++-v3/config/cpu/i{4,3}86/atomicity.h
 
 %build
+
 # Undo the broken autoconf change in recent Fedora versions
 export CONFIG_SITE=NONE
 
 %{__rm} -fr obj-%{gcc_target_platform}
 %{__mkdir} obj-%{gcc_target_platform}
 pushd obj-%{gcc_target_platform}
+
+%if %{build_cloog}
+mkdir isl-build isl-install
+%ifarch s390 s390x
+ISL_FLAG_PIC=-fPIC
+%else
+ISL_FLAG_PIC=-fpic
+%endif
+cd isl-build
+../../isl-%{isl_version}/configure --disable-shared \
+  CC=/usr/bin/gcc CXX=/usr/bin/g++ \
+  CFLAGS="${CFLAGS:-%optflags} $ISL_FLAG_PIC" --prefix=`cd ..; pwd`/isl-install
+make %{?_smp_mflags}
+make install
+cd ..
+
+mkdir cloog-build cloog-install
+cd cloog-build
+cat >> ../../cloog-%{cloog_version}/source/isl/constraints.c << \EOF
+#include <isl/flow.h>
+static void __attribute__((used)) *s1 = (void *) isl_union_map_compute_flow;
+static void __attribute__((used)) *s2 = (void *) isl_map_dump;
+EOF
+sed -i 's|libcloog|libgcc49privatecloog|g' \
+  ../../cloog-%{cloog_version}/{,test/}Makefile.{am,in}
+isl_prefix=`cd ../isl-install; pwd` \
+../../cloog-%{cloog_version}/configure --with-isl=system \
+  --with-isl-prefix=`cd ../isl-install; pwd` \
+  CC=/usr/bin/gcc CXX=/usr/bin/g++ \
+  CFLAGS="${CFLAGS:-%optflags}" CXXFLAGS="${CXXFLAGS:-%optflags}" \
+   --prefix=`cd ..; pwd`/cloog-install
+sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
+sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
+make %{?_smp_mflags}
+make %{?_smp_mflags} install
+cd ../cloog-install/lib
+rm libgcc49privatecloog-isl.so{,.4}
+mv libgcc49privatecloog-isl.so.4.0.0 libcloog-isl.so.4
+ln -sf libcloog-isl.so.4 libcloog-isl.so
+ln -sf libcloog-isl.so.4 libcloog.so
+cd ../..
+%endif
 
 CC=gcc
 OPT_FLAGS=`echo %{optflags}|sed -e 's/\(-Wp,\)\?-D_FORTIFY_SOURCE=[12]//g'`
@@ -260,25 +327,40 @@ case "$OPT_FLAGS" in
       ../gcc/Makefile.in
     ;;
 esac
+
 CC="$CC" CFLAGS="$OPT_FLAGS" \
 	CXXFLAGS="`echo " $OPT_FLAGS " | sed 's/ -Wall / /g;s/ -fexceptions / /g'`" \
 	XCFLAGS="$OPT_FLAGS" TCFLAGS="$OPT_FLAGS" GCJFLAGS="$OPT_FLAGS" \
 	../configure --prefix=%{_prefix} --mandir=%{_mandir} --infodir=%{_infodir} \
 	--with-bugurl=http://bugzilla.redhat.com/bugzilla --enable-bootstrap=no \
 	--enable-shared --enable-threads=posix --enable-checking=release \
+%ifarch ppc64le
+        --disable-multilib \
+%else
+        --enable-multilib \
+%endif
 	--with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions \
 	--enable-gnu-unique-object --enable-linker-build-id --with-linker-hash-style=gnu \
 	--enable-languages=vhdl \
 	--enable-plugin --enable-initfini-array \
 	--disable-libgcj \
-	--without-isl --without-cloog \
+%if %{build_cloog}
+        --with-isl=`pwd`/isl-install --with-cloog=`pwd`/cloog-install \
+%else
+        --without-isl --without-cloog \
+%endif
+%if 0%{?fedora} >= 21 || 0%{?rhel} >= 7
+%if %{attr_ifunc}
+        --enable-gnu-indirect-function \
+%endif
+%endif
 %ifarch %{arm}
 	--disable-sjlj-exceptions \
 %endif
-%ifarch ppc ppc64
+%ifarch ppc ppc64 ppc64le ppc64p7
 	--enable-secureplt \
 %endif
-%ifarch sparc sparcv9 sparc64 ppc ppc64 s390 s390x alpha
+%ifarch sparc sparcv9 sparc64 ppc ppc64 ppc64le ppc64p7 s390 s390x alpha
 	--with-long-double-128 \
 %endif
 %ifarch sparc
@@ -290,7 +372,7 @@ CC="$CC" CFLAGS="$OPT_FLAGS" \
 %ifarch sparc sparcv9
 	--host=%{gcc_target_platform} --build=%{gcc_target_platform} --target=%{gcc_target_platform} --with-cpu=v7
 %endif
-%ifarch ppc ppc64
+%ifarch ppc ppc64 ppc64le ppc64p7
 %if 0%{?rhel} >= 7
 	--with-cpu-32=power7 --with-tune-32=power7 --with-cpu-64=power7 --with-tune-64=power7 \
 %endif
@@ -321,9 +403,9 @@ CC="$CC" CFLAGS="$OPT_FLAGS" \
 %endif
 %ifarch s390 s390x
 %if 0%{?rhel} >= 7
-	--with-arch=z10 --with-tune=zEC12 --enable-decimal-float \
+        --with-arch=z196 --with-tune=zEC12 --enable-decimal-float \
 %else
-	--with-arch=z9-109 --with-tune=z10 --enable-decimal-float \
+        --with-arch=z9-109 --with-tune=z10 --enable-decimal-float \
 %endif
 %endif
 %ifarch armv7hl
@@ -334,8 +416,18 @@ CC="$CC" CFLAGS="$OPT_FLAGS" \
 	--build=%{gcc_target_platform}
 %endif
 
+#%ifarch %{arm} sparc sparcv9 sparc64
+#GCJFLAGS="$OPT_FLAGS" make %{?_smp_mflags} BOOT_CFLAGS="$OPT_FLAGS" bootstrap
+#%else
+#GCJFLAGS="$OPT_FLAGS" make %{?_smp_mflags} BOOT_CFLAGS="$OPT_FLAGS" profiledbootstrap
+#%endif
+
 #%{__make} %{?_smp_mflags}
 %{__make}
+
+%if %{build_cloog}
+cp -a cloog-install/lib/libcloog-isl.so.4 gcc/
+%endif
 
 popd
 
@@ -415,21 +507,6 @@ pushd %{buildroot}
 
 popd
 
-# copy v08 libraries from v93 for now
-P64=%{buildroot}/%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/vhdl/lib/
-%{__cp} -rv ${P64}v93 ${P64}v08
-%{__mv} ${P64}v08/std/std-obj93.cf ${P64}v08/std/std-obj08.cf
-%{__mv} ${P64}v08/ieee/ieee-obj93.cf ${P64}v08/ieee/ieee-obj08.cf
-%{__mv} ${P64}v08/mentor/ieee-obj93.cf ${P64}v08/mentor/ieee-obj08.cf
-%{__mv} ${P64}v08/synopsys/ieee-obj93.cf ${P64}v08/synopsys/ieee-obj08.cf
-%ifarch x86_64
-%{__cp} -rv ${P32}v93 ${P32}v08
-%{__mv} ${P32}v08/std/std-obj93.cf ${P32}v08/std/std-obj08.cf
-%{__mv} ${P32}v08/ieee/ieee-obj93.cf ${P32}v08/ieee/ieee-obj08.cf
-%{__mv} ${P32}v08/mentor/ieee-obj93.cf ${P32}v08/mentor/ieee-obj08.cf
-%{__mv} ${P32}v08/synopsys/ieee-obj93.cf ${P32}v08/synopsys/ieee-obj08.cf
-%endif
-
 %clean
 %{__rm} -rf %{buildroot}
 
@@ -459,6 +536,9 @@ P64=%{buildroot}/%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/vhdl/l
 
 
 %changelog
+* Wed Nov 19 2014 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.32rc1-0.hg484.0
+- update to 0.32rc1 (hg484)
+
 * Sat Aug 16 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.31-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
 
