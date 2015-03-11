@@ -287,7 +287,7 @@ popd
 cp -r ghdl-updates-code ghdl-updates-code-mcode
 pushd ghdl-updates-code-mcode
 %patch112 -p0 -b .mcode32
-%if %{__isa_bits} == 64
+%if "%{?_lib}" == "lib64"
 perl -i -pe 's,^libdirsuffix=.*$,libdirsuffix=lib64/ghdl/mcode,' configure
 %else
 perl -i -pe 's,^libdirsuffix=.*$,libdirsuffix=lib/ghdl/mcode,' configure
@@ -299,7 +299,7 @@ popd
 
 %if %{with llvm}
 pushd ghdl-updates-code
-%if %{__isa_bits} == 64
+%if "%{?_lib}" == "lib64"
 perl -i -pe 's,^libdirsuffix=.*$,libdirsuffix=lib64/ghdl/llvm,' configure
 %else
 perl -i -pe 's,^libdirsuffix=.*$,libdirsuffix=lib/ghdl/llvm,' configure
