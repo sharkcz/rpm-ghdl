@@ -1,8 +1,8 @@
 %global DATE 20141101
 %global SVNREV 216995
 %global gcc_version 4.9.2
-%global ghdlver 0.32rc1
-%global ghdlhgrev .hg484
+%global ghdlver 0.33dev
+%global ghdlhgrev .hg688
 
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
@@ -12,11 +12,14 @@ Release: 0%{ghdlhgrev}.0%{?dist}
 License: GPLv2+
 Group: Development/Languages
 URL: http://ghdl.free.fr/
-# HOWTO create source files from ghdl SVN at https://gna.org/projects/ghdl/
-# check out the SVN repo
-# svn co svn://svn.gna.org/svn/ghdl/trunk ghdl
+# HOWTO create source files from ghdl HG at
+# check out the HG repo
+# hg clone http://hg.code.sf.net/p/ghdl-updates/code ghdl-updates-code
+
+# tar cvJf ghdl%{ghdlhgrev}.tar.bz2 ghdl-updates-code
 # cd translate/gcc/
 # ./dist.sh sources
+#
 # The source for this package was pulled from upstream's vcs.  Use the
 # following commands to generate the tarball:
 # svn export svn://gcc.gnu.org/svn/gcc/branches/redhat/gcc-4_7-branch@%{SVNREV} gcc-%{version}-%{DATE}
@@ -46,9 +49,9 @@ Patch17: gcc49-aarch64-async-unw-tables.patch
 Patch18: gcc49-aarch64-unwind-opt.patch
 Patch19: gcc49-pr63659.patch
 Patch1100: cloog-%{cloog_version}-ppc64le-config.patch
-Source100: http://downloads.sourceforge.net/project/ghdl-updates/Source/ghdl-%{ghdlver}%{ghdlhgrev}.tar.bz2
+Source100: ghdl%{ghdlhgrev}.tar.bz2
 Patch103: ghdl-noruntime.patch
-Patch104: ghdl-svn143-libgnat49.patch
+#Patch104: ghdl-svn143-libgnat49.patch
 Patch105: ghdl-grtadac.patch
 # Both following patches have been sent to upstream mailing list:
 # From: Thomas Sailer <t.sailer@alumni.ethz.ch>
@@ -58,6 +61,8 @@ Patch105: ghdl-grtadac.patch
 Patch106: ghdl-ppc64abort.patch
 # http://gcc.gnu.org/ml/gcc-patches/2012-10/msg02505.html
 Patch111: gcc47-texinfo.patch
+Patch112: ghdl-mcode32bit.patch
+Patch113: ghdl-hgreorg.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -126,6 +131,13 @@ BuildRequires: /lib/libc.so.6 /usr/lib/libc.so /lib64/libc.so.6 /usr/lib64/libc.
 %ifarch ia64
 BuildRequires: libunwind >= 0.98
 %endif
+# for x86, we also build the mcode version; if on x86_64, we need some 32bit libraries
+%ifarch x86_64
+BuildRequires: libgnat(x86-32)
+BuildRequires: libgnat-devel(x86-32)
+BuildRequires: zlib(x86-32)
+BuildRequires: zlib-devel(x86-32)
+%endif
 
 Requires: ghdl-grt = %{version}-%{release}
 Provides: bundled(libiberty)
@@ -176,8 +188,28 @@ This package contains the runtime libraries needed to link ghdl-compiled
 object files into simulator executables. grt contains the simulator kernel
 that tracks signal updates and schedules processes.
 
+%ifarch %{ix86} x86_64
+%package mcode
+Summary: GHDL with mcode backend
+Group: Development/Languages
+Requires: ghdl-mcode-grt = %{version}-%{release}
+
+%description mcode
+This package contains the ghdl compiler with the mcode backend. The mcode
+backend provides for faster compile time at the expense of longer run time.
+
+%package mcode-grt
+Summary: GHDL mcode runtime libraries
+Group: System Environment/Libraries
+
+%description mcode-grt
+This package contains the runtime libraries needed to link ghdl-mcode-compiled
+object files into simulator executables. mcode-grt contains the simulator kernel
+that tracks signal updates and schedules processes.
+%endif
+
 %prep
-%setup -q -n gcc-%{gcc_version}-%{DATE} -a 1 -a 2
+%setup -q -n gcc-%{gcc_version}-%{DATE} -a 1 -a 2 -a 100
 %patch0 -p0 -b .hack~
 %patch1 -p0 -b .java-nomulti~
 %patch2 -p0 -b .ppc32-retaddr~
@@ -205,13 +237,24 @@ rm -f libgo/go/crypto/elliptic/p224{,_test}.go
 %patch18 -p0 -b .aarch64-unwind-opt~
 %patch19 -p0 -b .pr63659~
 
-tar xjf %{SOURCE100}
+pushd ghdl-updates-code
+%patch113 -p0 -b .reorg
+pushd dist/gcc
+./dist.sh sources
+popd
+%ifarch %{ix86} x86_64
+%patch112 -p0 -b .mcode32
+%endif
+popd
+
+tar xvjf ghdl-updates-code/dist/gcc/ghdl-%{ghdlver}.tar.bz2
+
 pushd ghdl-%{ghdlver}
 %patch103 -p0 -b .noruntime
 %{__mv} vhdl ../gcc/
 popd
 #patch102 -p1 -b .makeinfo
-%patch104 -p0 -b .libgnat44
+#patch104 -p0 -b .libgnat44
 %patch105 -p1 -b .grtadac
 %patch106 -p0 -b .ppc64abort
 #patch111 -p0 -b .texinfo
@@ -239,6 +282,14 @@ sed -i 's/#define[[:blank:]]*EMIT_DEBUG_MACRO[[:blank:]].*$/#define EMIT_DEBUG_M
 cp -a libstdc++-v3/config/cpu/i{4,3}86/atomicity.h
 
 %build
+
+# build mcode on x86
+%ifarch %{ix86} x86_64
+pushd ghdl-updates-code
+./configure --prefix=/usr
+make
+popd
+%endif
 
 # Undo the broken autoconf change in recent Fedora versions
 export CONFIG_SITE=NONE
@@ -433,9 +484,19 @@ popd
 
 %install
 %{__rm} -rf %{buildroot}
+
+# build mcode on x86
+%ifarch %{ix86} x86_64
+pushd ghdl-updates-code
+make DESTDIR=%{buildroot} install
+mv %{buildroot}/%{_bindir}/ghdl %{buildroot}/%{_bindir}/ghdl-mcode
+popd
+%endif
+
 %{__make} -C obj-%{gcc_target_platform} DESTDIR=%{buildroot} install
 
 %ifarch x86_64
+PSRC=`pwd`
 pushd obj-%{gcc_target_platform}/gcc/vhdl
 P32=%{buildroot}/%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/vhdl/lib/32/
 %{__install} -d ${P32}
@@ -450,19 +511,27 @@ make grt.lst
 %endif
 PDIR=`pwd`
 pushd ${P32}/../..
-%{__install} -d lib/32/v93
-%{__install} -d lib/32/v87
-%{__make} -f ${PDIR}/Makefile REL_DIR=../../../.. \
-         LIBSRC_DIR=src LIB93_DIR=lib/32/v93 LIB87_DIR=lib/32/v87 \
+%{__install} -d lib/32/
+%{__install} -d lib/v87_32
+%{__install} -d lib/v93_32
+%{__install} -d lib/v08_32
+%{__make} -f ${PDIR}/Makefile REL_DIR=../../../.. srcdir=${PSRC}/gcc/vhdl \
+         LIB87_DIR=lib/v87_32 LIB93_DIR=lib/v93_32 LIB08_DIR=lib/v08_32 \
          ANALYZE="${PDIR}/../ghdl -a -m32 --GHDL1=${PDIR}/../ghdl1 --ieee=none" \
-         std.v93 std.v87 ieee.v93 ieee.v87 synopsys.v93 synopsys.v87 mentor.v93
+         vhdl.libs.all
+%{__mv} lib/v87_32 lib/32/v87
+%{__mv} lib/v93_32 lib/32/v93
+%{__mv} lib/v08_32 lib/32/v08
 popd
-../ghdl1 -m32 --std=87 -quiet -o std_standard.s --compile-standard
+../ghdl1 -m32 -O2 -g --std=87 -quiet -o std_standard.s --compile-standard
 ../xgcc -m32 -c -o std_standard.o std_standard.s
 %{__mv} std_standard.o ${P32}/v87/std/std_standard.o
-../ghdl1 -m32 --std=93 -quiet -o std_standard.s --compile-standard
+../ghdl1 -m32 -O2 -g --std=93 -quiet -o std_standard.s --compile-standard
 ../xgcc -m32 -c -o std_standard.o std_standard.s
 %{__mv} std_standard.o ${P32}/v93/std/std_standard.o
+../ghdl1 -m32 -O2 -g --std=08 -quiet -o std_standard.s --compile-standard
+../xgcc -m32 -c -o std_standard.o std_standard.s
+%{__mv} std_standard.o ${P32}/v08/std/std_standard.o
 popd
 %endif
 
@@ -534,8 +603,19 @@ popd
 # %{gcc_target_platform}/%{gcc_version} subdirectory
 %{_prefix}/lib/gcc/
 
+%ifarch %{ix86} x86_64
+%files mcode
+%{_bindir}/ghdl-mcode
+
+%files mcode-grt
+%{_prefix}/lib/ghdl/
+%endif
 
 %changelog
+* Wed Mar 11 2015 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.33dev-0.hg688.0
+- update to 0.33dev (hg688)
+- build mcode backend on x86
+
 * Wed Nov 19 2014 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.32rc1-0.hg484.0
 - update to 0.32rc1 (hg484)
 
