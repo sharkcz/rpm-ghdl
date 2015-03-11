@@ -4,6 +4,13 @@
 %global ghdlver 0.33dev
 %global ghdlhgrev .hg688
 
+%ifarch %{ix86}
+%bcond_without mcode
+%else
+%bcond_with mcode
+%endif
+%bcond_without llvm
+
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
@@ -63,6 +70,7 @@ Patch106: ghdl-ppc64abort.patch
 Patch111: gcc47-texinfo.patch
 Patch112: ghdl-mcode32bit.patch
 Patch113: ghdl-hgreorg.patch
+Patch114: ghdl-llvmlib.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -133,10 +141,18 @@ BuildRequires: libunwind >= 0.98
 %endif
 # for x86, we also build the mcode version; if on x86_64, we need some 32bit libraries
 %ifarch x86_64
+%if %{with mcode}
 BuildRequires: libgnat(x86-32)
 BuildRequires: libgnat-devel(x86-32)
 BuildRequires: zlib(x86-32)
 BuildRequires: zlib-devel(x86-32)
+%endif
+%endif
+%if %{with llvm}
+BuildRequires: clang
+BuildRequires: llvm
+BuildRequires: llvm-devel
+BuildRequires: llvm-static
 %endif
 
 Requires: ghdl-grt = %{version}-%{release}
@@ -189,6 +205,7 @@ object files into simulator executables. grt contains the simulator kernel
 that tracks signal updates and schedules processes.
 
 %ifarch %{ix86} x86_64
+%if %{with mcode}
 %package mcode
 Summary: GHDL with mcode backend
 Group: Development/Languages
@@ -205,6 +222,27 @@ Group: System Environment/Libraries
 %description mcode-grt
 This package contains the runtime libraries needed to link ghdl-mcode-compiled
 object files into simulator executables. mcode-grt contains the simulator kernel
+that tracks signal updates and schedules processes.
+%endif
+%endif
+
+%if %{with llvm}
+%package llvm
+Summary: GHDL with LLVM backend
+Group: Development/Languages
+Requires: ghdl-llvm-grt = %{version}-%{release}
+
+%description llvm
+This package contains the ghdl compiler with the LLVM backend. The LLVM
+backend is experimental.
+
+%package llvm-grt
+Summary: GHDL LLVM runtime libraries
+Group: System Environment/Libraries
+
+%description llvm-grt
+This package contains the runtime libraries needed to link ghdl-llvm-compiled
+object files into simulator executables. llvm-grt contains the simulator kernel
 that tracks signal updates and schedules processes.
 %endif
 
@@ -239,13 +277,36 @@ rm -f libgo/go/crypto/elliptic/p224{,_test}.go
 
 pushd ghdl-updates-code
 %patch113 -p0 -b .reorg
+%patch114 -p0 -b .llvm
 pushd dist/gcc
 ./dist.sh sources
 popd
-%ifarch %{ix86} x86_64
-%patch112 -p0 -b .mcode32
-%endif
 popd
+%ifarch %{ix86} x86_64
+%if %{with mcode}
+cp -r ghdl-updates-code ghdl-updates-code-mcode
+pushd ghdl-updates-code-mcode
+%patch112 -p0 -b .mcode32
+%if %{__isa_bits} == 64
+perl -i -pe 's,^libdirsuffix=.*$,libdirsuffix=lib64/ghdl/mcode,' configure
+%else
+perl -i -pe 's,^libdirsuffix=.*$,libdirsuffix=lib/ghdl/mcode,' configure
+%endif
+perl -i -pe 's,^libdirreverse=.*$,libdirreverse=../../..,' configure
+popd
+%endif
+%endif
+
+%if %{with llvm}
+pushd ghdl-updates-code
+%if %{__isa_bits} == 64
+perl -i -pe 's,^libdirsuffix=.*$,libdirsuffix=lib64/ghdl/llvm,' configure
+%else
+perl -i -pe 's,^libdirsuffix=.*$,libdirsuffix=lib/ghdl/llvm,' configure
+%endif
+perl -i -pe 's,^libdirreverse=.*$,libdirreverse=../../..,' configure
+popd
+%endif
 
 tar xvjf ghdl-updates-code/dist/gcc/ghdl-%{ghdlver}.tar.bz2
 
@@ -285,8 +346,17 @@ cp -a libstdc++-v3/config/cpu/i{4,3}86/atomicity.h
 
 # build mcode on x86
 %ifarch %{ix86} x86_64
-pushd ghdl-updates-code
+%if %{with mcode}
+pushd ghdl-updates-code-mcode
 ./configure --prefix=/usr
+make
+popd
+%endif
+%endif
+
+%if %{with llvm}
+pushd ghdl-updates-code
+./configure --prefix=/usr --with-llvm=/usr
 make
 popd
 %endif
@@ -487,11 +557,22 @@ popd
 
 # build mcode on x86
 %ifarch %{ix86} x86_64
-pushd ghdl-updates-code
+%if %{with mcode}
+pushd ghdl-updates-code-mcode
 make DESTDIR=%{buildroot} install
 mv %{buildroot}/%{_bindir}/ghdl %{buildroot}/%{_bindir}/ghdl-mcode
 popd
 %endif
+%endif
+
+%if %{with llvm}
+pushd ghdl-updates-code
+make DESTDIR=%{buildroot} install
+mv %{buildroot}/%{_bindir}/ghdl %{buildroot}/%{_bindir}/ghdl-llvm
+popd
+%endif
+
+
 
 %{__make} -C obj-%{gcc_target_platform} DESTDIR=%{buildroot} install
 
@@ -604,17 +685,31 @@ popd
 %{_prefix}/lib/gcc/
 
 %ifarch %{ix86} x86_64
+%if %{with mcode}
 %files mcode
 %{_bindir}/ghdl-mcode
 
 %files mcode-grt
-%{_prefix}/lib/ghdl/
+%dir %{_libdir}/ghdl
+%{_libdir}/ghdl/mcode
+%endif
+%endif
+
+%if %{with llvm}
+%files llvm
+%{_bindir}/ghdl-llvm
+%{_bindir}/ghdl1-llvm
+
+%files llvm-grt
+%dir %{_libdir}/ghdl
+%{_libdir}/ghdl/llvm
 %endif
 
 %changelog
 * Wed Mar 11 2015 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.33dev-0.hg688.0
 - update to 0.33dev (hg688)
-- build mcode backend on x86
+- build mcode backend on x86(-32)
+- build LLVM backend
 
 * Wed Nov 19 2014 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.32rc1-0.hg484.0
 - update to 0.32rc1 (hg484)
