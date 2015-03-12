@@ -277,11 +277,8 @@ rm -f libgo/go/crypto/elliptic/p224{,_test}.go
 %patch19 -p0 -b .pr63659~
 
 pushd ghdl-updates-code
-%patch113 -p0 -b .reorg
+#patch113 -p0 -b .reorg
 %patch114 -p0 -b .llvm
-pushd dist/gcc
-./dist.sh sources
-popd
 popd
 %ifarch %{ix86} x86_64
 %if %{with mcode}
@@ -299,7 +296,8 @@ popd
 %endif
 
 %if %{with llvm}
-pushd ghdl-updates-code
+cp -r ghdl-updates-code ghdl-updates-code-llvm
+pushd ghdl-updates-code-llvm
 %if "%{?_lib}" == "lib64"
 perl -i -pe 's,^libdirsuffix=.*$,libdirsuffix=lib64/ghdl/llvm,' configure
 %else
@@ -309,11 +307,16 @@ perl -i -pe 's,^libdirreverse=.*$,libdirreverse=../../..,' configure
 popd
 %endif
 
-tar xvjf ghdl-updates-code/dist/gcc/ghdl-%{ghdlver}.tar.bz2
+sed -i -e 's/4\.9\.3/4.9.2/' gcc/BASE-VER
+echo 'Red Hat %{version}-%{gcc_release}' > gcc/DEV-PHASE
 
-pushd ghdl-%{ghdlver}
-%patch103 -p0 -b .noruntime
-%{__mv} vhdl ../gcc/
+pushd ghdl-updates-code
+./configure --prefix=/usr --with-gcc=..
+make copy-sources
+popd
+
+pushd gcc
+#patch103 -p0 -b .noruntime
 popd
 #patch102 -p1 -b .makeinfo
 #patch104 -p0 -b .libgnat44
@@ -322,9 +325,6 @@ popd
 #patch111 -p0 -b .texinfo
 
 %patch1100 -p0 -b .cloog-ppc64le-config~
-
-sed -i -e 's/4\.9\.3/4.9.2/' gcc/BASE-VER
-echo 'Red Hat %{version}-%{gcc_release}' > gcc/DEV-PHASE
 
 %if 0%{?fedora} >= 16 || 0%{?rhel} >= 7
 # Default to -gdwarf-4 -fno-debug-types-section rather than -gdwarf-2
@@ -356,7 +356,7 @@ popd
 %endif
 
 %if %{with llvm}
-pushd ghdl-updates-code
+pushd ghdl-updates-code-llvm
 ./configure --prefix=/usr --with-llvm=/usr
 make
 popd
@@ -556,7 +556,7 @@ popd
 %install
 %{__rm} -rf %{buildroot}
 
-# build mcode on x86
+# install mcode on x86
 %ifarch %{ix86} x86_64
 %if %{with mcode}
 pushd ghdl-updates-code-mcode
@@ -566,15 +566,15 @@ popd
 %endif
 %endif
 
+# install llvm
 %if %{with llvm}
-pushd ghdl-updates-code
+pushd ghdl-updates-code-llvm
 make DESTDIR=%{buildroot} install
 mv %{buildroot}/%{_bindir}/ghdl %{buildroot}/%{_bindir}/ghdl-llvm
 popd
 %endif
 
-
-
+# install gcc
 %{__make} -C obj-%{gcc_target_platform} DESTDIR=%{buildroot} install
 
 %ifarch x86_64
@@ -680,7 +680,7 @@ popd
 
 %files grt
 %defattr(-,root,root,-)
-%doc ghdl-%{ghdlver}/COPYING
+%doc ghdl-updates-code/COPYING
 # Need to own directory %{_libdir}/gcc even though we only want the
 # %{gcc_target_platform}/%{gcc_version} subdirectory
 %{_prefix}/lib/gcc/
@@ -691,6 +691,7 @@ popd
 %{_bindir}/ghdl-mcode
 
 %files mcode-grt
+%doc ghdl-updates-code/COPYING
 %dir %{_libdir}/ghdl
 %{_libdir}/ghdl/mcode
 %endif
@@ -702,6 +703,7 @@ popd
 %{_bindir}/ghdl1-llvm
 
 %files llvm-grt
+%doc ghdl-updates-code/COPYING
 %dir %{_libdir}/ghdl
 %{_libdir}/ghdl/llvm
 %endif
