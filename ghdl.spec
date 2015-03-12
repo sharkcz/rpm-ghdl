@@ -618,12 +618,12 @@ popd
 %endif
 
 # Add additional libraries to link
-(
-echo "-lm"
-%ifarch x86_64
-echo "-ldl"
-%endif
-) >> %{buildroot}%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/vhdl/grt.lst
+#(
+#echo "-lm"
+#%ifarch x86_64
+#echo "-ldl"
+#%endif
+#) >> %{buildroot}%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/vhdl/grt.lst
 
 # Remove files not to be packaged
 pushd %{buildroot}
