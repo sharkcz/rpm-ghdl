@@ -2,14 +2,14 @@
 %global SVNREV 216995
 %global gcc_version 4.9.2
 %global ghdlver 0.33dev
-%global ghdlhgrev .hg688
+%global ghdlhgrev .hg692
 
 %ifarch %{ix86}
 %bcond_without mcode
 %else
 %bcond_with mcode
 %endif
-%bcond_with llvm
+%bcond_without llvm
 
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
@@ -709,6 +709,9 @@ popd
 %endif
 
 %changelog
+* Thu Mar 12 2015 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.33dev-0.hg692.0
+- update to 0.33dev (hg692)
+
 * Wed Mar 11 2015 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.33dev-0.hg688.0
 - update to 0.33dev (hg688)
 - build mcode backend on x86(-32)
