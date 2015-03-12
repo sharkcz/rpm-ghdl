@@ -67,9 +67,9 @@ Patch105: ghdl-grtadac.patch
 # https://gna.org/bugs/index.php?13390
 Patch106: ghdl-ppc64abort.patch
 # http://gcc.gnu.org/ml/gcc-patches/2012-10/msg02505.html
+Patch110: ghdl-gcc5.patch
 Patch111: gcc47-texinfo.patch
 Patch112: ghdl-mcode32bit.patch
-Patch113: ghdl-hgreorg.patch
 Patch114: ghdl-llvmlib.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(post): /sbin/install-info
@@ -277,7 +277,7 @@ rm -f libgo/go/crypto/elliptic/p224{,_test}.go
 %patch19 -p0 -b .pr63659~
 
 pushd ghdl-updates-code
-#patch113 -p0 -b .reorg
+%patch110 -p0 -b .gcc5
 %patch114 -p0 -b .llvm
 popd
 %ifarch %{ix86} x86_64
