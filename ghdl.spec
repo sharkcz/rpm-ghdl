@@ -2,7 +2,7 @@
 %global SVNREV 216995
 %global gcc_version 4.9.2
 %global ghdlver 0.33dev
-%global ghdlhgrev .hg692
+%global ghdlhgrev .hg700
 
 %ifarch %{ix86}
 %bcond_without mcode
@@ -618,12 +618,12 @@ popd
 %endif
 
 # Add additional libraries to link
-#(
-#echo "-lm"
+(
+echo "-lgnat-5"
 #%ifarch x86_64
 #echo "-ldl"
 #%endif
-#) >> %{buildroot}%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/vhdl/grt.lst
+) >> %{buildroot}%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/vhdl/grt.lst
 
 # Remove files not to be packaged
 pushd %{buildroot}
@@ -709,6 +709,9 @@ popd
 %endif
 
 %changelog
+* Sat Mar 14 2015 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.33dev-0.hg700.0
+- update to 0.33dev (hg700)
+
 * Thu Mar 12 2015 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.33dev-0.hg692.0
 - update to 0.33dev (hg692)
 
