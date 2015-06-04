@@ -2,7 +2,7 @@
 %global SVNREV 216995
 %global gcc_version 4.9.2
 %global ghdlver 0.33dev
-%global ghdlhgrev .hg700
+%global ghdlhgrev .hg813
 
 %ifarch %{ix86}
 %bcond_without mcode
@@ -57,8 +57,6 @@ Patch18: gcc49-aarch64-unwind-opt.patch
 Patch19: gcc49-pr63659.patch
 Patch1100: cloog-%{cloog_version}-ppc64le-config.patch
 Source100: ghdl%{ghdlhgrev}.tar.bz2
-Patch103: ghdl-noruntime.patch
-#Patch104: ghdl-svn143-libgnat49.patch
 Patch105: ghdl-grtadac.patch
 # Both following patches have been sent to upstream mailing list:
 # From: Thomas Sailer <t.sailer@alumni.ethz.ch>
@@ -67,9 +65,7 @@ Patch105: ghdl-grtadac.patch
 # https://gna.org/bugs/index.php?13390
 Patch106: ghdl-ppc64abort.patch
 # http://gcc.gnu.org/ml/gcc-patches/2012-10/msg02505.html
-Patch111: gcc47-texinfo.patch
 Patch112: ghdl-mcode32bit.patch
-Patch114: ghdl-llvmlib.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -275,9 +271,6 @@ rm -f libgo/go/crypto/elliptic/p224{,_test}.go
 %patch18 -p0 -b .aarch64-unwind-opt~
 %patch19 -p0 -b .pr63659~
 
-pushd ghdl-updates-code
-%patch114 -p0 -b .llvm
-popd
 %ifarch %{ix86} x86_64
 %if %{with mcode}
 cp -r ghdl-updates-code ghdl-updates-code-mcode
@@ -313,14 +306,8 @@ pushd ghdl-updates-code
 make copy-sources
 popd
 
-pushd gcc
-#patch103 -p0 -b .noruntime
-popd
-#patch102 -p1 -b .makeinfo
-#patch104 -p0 -b .libgnat44
 %patch105 -p1 -b .grtadac
 %patch106 -p0 -b .ppc64abort
-#patch111 -p0 -b .texinfo
 
 %patch1100 -p0 -b .cloog-ppc64le-config~
 
@@ -707,6 +694,9 @@ popd
 %endif
 
 %changelog
+* Thu Jun 04 2015 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.33dev-0.hg813.0
+- update to 0.33dev (hg813)
+
 * Sat Mar 14 2015 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.33dev-0.hg700.0
 - update to 0.33dev (hg700)
 
