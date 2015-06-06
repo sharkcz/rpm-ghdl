@@ -9,7 +9,7 @@
 %else
 %bcond_with mcode
 %endif
-%bcond_without llvm
+%bcond_with llvm
 
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
