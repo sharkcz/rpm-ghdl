@@ -66,6 +66,8 @@ Patch105: ghdl-grtadac.patch
 Patch106: ghdl-ppc64abort.patch
 # http://gcc.gnu.org/ml/gcc-patches/2012-10/msg02505.html
 Patch112: ghdl-mcode32bit.patch
+# https://mail.gna.org/public/ghdl-discuss/2015-06/msg00008.html
+Patch113: ghdl-llvm36.diff
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -289,6 +291,7 @@ popd
 %if %{with llvm}
 cp -r ghdl-updates-code ghdl-updates-code-llvm
 pushd ghdl-updates-code-llvm
+%patch113 -p0 -b .llvm36
 %if "%{?_lib}" == "lib64"
 perl -i -pe 's,^libdirsuffix=.*$,libdirsuffix=lib64/ghdl/llvm,' configure
 %else
@@ -343,7 +346,8 @@ popd
 %if %{with llvm}
 pushd ghdl-updates-code-llvm
 ./configure --prefix=/usr --with-llvm=/usr
-make
+# FIXME: disable library debug info for now because it doesn't work with LLVM 3.6
+make LIB_CFLAGS=
 popd
 %endif
 

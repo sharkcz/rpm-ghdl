@@ -1,0 +1,22 @@
+--- ./src/ortho/llvm/llvm-cbindings.cpp.xx	2015-06-06 22:14:15.303908540 +0200
++++ ./src/ortho/llvm/llvm-cbindings.cpp	2015-06-06 22:14:47.670826004 +0200
+@@ -50,7 +50,7 @@
+ void
+ LLVMMDNodeReplaceOperandWith_extra (LLVMValueRef N, unsigned i, LLVMValueRef V) {
+   MDNode *MD = cast<MDNode>(unwrap(N));
+-  MD->replaceOperandWith (i, unwrap(V));
++  MD->replaceOperandWith (i, ValueAsMetadata::get(unwrap(V)));
+ }
+ 
+ void *LLVMGetPointerToFunction(LLVMExecutionEngineRef EE, LLVMValueRef Func)
+--- ./src/ortho/llvm/ortho_code_main.adb.xx	2015-06-06 22:28:25.603010956 +0200
++++ ./src/ortho/llvm/ortho_code_main.adb	2015-06-06 22:28:58.081931596 +0200
+@@ -209,8 +209,6 @@
+    InitializeNativeTarget;
+    InitializeNativeAsmPrinter;
+ 
+-   LinkInJIT;
+-
+    Module := ModuleCreateWithName (Module_Name'Address);
+ 
+    if Output = null and then Exec_Func /= null then
