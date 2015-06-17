@@ -15,7 +15,7 @@ Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
 #Release: 4.%{ghdlsvnver}svn.3%{?dist}
-Release: 0%{ghdlhgrev}.0%{?dist}
+Release: 1%{ghdlhgrev}.0%{?dist}
 License: GPLv2+
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -698,6 +698,9 @@ popd
 %endif
 
 %changelog
+* Wed Jun 17 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.33dev-1.hg813.0
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
+
 * Thu Jun 04 2015 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.33dev-0.hg813.0
 - update to 0.33dev (hg813)
 
