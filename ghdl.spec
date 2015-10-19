@@ -2,7 +2,7 @@
 %global SVNREV 216995
 %global gcc_version 4.9.2
 %global ghdlver 0.33dev
-%global ghdlhgrev .hg813
+%global ghdlhgrev .hg899
 
 %ifarch %{ix86}
 %bcond_without mcode
@@ -14,7 +14,6 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-#Release: 4.%{ghdlsvnver}svn.3%{?dist}
 Release: 1%{ghdlhgrev}.0%{?dist}
 License: GPLv2+
 Group: Development/Languages
