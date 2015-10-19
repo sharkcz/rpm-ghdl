@@ -1,4 +1,4 @@
---- ./src/ortho/llvm/llvm-cbindings.cpp.xx	2015-06-06 22:14:15.303908540 +0200
+--- ./src/ortho/llvm/llvm-cbindings.cpp	2015-06-06 22:14:15.303908540 +0200
 +++ ./src/ortho/llvm/llvm-cbindings.cpp	2015-06-06 22:14:47.670826004 +0200
 @@ -50,7 +50,7 @@
  void
@@ -9,7 +9,7 @@
  }
  
  void *LLVMGetPointerToFunction(LLVMExecutionEngineRef EE, LLVMValueRef Func)
---- ./src/ortho/llvm/ortho_code_main.adb.xx	2015-06-06 22:28:25.603010956 +0200
+--- ./src/ortho/llvm/ortho_code_main.adb	2015-06-06 22:28:25.603010956 +0200
 +++ ./src/ortho/llvm/ortho_code_main.adb	2015-06-06 22:28:58.081931596 +0200
 @@ -209,8 +209,6 @@
     InitializeNativeTarget;
@@ -20,3 +20,14 @@
     Module := ModuleCreateWithName (Module_Name'Address);
  
     if Output = null and then Exec_Func /= null then
+--- ./README	2015-10-19 19:24:14.381447432 +0200
++++ ./README	2015-10-19 19:24:26.357185413 +0200
+@@ -115,7 +115,7 @@
+ ******************************
+ 
+ You need to build and install
+-llvm version 3.5 [do not modify this line as this is read by scripts].
++llvm version 3.7.0 [do not modify this line as this is read by scripts].
+ 
+ First configure ghdl and specify where llvm is installed
+ $ ./configure --with-llvm=PREFIX

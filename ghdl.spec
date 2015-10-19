@@ -66,7 +66,7 @@ Patch106: ghdl-ppc64abort.patch
 # http://gcc.gnu.org/ml/gcc-patches/2012-10/msg02505.html
 Patch112: ghdl-mcode32bit.patch
 # https://mail.gna.org/public/ghdl-discuss/2015-06/msg00008.html
-Patch113: ghdl-llvm36.diff
+Patch113: ghdl-llvm37.diff
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
