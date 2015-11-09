@@ -2,7 +2,7 @@
 %global SVNREV 216995
 %global gcc_version 4.9.2
 %global ghdlver 0.33dev
-%global ghdlhgrev .hg899
+%global ghdlhgrev .hg914
 
 %ifarch %{ix86}
 %bcond_without mcode
@@ -290,7 +290,7 @@ popd
 %if %{with llvm}
 cp -r ghdl-updates-code ghdl-updates-code-llvm
 pushd ghdl-updates-code-llvm
-%patch113 -p0 -b .llvm36
+%patch113 -p0 -b .llvm37
 %if "%{?_lib}" == "lib64"
 perl -i -pe 's,^libdirsuffix=.*$,libdirsuffix=lib64/ghdl/llvm,' configure
 %else
@@ -697,6 +697,12 @@ popd
 %endif
 
 %changelog
+* Mon Nov  9 2015 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.33dev-0.hg914.0
+- update to 0.33dev (hg914)
+
+* Fri Oct 30 2015 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.33dev-0.hg903.0
+- update to 0.33dev (hg903)
+
 * Mon Oct 19 2015 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.33dev-0.hg899.0
 - update to 0.33dev (hg899)
 
