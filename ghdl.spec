@@ -2,7 +2,7 @@
 %global SVNREV 216995
 %global gcc_version 4.9.2
 %global ghdlver 0.33dev
-%global ghdlhgrev .hg914
+%global ghdlgitrev .20151120gitff4bc5f
 
 %ifarch %{ix86}
 %bcond_without mcode
@@ -14,15 +14,15 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-Release: 0%{ghdlhgrev}.0%{?dist}
+Release: 1%{ghdlgitrev}.0%{?dist}
 License: GPLv2+
 Group: Development/Languages
 URL: http://ghdl.free.fr/
-# HOWTO create source files from ghdl HG at
-# check out the HG repo
-# hg clone http://hg.code.sf.net/p/ghdl-updates/code ghdl-updates-code
+# HOWTO create source files from ghdl git at github.com
+# check out the git repo
+# git clone https://github.com/tgingold/ghdl.git
 
-# tar cvJf ghdl%{ghdlhgrev}.tar.bz2 ghdl-updates-code
+# tar cvJf ghdl%{ghdlgitrev}.tar.bz2 --exclude-vcs ghdl
 # cd translate/gcc/
 # ./dist.sh sources
 #
@@ -55,7 +55,7 @@ Patch17: gcc49-aarch64-async-unw-tables.patch
 Patch18: gcc49-aarch64-unwind-opt.patch
 Patch19: gcc49-pr63659.patch
 Patch1100: cloog-%{cloog_version}-ppc64le-config.patch
-Source100: ghdl%{ghdlhgrev}.tar.bz2
+Source100: ghdl%{ghdlgitrev}.tar.bz2
 Patch105: ghdl-grtadac.patch
 # Both following patches have been sent to upstream mailing list:
 # From: Thomas Sailer <t.sailer@alumni.ethz.ch>
@@ -274,8 +274,8 @@ rm -f libgo/go/crypto/elliptic/p224{,_test}.go
 
 %ifarch %{ix86} x86_64
 %if %{with mcode}
-cp -r ghdl-updates-code ghdl-updates-code-mcode
-pushd ghdl-updates-code-mcode
+cp -r ghdl ghdl-mcode
+pushd ghdl-mcode
 %patch112 -p0 -b .mcode32
 %if "%{?_lib}" == "lib64"
 perl -i -pe 's,^libdirsuffix=.*$,libdirsuffix=lib64/ghdl/mcode,' configure
@@ -288,8 +288,8 @@ popd
 %endif
 
 %if %{with llvm}
-cp -r ghdl-updates-code ghdl-updates-code-llvm
-pushd ghdl-updates-code-llvm
+cp -r ghdl ghdl-llvm
+pushd ghdl-llvm
 %patch113 -p0 -b .llvm37
 %if "%{?_lib}" == "lib64"
 perl -i -pe 's,^libdirsuffix=.*$,libdirsuffix=lib64/ghdl/llvm,' configure
@@ -303,7 +303,7 @@ popd
 sed -i -e 's/4\.9\.3/4.9.2/' gcc/BASE-VER
 echo 'Red Hat %{version}-%{gcc_release}' > gcc/DEV-PHASE
 
-pushd ghdl-updates-code
+pushd ghdl
 ./configure --prefix=/usr --with-gcc=..
 make copy-sources
 popd
@@ -335,7 +335,7 @@ cp -a libstdc++-v3/config/cpu/i{4,3}86/atomicity.h
 # build mcode on x86
 %ifarch %{ix86} x86_64
 %if %{with mcode}
-pushd ghdl-updates-code-mcode
+pushd ghdl-mcode
 ./configure --prefix=/usr
 make
 popd
@@ -343,7 +343,7 @@ popd
 %endif
 
 %if %{with llvm}
-pushd ghdl-updates-code-llvm
+pushd ghdl-llvm
 ./configure --prefix=/usr --with-llvm=/usr
 # FIXME: disable library debug info for now because it doesn't work with LLVM 3.6
 make LIB_CFLAGS=
@@ -547,7 +547,7 @@ popd
 # install mcode on x86
 %ifarch %{ix86} x86_64
 %if %{with mcode}
-pushd ghdl-updates-code-mcode
+pushd ghdl-mcode
 make DESTDIR=%{buildroot} install
 mv %{buildroot}/%{_bindir}/ghdl %{buildroot}/%{_bindir}/ghdl-mcode
 popd
@@ -556,7 +556,7 @@ popd
 
 # install llvm
 %if %{with llvm}
-pushd ghdl-updates-code-llvm
+pushd ghdl-llvm
 make DESTDIR=%{buildroot} install
 mv %{buildroot}/%{_bindir}/ghdl %{buildroot}/%{_bindir}/ghdl-llvm
 popd
@@ -668,7 +668,7 @@ popd
 
 %files grt
 %defattr(-,root,root,-)
-%doc ghdl-updates-code/COPYING
+%doc ghdl/COPYING
 # Need to own directory %{_libdir}/gcc even though we only want the
 # %{gcc_target_platform}/%{gcc_version} subdirectory
 %{_prefix}/lib/gcc/
@@ -679,7 +679,7 @@ popd
 %{_bindir}/ghdl-mcode
 
 %files mcode-grt
-%doc ghdl-updates-code/COPYING
+%doc ghdl/COPYING
 %dir %{_libdir}/ghdl
 %{_libdir}/ghdl/mcode
 %endif
@@ -691,12 +691,15 @@ popd
 %{_bindir}/ghdl1-llvm
 
 %files llvm-grt
-%doc ghdl-updates-code/COPYING
+%doc ghdl/COPYING
 %dir %{_libdir}/ghdl
 %{_libdir}/ghdl/llvm
 %endif
 
 %changelog
+* Fri Nov 20 2015 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.33dev-1.20151120gitff4bc5f.0
+- update to 0.33dev (gitff4bc5f)
+
 * Mon Nov  9 2015 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.33dev-0.hg914.0
 - update to 0.33dev (hg914)
 
