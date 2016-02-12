@@ -14,7 +14,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-Release: 2%{ghdlgitrev}.0%{?dist}
+Release: 1%{ghdlgitrev}.1%{?dist}
 License: GPLv2+
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -147,9 +147,9 @@ BuildRequires: zlib-devel(x86-32)
 %if %{with llvm}
 BuildRequires: libedit-devel
 BuildRequires: clang
-BuildRequires: llvm
-BuildRequires: llvm-devel
-BuildRequires: llvm-static
+BuildRequires: llvm35
+BuildRequires: llvm35-devel
+BuildRequires: llvm35-static
 %endif
 
 Requires: ghdl-grt = %{version}-%{release}
@@ -290,7 +290,7 @@ popd
 %if %{with llvm}
 cp -r ghdl ghdl-llvm
 pushd ghdl-llvm
-%patch113 -p0 -b .llvm37
+#patch113 -p0 -b .llvm37
 %if "%{?_lib}" == "lib64"
 perl -i -pe 's,^libdirsuffix=.*$,libdirsuffix=lib64/ghdl/llvm,' configure
 %else
@@ -697,8 +697,8 @@ popd
 %endif
 
 %changelog
-* Wed Feb 03 2016 Fedora Release Engineering <releng@fedoraproject.org> - 0.33dev-2.20151120gitff4bc5f.0
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
+* Fri Feb 12 2016 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.33dev-1.20151120gitff4bc5f.1
+- build fix
 
 * Fri Nov 20 2015 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.33dev-1.20151120gitff4bc5f.0
 - update to 0.33dev (gitff4bc5f)
