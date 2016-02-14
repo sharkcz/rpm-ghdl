@@ -146,7 +146,7 @@ BuildRequires: zlib-devel(x86-32)
 %endif
 %if %{with llvm}
 BuildRequires: libedit-devel
-BuildRequires: clang
+BuildRequires: clang35
 BuildRequires: llvm35
 BuildRequires: llvm35-devel
 BuildRequires: llvm35-static
