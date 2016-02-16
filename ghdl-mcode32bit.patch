@@ -1,5 +1,5 @@
---- Makefile.in.orig	2015-03-10 14:43:16.232451425 +0100
-+++ Makefile.in	2015-03-10 14:52:46.713449823 +0100
+--- Makefile.in.mcode32	2016-02-16 16:22:12.273051621 +0100
++++ Makefile.in	2016-02-16 16:23:54.506135640 +0100
 @@ -16,7 +16,7 @@
  #  Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  #  02111-1307, USA.
@@ -9,12 +9,12 @@
  srcdir=@srcdir@
  GNATMAKE=@GNATMAKE@
  prefix=@prefix@
-@@ -40,7 +40,7 @@
+@@ -43,7 +43,7 @@
  ADAC=$(CC)
  
  # Debug
 -OPT_FLAGS=-g
 +OPT_FLAGS=-g -m32
  ADA_FLAGS=-gnata
+ LIB_CFLAGS=
  
- # Optimize, do not forget to use MODE=--genfast for iirs.adb.
