@@ -1,20 +1,25 @@
 %global DATE 20141101
 %global SVNREV 216995
 %global gcc_version 4.9.2
-%global ghdlver 0.33dev
-%global ghdlgitrev .20151120gitff4bc5f
+%global ghdlver 0.34dev
+%global ghdlgitrev .20160214gite7adf19
 
 %ifarch %{ix86}
 %bcond_without mcode
 %else
 %bcond_with mcode
 %endif
-%bcond_without llvm
+#bcond_without llvm
+# disable llvm for now, clang seems broken
+# clang++ -c `/usr/bin/llvm-config --cxxflags` -o llvm-cbindings.o src/ortho/llvm/llvm-cbindings.cpp
+# : CommandLine Error: Option 'track-memory' registered more than once!
+# LLVM ERROR: inconsistency in registered CommandLine options
+%bcond_with llvm
 
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-Release: 1%{ghdlgitrev}.1%{?dist}
+Release: 0%{ghdlgitrev}.0%{?dist}
 License: GPLv2+
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -146,10 +151,10 @@ BuildRequires: zlib-devel(x86-32)
 %endif
 %if %{with llvm}
 BuildRequires: libedit-devel
-#BuildRequires: clang
-BuildRequires: llvm35
-BuildRequires: llvm35-devel
-BuildRequires: llvm35-static
+BuildRequires: clang
+BuildRequires: llvm
+BuildRequires: llvm-devel
+BuildRequires: llvm-static
 %endif
 
 Requires: ghdl-grt = %{version}-%{release}
@@ -290,7 +295,7 @@ popd
 %if %{with llvm}
 cp -r ghdl ghdl-llvm
 pushd ghdl-llvm
-#patch113 -p0 -b .llvm37
+%patch113 -p0 -b .llvm37
 %if "%{?_lib}" == "lib64"
 perl -i -pe 's,^libdirsuffix=.*$,libdirsuffix=lib64/ghdl/llvm,' configure
 %else
@@ -697,6 +702,9 @@ popd
 %endif
 
 %changelog
+* Tue Feb 16 2016 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.34dev-0.20160214gite7adf19.0
+- update to 0.34dev (gite7adf19)
+
 * Fri Feb 12 2016 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.33dev-1.20151120gitff4bc5f.1
 - build fix
 

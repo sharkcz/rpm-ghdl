@@ -20,14 +20,14 @@
     Module := ModuleCreateWithName (Module_Name'Address);
  
     if Output = null and then Exec_Func /= null then
---- ./README	2015-10-19 19:24:14.381447432 +0200
-+++ ./README	2015-10-19 19:24:26.357185413 +0200
-@@ -115,7 +115,7 @@
+--- BUILD.txt.x	2016-02-16 14:36:28.308035580 +0100
++++ BUILD.txt	2016-02-16 14:36:36.710289870 +0100
+@@ -87,7 +87,7 @@
  ******************************
  
  You need to build and install
 -llvm version 3.5 [do not modify this line as this is read by scripts].
-+llvm version 3.7.0 [do not modify this line as this is read by scripts].
++llvm version 3.7.1 [do not modify this line as this is read by scripts].
+ (Usually llvm also depends on libedit).
  
- First configure ghdl and specify where llvm is installed
- $ ./configure --with-llvm=PREFIX
+ First configure ghdl with '--with-llvm-config'
