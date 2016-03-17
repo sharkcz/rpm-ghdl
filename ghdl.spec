@@ -134,14 +134,6 @@ BuildRequires: /lib/libc.so.6 /usr/lib/libc.so /lib64/libc.so.6 /usr/lib64/libc.
 BuildRequires: libunwind >= 0.98
 %endif
 # for x86, we also build the mcode version; if on x86_64, we need some 32bit libraries
-%ifarch x86_64
-%if %{with mcode}
-BuildRequires: libgnat(x86-32)
-BuildRequires: libgnat-devel(x86-32)
-BuildRequires: zlib(x86-32)
-BuildRequires: zlib-devel(x86-32)
-%endif
-%endif
 %if %{with llvm}
 BuildRequires: libedit-devel
 BuildRequires: clang
