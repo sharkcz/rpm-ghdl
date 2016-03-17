@@ -2,7 +2,7 @@
 %global SVNREV 216995
 %global gcc_version 4.9.2
 %global ghdlver 0.34dev
-%global ghdlgitrev .20160224gitf818155
+%global ghdlgitrev .20160317gitf1ddf16
 
 %ifarch %{ix86}
 %bcond_without mcode
