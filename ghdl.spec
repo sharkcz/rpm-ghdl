@@ -4,17 +4,12 @@
 %global ghdlver 0.34dev
 %global ghdlgitrev .20160317gitf1ddf16
 
-%ifarch %{ix86}
+%ifarch %{ix86} x86_64
 %bcond_without mcode
 %else
 %bcond_with mcode
 %endif
-#bcond_without llvm
-# disable llvm for now, clang seems broken
-# clang++ -c `/usr/bin/llvm-config --cxxflags` -o llvm-cbindings.o src/ortho/llvm/llvm-cbindings.cpp
-# : CommandLine Error: Option 'track-memory' registered more than once!
-# LLVM ERROR: inconsistency in registered CommandLine options
-%bcond_with llvm
+%bcond_without llvm
 
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
@@ -69,9 +64,7 @@ Patch105: ghdl-grtadac.patch
 # https://gna.org/bugs/index.php?13390
 Patch106: ghdl-ppc64abort.patch
 # http://gcc.gnu.org/ml/gcc-patches/2012-10/msg02505.html
-Patch112: ghdl-mcode32bit.patch
-# https://mail.gna.org/public/ghdl-discuss/2015-06/msg00008.html
-Patch113: ghdl-llvm37.diff
+Patch112: ghdl-llvm38.diff
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -281,7 +274,6 @@ rm -f libgo/go/crypto/elliptic/p224{,_test}.go
 %if %{with mcode}
 cp -r ghdl ghdl-mcode
 pushd ghdl-mcode
-%patch112 -p0 -b .mcode32
 %if "%{?_lib}" == "lib64"
 perl -i -pe 's,^libdirsuffix=.*$,libdirsuffix=lib64/ghdl/mcode,' configure
 %else
@@ -295,7 +287,7 @@ popd
 %if %{with llvm}
 cp -r ghdl ghdl-llvm
 pushd ghdl-llvm
-%patch113 -p0 -b .llvm37
+%patch112 -p0 -b .llvm38
 %if "%{?_lib}" == "lib64"
 perl -i -pe 's,^libdirsuffix=.*$,libdirsuffix=lib64/ghdl/llvm,' configure
 %else
@@ -702,6 +694,9 @@ popd
 %endif
 
 %changelog
+* Thu Mar 17 2016 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.34dev-0.20160317gitf1ddf16.0
+- update to 0.34dev (gitf1ddf16)
+
 * Wed Feb 24 2016 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.34dev-0.20160224gitf818155.0
 - update to 0.34dev (gitf818155)
 
