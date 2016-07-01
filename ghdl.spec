@@ -686,7 +686,7 @@ popd
 %endif
 
 %changelog
-* Fri Jul  2 2016 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.34dev-0.20160702git50d0507.0
+* Fri Jul  1 2016 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.34dev-0.20160702git50d0507.0
 - update to 0.34dev (git50d0507)
 
 * Thu May 26 2016 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.34dev-0.20160503git6ccb80e.0
