@@ -2,7 +2,7 @@
 %global SVNREV 216995
 %global gcc_version 4.9.2
 %global ghdlver 0.34dev
-%global ghdlgitrev .20160702git50d0507
+%global ghdlgitrev .20160914git707123f
 
 %ifarch %{ix86} x86_64
 %bcond_without mcode
@@ -56,6 +56,7 @@ Patch18: gcc49-aarch64-unwind-opt.patch
 Patch19: gcc49-pr63659.patch
 Patch1100: cloog-%{cloog_version}-ppc64le-config.patch
 Source100: ghdl%{ghdlgitrev}.tar.bz2
+Patch104: ghdl-grtbuild.patch
 Patch105: ghdl-grtadac.patch
 # Both following patches have been sent to upstream mailing list:
 # From: Thomas Sailer <t.sailer@alumni.ethz.ch>
@@ -297,7 +298,8 @@ pushd ghdl
 make copy-sources
 popd
 
-%patch105 -p1 -b .grtadac
+%patch104 -p0 -b .grtbuild
+#patch105 -p1 -b .grtadac
 %patch106 -p0 -b .ppc64abort
 
 %patch1100 -p0 -b .cloog-ppc64le-config~
@@ -554,45 +556,22 @@ popd
 # install gcc
 %{__make} -C obj-%{gcc_target_platform} DESTDIR=%{buildroot} install
 
-%ifarch x86_64
-PSRC=`pwd`
-pushd obj-%{gcc_target_platform}/gcc/vhdl
+PBINDIR=`pwd`/obj-%{gcc_target_platform}/gcc/
+PNATIVE=%{buildroot}/%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/vhdl/lib/
 P32=%{buildroot}/%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/vhdl/lib/32/
+
+pushd ghdl
+%ifarch x86_64
+make bindir=${PBINDIR} ANALYZE_OPTS="--GHDL1=${PBINDIR}/ghdl1 -m32" STD_GHDL_FLAGS="--GHDL1=${PBINDIR}/ghdl1 -m32" OPT_FLAGS="-g -m32" ghdllib
+make DESTDIR=%{buildroot} install
 %{__install} -d ${P32}
-make ghdllibs-clean
-%if %{!?_without_mock:0}%{?_without_mock:1}
-make grt-clean
-make GRT_FLAGS=-m32 GRT_TARGET_OBJS="i386.o linux.o times.o" ghdllib
-make grt.lst
-%{__install} -m 644 libgrt.a ${P32}/libgrt.a
-%{__install} -m 644 grt.lst ${P32}/grt.lst
-%{__install} -m 644 grt.ver ${P32}/grt.ver
+mv ${PNATIVE}/* ${P32}
+make clean
 %endif
-PDIR=`pwd`
-pushd ${P32}/../..
-%{__install} -d lib/32/
-%{__install} -d lib/v87_32
-%{__install} -d lib/v93_32
-%{__install} -d lib/v08_32
-%{__make} -f ${PDIR}/Makefile REL_DIR=../../../.. srcdir=${PSRC}/gcc/vhdl \
-         LIB87_DIR=lib/v87_32 LIB93_DIR=lib/v93_32 LIB08_DIR=lib/v08_32 \
-         ANALYZE="${PDIR}/../ghdl -a -m32 --GHDL1=${PDIR}/../ghdl1 --ieee=none" \
-         vhdl.libs.all
-%{__mv} lib/v87_32 lib/32/v87
-%{__mv} lib/v93_32 lib/32/v93
-%{__mv} lib/v08_32 lib/32/v08
+
+make bindir=${PBINDIR} ANALYZE_OPTS="--GHDL1=${PBINDIR}/ghdl1" STD_GHDL_FLAGS="--GHDL1=${PBINDIR}/ghdl1" ghdllib
+make DESTDIR=%{buildroot} install
 popd
-../ghdl1 -m32 -O2 -g --std=87 -quiet -o std_standard.s --compile-standard
-../xgcc -m32 -c -o std_standard.o std_standard.s
-%{__mv} std_standard.o ${P32}/v87/std/std_standard.o
-../ghdl1 -m32 -O2 -g --std=93 -quiet -o std_standard.s --compile-standard
-../xgcc -m32 -c -o std_standard.o std_standard.s
-%{__mv} std_standard.o ${P32}/v93/std/std_standard.o
-../ghdl1 -m32 -O2 -g --std=08 -quiet -o std_standard.s --compile-standard
-../xgcc -m32 -c -o std_standard.o std_standard.s
-%{__mv} std_standard.o ${P32}/v08/std/std_standard.o
-popd
-%endif
 
 # Add additional libraries to link
 (
