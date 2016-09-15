@@ -557,15 +557,15 @@ popd
 %{__make} -C obj-%{gcc_target_platform} DESTDIR=%{buildroot} install
 
 PBINDIR=`pwd`/obj-%{gcc_target_platform}/gcc/
-PNATIVE=%{buildroot}/%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/vhdl/lib/
-P32=%{buildroot}/%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/vhdl/lib/32/
+PNATIVE=%{buildroot}/%{_prefix}/lib/ghdl/
+P32=%{buildroot}/%{_prefix}/lib/ghdl/32/
 
 pushd ghdl
 %ifarch x86_64
 make bindir=${PBINDIR} ANALYZE_OPTS="--GHDL1=${PBINDIR}/ghdl1 -m32" STD_GHDL_FLAGS="--GHDL1=${PBINDIR}/ghdl1 -m32" OPT_FLAGS="-g -m32" ghdllib
 make DESTDIR=%{buildroot} install
 %{__install} -d ${P32}
-mv ${PNATIVE}/* ${P32}
+%{__mv} ${PNATIVE}/grt.* ${PNATIVE}/lib* ${PNATIVE}/src ${PNATIVE}/v08 ${PNATIVE}/v87 ${PNATIVE}/v93 ${PNATIVE}/vendors ${P32}
 make clean
 %endif
 
@@ -573,13 +573,15 @@ make bindir=${PBINDIR} ANALYZE_OPTS="--GHDL1=${PBINDIR}/ghdl1" STD_GHDL_FLAGS="-
 make DESTDIR=%{buildroot} install
 popd
 
+%{__mv} %{buildroot}%{_prefix}/lib/libghdlvpi.so %{buildroot}%{_libdir}/ghdlvpi.so
+
 # Add additional libraries to link
 (
 echo "-lgnat-6"
 #%ifarch x86_64
 #echo "-ldl"
 #%endif
-) >> %{buildroot}%{_prefix}/lib/gcc/%{gcc_target_platform}/%{gcc_version}/vhdl/grt.lst
+) >> %{buildroot}%{_prefix}/lib/ghdl/grt.lst
 
 # Remove files not to be packaged
 pushd %{buildroot}
@@ -614,6 +616,8 @@ pushd %{buildroot}
 
 popd
 
+%{__mv} %{buildroot}%{_libdir}/ghdlvpi.so %{buildroot}%{_libdir}/libghdlvpi.so
+
 %clean
 %{__rm} -rf %{buildroot}
 
@@ -633,6 +637,8 @@ popd
 # %{gcc_target_platform}/%{gcc_version} subdirectory
 %{_libexecdir}/gcc/
 %{_mandir}/man1/*
+%{_includedir}/vpi_user.h
+%{_libdir}/libghdlvpi.so
 
 %files grt
 %defattr(-,root,root,-)
@@ -640,6 +646,7 @@ popd
 # Need to own directory %{_libdir}/gcc even though we only want the
 # %{gcc_target_platform}/%{gcc_version} subdirectory
 %{_prefix}/lib/gcc/
+%{_prefix}/lib/ghdl/
 
 %ifarch %{ix86} x86_64
 %if %{with mcode}
