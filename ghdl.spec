@@ -108,7 +108,10 @@ BuildRequires: elfutils-libelf-devel >= 0.147
 BuildRequires: glibc >= 2.3.90-35
 %endif
 # GHDL requires Ada to build
-BuildRequires: gcc-gnat >= 4.3, libgnat >= 4.3
+BuildRequires: gcc-gnat >= 4.3, libgnat-devel >= 4.3
+%ifarch x86_64
+BuildRequires: libgnat-devel.i686 >= 4.3
+%endif
 # GCC build requirements
 BuildRequires: gmp-devel >= 4.1.2-8, mpfr-devel >= 2.2.1, libmpc-devel >= 0.8.1
 BuildRequires: gcc-c++ >= 4.3
