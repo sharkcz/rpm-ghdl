@@ -11,6 +11,10 @@
 %endif
 %bcond_without llvm
 
+%ifarch x86_64
+%bcond_with m32
+%endif
+
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
@@ -109,9 +113,6 @@ BuildRequires: glibc >= 2.3.90-35
 %endif
 # GHDL requires Ada to build
 BuildRequires: gcc-gnat >= 4.3, libgnat-devel >= 4.3
-%ifarch x86_64
-BuildRequires: libgnat-devel.i686 >= 4.3
-%endif
 # GCC build requirements
 BuildRequires: gmp-devel >= 4.1.2-8, mpfr-devel >= 2.2.1, libmpc-devel >= 0.8.1
 BuildRequires: gcc-c++ >= 4.3
@@ -565,11 +566,13 @@ P32=%{buildroot}/%{_prefix}/lib/ghdl/32/
 
 pushd ghdl
 %ifarch x86_64
+%if %{with m32}
 make bindir=${PBINDIR} ANALYZE_OPTS="--GHDL1=${PBINDIR}/ghdl1 -m32" STD_GHDL_FLAGS="--GHDL1=${PBINDIR}/ghdl1 -m32" OPT_FLAGS="-g -m32" ghdllib
 make DESTDIR=%{buildroot} install
 %{__install} -d ${P32}
 %{__mv} ${PNATIVE}/grt.* ${PNATIVE}/lib* ${PNATIVE}/src ${PNATIVE}/v08 ${PNATIVE}/v87 ${PNATIVE}/v93 ${PNATIVE}/vendors ${P32}
 make clean
+%endif
 %endif
 
 make bindir=${PBINDIR} ANALYZE_OPTS="--GHDL1=${PBINDIR}/ghdl1" STD_GHDL_FLAGS="--GHDL1=${PBINDIR}/ghdl1" ghdllib
