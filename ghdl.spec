@@ -2,7 +2,7 @@
 %global SVNREV 216995
 %global gcc_version 4.9.2
 %global ghdlver 0.34dev
-%global ghdlgitrev .20160914git707123f
+%global ghdlgitrev .20170207gitdb4b46e
 
 %ifarch %{ix86} x86_64
 %bcond_without mcode
@@ -678,7 +678,10 @@ popd
 %endif
 
 %changelog
-* Fri Jul  1 2016 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.34dev-0.20160702git50d0507.0
+* Tue Feb 07 2017 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.34dev-0.20170207gitdb4b46e.0
+- update to 0.34dev (gitdb4b46e)
+
+* Fri Jul 01 2016 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.34dev-0.20160702git50d0507.0
 - update to 0.34dev (git50d0507)
 
 * Thu May 26 2016 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.34dev-0.20160503git6ccb80e.0
