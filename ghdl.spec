@@ -69,7 +69,6 @@ Patch105: ghdl-grtadac.patch
 # https://gna.org/bugs/index.php?13390
 Patch106: ghdl-ppc64abort.patch
 # http://gcc.gnu.org/ml/gcc-patches/2012-10/msg02505.html
-Patch112: ghdl-llvm38.diff
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -284,7 +283,6 @@ popd
 %if %{with llvm}
 cp -r ghdl ghdl-llvm
 pushd ghdl-llvm
-%patch112 -p0 -b .llvm38
 %if "%{?_lib}" == "lib64"
 perl -i -pe 's,^libdirsuffix=.*$,libdirsuffix=lib64/ghdl/llvm,' configure
 %else
@@ -332,16 +330,15 @@ cp -a libstdc++-v3/config/cpu/i{4,3}86/atomicity.h
 %if %{with mcode}
 pushd ghdl-mcode
 ./configure --prefix=/usr
-make
+make %{?_smp_mflags}
 popd
 %endif
 %endif
 
 %if %{with llvm}
 pushd ghdl-llvm
-./configure --prefix=/usr --with-llvm=/usr
-# FIXME: disable library debug info for now because it doesn't work with LLVM 3.6
-make LIB_CFLAGS=
+./configure --prefix=/usr --with-llvm-config=/usr/bin/llvm-config
+make %{?_smp_mflags}
 popd
 %endif
 
