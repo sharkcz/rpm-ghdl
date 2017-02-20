@@ -518,6 +518,14 @@ CC="$CC" CFLAGS="$OPT_FLAGS" \
 	--build=%{gcc_target_platform}
 %endif
 
+
+# workaround for gcc gnat ICE on valid, do not compile trans-chap8 with optimization
+%{__make} || true
+pushd gcc/vhdl
+gnatmake -c -aI%{_builddir}/gcc-%{gcc_version}-%{DATE}/gcc/vhdl ortho_gcc-main \
+ -cargs -g -Wall -fexceptions -fstack-protector-strong --param=ssp-buffer-size=4 -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -mtune=generic -gnata -gnat05 -gnaty3befhkmr -gnatwae
+popd
+
 #%ifarch %{arm} sparc sparcv9 sparc64
 #GCJFLAGS="$OPT_FLAGS" make %{?_smp_mflags} BOOT_CFLAGS="$OPT_FLAGS" bootstrap
 #%else
