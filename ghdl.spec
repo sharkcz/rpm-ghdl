@@ -9,7 +9,15 @@
 %else
 %bcond_with mcode
 %endif
+
+#workaround for another compiler error
+#bcond_without llvm
+
+%ifarch %{ix86} x86_64 ppc ppc64 ppc64le ppc64p7
 %bcond_without llvm
+%else
+%bcond_with llvm
+%endif
 
 %ifarch x86_64
 %bcond_with m32
@@ -523,7 +531,14 @@ CC="$CC" CFLAGS="$OPT_FLAGS" \
 %{__make} || true
 pushd gcc/vhdl
 gnatmake -c -aI%{_builddir}/gcc-%{gcc_version}-%{DATE}/gcc/vhdl ortho_gcc-main \
- -cargs -g -Wall -fexceptions -fstack-protector-strong --param=ssp-buffer-size=4 -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 -mtune=generic -gnata -gnat05 -gnaty3befhkmr -gnatwae
+  -cargs -g -Wall -fexceptions -fstack-protector-strong --param=ssp-buffer-size=4 -grecord-gcc-switches -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1 \
+%ifarch %{ix86} x86_64
+  -mtune=generic \
+%endif
+%ifarch ppc64le
+  -mcpu=power8 -mtune=power8 \
+%endif
+  -gnata -gnat05 -gnaty3befhkmr -gnatwae
 popd
 
 #%ifarch %{arm} sparc sparcv9 sparc64
