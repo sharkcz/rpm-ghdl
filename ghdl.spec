@@ -338,7 +338,7 @@ popd
 %if %{with llvm}
 pushd ghdl-llvm
 ./configure --prefix=/usr --with-llvm-config=/usr/bin/llvm-config
-make %{?_smp_mflags}
+make %{?_smp_mflags} LDFLAGS=-Wl,--build-id
 popd
 %endif
 
