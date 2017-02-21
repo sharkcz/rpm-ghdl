@@ -2,7 +2,7 @@
 %global SVNREV 216995
 %global gcc_version 4.9.2
 %global ghdlver 0.34dev
-%global ghdlgitrev .20170207gitdb4b46e
+%global ghdlgitrev .20170221git663ebfd
 
 %ifarch %{ix86} x86_64
 %bcond_without mcode
@@ -698,6 +698,9 @@ popd
 %endif
 
 %changelog
+* Tue Feb 21 2017 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.34dev-0.20170221git663ebfd.0
+- update to 0.34dev (git663ebfd)
+
 * Tue Feb 07 2017 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.34dev-0.20170207gitdb4b46e.0
 - update to 0.34dev (gitdb4b46e)
 
