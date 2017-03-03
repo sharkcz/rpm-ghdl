@@ -607,7 +607,11 @@ popd
 
 # Add additional libraries to link
 (
+%if 0%{?fedora} >= 25
+echo "-lgnat-7"
+%else
 echo "-lgnat-6"
+%endif
 #%ifarch x86_64
 #echo "-ldl"
 #%endif
