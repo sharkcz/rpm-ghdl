@@ -150,6 +150,8 @@ BuildRequires: /lib/libc.so.6 /usr/lib/libc.so /lib64/libc.so.6 /usr/lib64/libc.
 %ifarch ia64
 BuildRequires: libunwind >= 0.98
 %endif
+BuildRequires: autoconf
+BuildRequires: automake
 # for x86, we also build the mcode version; if on x86_64, we need some 32bit libraries
 %if %{with llvm}
 BuildRequires: libedit-devel
