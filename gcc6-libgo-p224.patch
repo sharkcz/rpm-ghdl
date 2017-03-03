@@ -18,9 +18,9 @@
  	go/crypto/elliptic/p256.go
  
  go_crypto_hmac_files = \
---- libgo/go/crypto/elliptic/elliptic.go.jj	2013-11-07 11:59:09.000000000 +0100
-+++ libgo/go/crypto/elliptic/elliptic.go	2014-03-05 15:21:04.186462859 +0100
-@@ -326,7 +326,6 @@ var p384 *CurveParams
+--- libgo/go/crypto/elliptic/elliptic.go.jj	2016-02-05 20:11:20.000000000 +0100
++++ libgo/go/crypto/elliptic/elliptic.go	2016-02-05 22:36:06.145039321 +0100
+@@ -338,7 +338,6 @@ var p384 *CurveParams
  var p521 *CurveParams
  
  func initAll() {
@@ -28,9 +28,9 @@
  	initP256()
  	initP384()
  	initP521()
---- libgo/go/crypto/elliptic/elliptic_test.go.jj	2013-11-07 11:59:09.000000000 +0100
-+++ libgo/go/crypto/elliptic/elliptic_test.go	2014-03-05 15:46:03.739373453 +0100
-@@ -5,26 +5,16 @@
+--- libgo/go/crypto/elliptic/elliptic_test.go.jj	2016-02-05 20:11:19.000000000 +0100
++++ libgo/go/crypto/elliptic/elliptic_test.go	2016-02-05 22:37:37.857772875 +0100
+@@ -5,39 +5,16 @@
  package elliptic
  
  import (
@@ -48,6 +48,19 @@
 -	}
 -}
 -
+-func TestOffCurve(t *testing.T) {
+-	p224 := P224()
+-	x, y := new(big.Int).SetInt64(1), new(big.Int).SetInt64(1)
+-	if p224.IsOnCurve(x, y) {
+-		t.Errorf("FAIL: point off curve is claimed to be on the curve")
+-	}
+-	b := Marshal(p224, x, y)
+-	x1, y1 := Unmarshal(p224, b)
+-	if x1 != nil || y1 != nil {
+-		t.Errorf("FAIL: unmarshalling a point not on the curve succeeded")
+-	}
+-}
+-
  type baseMultTest struct {
  	k    string
  	x, y string
@@ -58,7 +71,7 @@
  	{
  		"1",
  		"b70e0cbd6bb4bf7f321390b94a03c1d356c21122343280d6115c1d21",
-@@ -287,47 +277,12 @@ var p224BaseMultTests = []baseMultTest{
+@@ -300,47 +277,12 @@ var p224BaseMultTests = []baseMultTest{
  	},
  }
  
@@ -108,7 +121,7 @@
  		k, _ := new(big.Int).SetString(e.k, 10)
  		scalars = append(scalars, k)
  	}
-@@ -352,7 +307,7 @@ func TestP256Mult(t *testing.T) {
+@@ -365,7 +307,7 @@ func TestP256Mult(t *testing.T) {
  	p256 := P256()
  	p256Generic := p256.Params()
  
@@ -117,7 +130,7 @@
  		x, _ := new(big.Int).SetString(e.x, 16)
  		y, _ := new(big.Int).SetString(e.y, 16)
  		k, _ := new(big.Int).SetString(e.k, 10)
-@@ -373,7 +328,6 @@ func TestInfinity(t *testing.T) {
+@@ -386,7 +328,6 @@ func TestInfinity(t *testing.T) {
  		name  string
  		curve Curve
  	}{
@@ -125,7 +138,7 @@
  		{"p256", P256()},
  	}
  
-@@ -406,53 +360,13 @@ func TestInfinity(t *testing.T) {
+@@ -419,21 +360,10 @@ func TestInfinity(t *testing.T) {
  	}
  }
  
@@ -148,7 +161,8 @@
  	k, _ := new(big.Int).SetString(e.k, 10)
  	b.StartTimer()
  	for i := 0; i < b.N; i++ {
- 		p256.ScalarBaseMult(k.Bytes())
+@@ -452,32 +382,3 @@ func BenchmarkScalarMultP256(b *testing.
+ 		p256.ScalarMult(x, y, priv)
  	}
  }
 -
@@ -180,8 +194,8 @@
 -		t.Error("P224 failed to validate a correct point")
 -	}
 -}
---- libgo/go/crypto/ecdsa/ecdsa_test.go.jj	2012-11-15 18:26:56.000000000 +0100
-+++ libgo/go/crypto/ecdsa/ecdsa_test.go	2014-03-05 15:26:38.461442929 +0100
+--- libgo/go/crypto/ecdsa/ecdsa_test.go.jj	2016-02-05 20:10:59.000000000 +0100
++++ libgo/go/crypto/ecdsa/ecdsa_test.go	2016-02-05 22:41:54.916215999 +0100
 @@ -33,7 +33,6 @@ func testKeyGeneration(t *testing.T, c e
  }
  
@@ -190,7 +204,7 @@
  	if testing.Short() {
  		return
  	}
-@@ -63,7 +62,6 @@ func testSignAndVerify(t *testing.T, c e
+@@ -98,7 +97,6 @@ func testSignAndVerify(t *testing.T, c e
  }
  
  func TestSignAndVerify(t *testing.T) {
@@ -198,7 +212,23 @@
  	if testing.Short() {
  		return
  	}
-@@ -129,8 +127,6 @@ func TestVectors(t *testing.T) {
+@@ -135,7 +133,6 @@ func testNonceSafety(t *testing.T, c ell
+ }
+ 
+ func TestNonceSafety(t *testing.T) {
+-	testNonceSafety(t, elliptic.P224(), "p224")
+ 	if testing.Short() {
+ 		return
+ 	}
+@@ -170,7 +167,6 @@ func testINDCCA(t *testing.T, c elliptic
+ }
+ 
+ func TestINDCCA(t *testing.T) {
+-	testINDCCA(t, elliptic.P224(), "p224")
+ 	if testing.Short() {
+ 		return
+ 	}
+@@ -236,8 +232,6 @@ func TestVectors(t *testing.T) {
  			parts := strings.SplitN(line, ",", 2)
  
  			switch parts[0] {
@@ -207,9 +237,9 @@
  			case "P-256":
  				pub.Curve = elliptic.P256()
  			case "P-384":
---- libgo/go/crypto/x509/x509.go.jj	2013-11-07 11:59:09.000000000 +0100
-+++ libgo/go/crypto/x509/x509.go	2014-03-05 15:27:37.022439437 +0100
-@@ -305,9 +305,6 @@ func getPublicKeyAlgorithmFromOID(oid as
+--- libgo/go/crypto/x509/x509.go.jj	2016-02-05 20:11:19.000000000 +0100
++++ libgo/go/crypto/x509/x509.go	2016-02-05 22:36:06.147039294 +0100
+@@ -334,9 +334,6 @@ func getPublicKeyAlgorithmFromOID(oid as
  
  // RFC 5480, 2.1.1.1. Named Curve
  //
@@ -219,7 +249,7 @@
  // secp256r1 OBJECT IDENTIFIER ::= {
  //   iso(1) member-body(2) us(840) ansi-X9-62(10045) curves(3)
  //   prime(1) 7 }
-@@ -320,7 +317,6 @@ func getPublicKeyAlgorithmFromOID(oid as
+@@ -349,7 +346,6 @@ func getPublicKeyAlgorithmFromOID(oid as
  //
  // NB: secp256r1 is equivalent to prime256v1
  var (
@@ -227,7 +257,7 @@
  	oidNamedCurveP256 = asn1.ObjectIdentifier{1, 2, 840, 10045, 3, 1, 7}
  	oidNamedCurveP384 = asn1.ObjectIdentifier{1, 3, 132, 0, 34}
  	oidNamedCurveP521 = asn1.ObjectIdentifier{1, 3, 132, 0, 35}
-@@ -328,8 +324,6 @@ var (
+@@ -357,8 +353,6 @@ var (
  
  func namedCurveFromOID(oid asn1.ObjectIdentifier) elliptic.Curve {
  	switch {
@@ -236,7 +266,7 @@
  	case oid.Equal(oidNamedCurveP256):
  		return elliptic.P256()
  	case oid.Equal(oidNamedCurveP384):
-@@ -342,8 +336,6 @@ func namedCurveFromOID(oid asn1.ObjectId
+@@ -371,8 +365,6 @@ func namedCurveFromOID(oid asn1.ObjectId
  
  func oidFromNamedCurve(curve elliptic.Curve) (asn1.ObjectIdentifier, bool) {
  	switch curve {
@@ -245,17 +275,17 @@
  	case elliptic.P256():
  		return oidNamedCurveP256, true
  	case elliptic.P384():
-@@ -1373,7 +1365,7 @@ func CreateCertificate(rand io.Reader, t
- 		hashFunc = crypto.SHA1
- 	case *ecdsa.PrivateKey:
- 		switch priv.Curve {
+@@ -1502,7 +1494,7 @@ func signingParamsForPublicKey(pub inter
+ 		pubType = ECDSA
+ 
+ 		switch pub.Curve {
 -		case elliptic.P224(), elliptic.P256():
 +		case elliptic.P256():
  			hashFunc = crypto.SHA256
- 			signatureAlgorithm.Algorithm = oidSignatureECDSAWithSHA256
+ 			sigAlgo.Algorithm = oidSignatureECDSAWithSHA256
  		case elliptic.P384():
---- libgo/go/crypto/elliptic/p224.go.jj	2012-11-15 18:26:57.000000000 +0100
-+++ libgo/go/crypto/elliptic/p224.go	2014-03-05 15:30:01.189430842 +0100
+--- libgo/go/crypto/elliptic/p224.go.jj	2016-01-15 10:58:09.000000000 +0100
++++ libgo/go/crypto/elliptic/p224.go	2016-02-05 22:36:06.147039294 +0100
 @@ -1,765 +0,0 @@
 -// Copyright 2012 The Go Authors.  All rights reserved.
 -// Use of this source code is governed by a BSD-style
@@ -281,7 +311,7 @@
 -
 -func initP224() {
 -	// See FIPS 186-3, section D.2.2
--	p224.CurveParams = new(CurveParams)
+-	p224.CurveParams = &CurveParams{Name: "P-224"}
 -	p224.P, _ = new(big.Int).SetString("26959946667150639794667015087019630673557916260026308143510066298881", 10)
 -	p224.N, _ = new(big.Int).SetString("26959946667150639794667015087019625940457807714424391721682722368061", 10)
 -	p224.B, _ = new(big.Int).SetString("b4050a850c04b3abf54132565044b0b7d7bfd8ba270b39432355ffb4", 16)
@@ -1022,8 +1052,8 @@
 -
 -	return new(big.Int).SetBytes(buf[:])
 -}
---- libgo/go/crypto/elliptic/p224_test.go.jj	2012-11-15 18:26:57.000000000 +0100
-+++ libgo/go/crypto/elliptic/p224_test.go	2014-03-05 15:29:58.743430988 +0100
+--- libgo/go/crypto/elliptic/p224_test.go.jj	2016-01-15 10:58:09.000000000 +0100
++++ libgo/go/crypto/elliptic/p224_test.go	2016-02-05 22:36:06.148039280 +0100
 @@ -1,47 +0,0 @@
 -// Copyright 2012 The Go Authors.  All rights reserved.
 -// Use of this source code is governed by a BSD-style
@@ -1072,9 +1102,9 @@
 -		}
 -	}
 -}
---- libgo/go/crypto/elliptic/p256.go.jj	2013-11-07 11:59:09.000000000 +0100
-+++ libgo/go/crypto/elliptic/p256.go	2014-03-05 15:34:31.910414701 +0100
-@@ -233,6 +233,8 @@ func p256ReduceCarry(inout *[p256Limbs]u
+--- libgo/go/crypto/elliptic/p256.go.jj	2016-02-05 20:11:19.000000000 +0100
++++ libgo/go/crypto/elliptic/p256.go	2016-02-05 22:36:06.148039280 +0100
+@@ -235,6 +235,8 @@ func p256ReduceCarry(inout *[p256Limbs]u
  	inout[7] += carry << 25
  }
  
@@ -1083,7 +1113,7 @@
  // p256Sum sets out = in+in2.
  //
  // On entry, in[i]+in2[i] must not overflow a 32-bit word.
-@@ -265,6 +267,7 @@ const (
+@@ -267,6 +269,7 @@ const (
  	two31m2    = 1<<31 - 1<<2
  	two31p24m2 = 1<<31 + 1<<24 - 1<<2
  	two30m27m2 = 1<<30 - 1<<27 - 1<<2

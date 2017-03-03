@@ -1,6 +1,6 @@
-%global DATE 20141101
-%global SVNREV 216995
-%global gcc_version 4.9.2
+%global DATE 20170118
+%global SVNREV 244565
+%global gcc_version 6.3.1
 %global ghdlver 0.34dev
 %global ghdlgitrev .20170302git31f8e7a
 
@@ -43,30 +43,24 @@ URL: http://ghdl.free.fr/
 # svn export svn://gcc.gnu.org/svn/gcc/branches/redhat/gcc-4_7-branch@%{SVNREV} gcc-%{version}-%{DATE}
 # tar cf - gcc-%{version}-%{DATE} | bzip2 -9 > gcc-%{version}-%{DATE}.tar.bz2
 Source0: gcc-%{gcc_version}-%{DATE}.tar.bz2
-%global isl_version 0.12.2
-Source1: ftp://gcc.gnu.org/pub/gcc/infrastructure/isl-%{isl_version}.tar.bz2
-%global cloog_version 0.18.1
+%global isl_version 0.14
+Source1: ftp://gcc.gnu.org/pub/gcc/infrastructure/isl-%{isl_version}.tar.xz
+%global cloog_version 0.18.3
 Source2: ftp://gcc.gnu.org/pub/gcc/infrastructure/cloog-%{cloog_version}.tar.gz
-Patch0: gcc49-hack.patch
-Patch1: gcc49-java-nomulti.patch
-Patch2: gcc49-ppc32-retaddr.patch
-Patch3: gcc49-rh330771.patch
-Patch4: gcc49-i386-libgomp.patch
-Patch5: gcc49-sparc-config-detection.patch
-Patch6: gcc49-libgomp-omp_h-multilib.patch
-Patch7: gcc49-libtool-no-rpath.patch
-Patch8: gcc49-cloog-dl.patch
-Patch9: gcc49-cloog-dl2.patch
-Patch10: gcc49-pr38757.patch
-Patch11: gcc49-libstdc++-docs.patch
-Patch12: gcc49-no-add-needed.patch
-Patch14: gcc49-pr56493.patch
-Patch15: gcc49-color-auto.patch
-Patch16: gcc49-libgo-p224.patch
-Patch17: gcc49-aarch64-async-unw-tables.patch
-Patch18: gcc49-aarch64-unwind-opt.patch
-Patch19: gcc49-pr63659.patch
-Patch1100: cloog-%{cloog_version}-ppc64le-config.patch
+Patch0: gcc6-hack.patch
+Patch1: gcc6-java-nomulti.patch
+Patch2: gcc6-ppc32-retaddr.patch
+Patch3: gcc6-rh330771.patch
+Patch4: gcc6-i386-libgomp.patch
+Patch5: gcc6-sparc-config-detection.patch
+Patch6: gcc6-libgomp-omp_h-multilib.patch
+Patch7: gcc6-libtool-no-rpath.patch
+Patch8: gcc6-isl-dl.patch
+Patch9: gcc6-libstdc++-docs.patch
+Patch10: gcc6-no-add-needed.patch
+Patch11: gcc6-libgo-p224.patch
+Patch12: gcc6-aarch64-async-unw-tables.patch
+Patch13: gcc6-libsanitize-aarch64-va42.patch
 Source100: ghdl%{ghdlgitrev}.tar.bz2
 Patch104: ghdl-grtbuild.patch
 Patch105: ghdl-grtadac.patch
@@ -95,9 +89,14 @@ Requires: gcc
 %ifarch x86_64
 %global multilib_32_arch i386
 %endif
-%global build_cloog 1
+#%ifarch %{ix86} x86_64
+#%global build_libmpx 1
+#%else
+%global build_libmpx 0
+#%endif
+%global build_isl 1
 %global build_libstdcxx_docs 1
-%ifarch %{ix86} x86_64 ppc ppc64 ppc64le ppc64p7 s390 s390x %{arm} aarch64
+%ifarch %{ix86} x86_64 ppc ppc64 ppc64le ppc64p7 s390 s390x %{arm} aarch64 %{mips}
 %global attr_ifunc 1
 %else
 %global attr_ifunc 0
@@ -106,8 +105,14 @@ Requires: gcc
 # Need binutils which can omit dot symbols and overlap .opd on ppc64 >= 2.15.91.0.2-4
 # Need binutils which handle -msecure-plt on ppc >= 2.16.91.0.2-2
 # Need binutils which support .weakref >= 2.16.91.0.3-1
-BuildRequires: binutils
-#BuildRequires: binutils >= 2.24
+# Need binutils which support --hash-style=gnu >= 2.17.50.0.2-7
+# Need binutils which support mffgpr and mftgpr >= 2.17.50.0.2-8
+# Need binutils which support --build-id >= 2.17.50.0.17-3
+# Need binutils which support %gnu_unique_object >= 2.19.51.0.14
+# Need binutils which support .cfi_sections >= 2.19.51.0.14-33
+# Need binutils which support --no-add-needed >= 2.20.51.0.2-12
+# Need binutils which support -plugin
+BuildRequires: binutils >= 2.24
 BuildRequires: zlib-devel, gettext, bison, flex, sharutils, texinfo, texinfo-tex, gawk, /usr/bin/pod2man
 # Make sure pthread.h doesn't contain __thread tokens
 # Make sure glibc supports stack protector
@@ -255,24 +260,21 @@ that tracks signal updates and schedules processes.
 %patch5 -p0 -b .sparc-config-detection~
 %patch6 -p0 -b .libgomp-omp_h-multilib~
 %patch7 -p0 -b .libtool-no-rpath~
-%if %{build_cloog}
-%patch8 -p0 -b .cloog-dl~
-%patch9 -p0 -b .cloog-dl2~
+%if %{build_isl}
+%patch8 -p0 -b .isl-dl~
 %endif
-%patch10 -p0 -b .pr38757~
 %if %{build_libstdcxx_docs}
-%patch11 -p0 -b .libstdc++-docs~
+%patch9 -p0 -b .libstdc++-docs~
 %endif
-%patch12 -p0 -b .no-add-needed~
-%patch14 -p0 -b .pr56493~
-%if 0%{?fedora} >= 20 || 0%{?rhel} >= 7
-%patch15 -p0 -b .color-auto~
-%endif
-%patch16 -p0 -b .libgo-p224~
+%patch10 -p0 -b .no-add-needed~
+%patch11 -p0 -b .libgo-p224~
 rm -f libgo/go/crypto/elliptic/p224{,_test}.go
-%patch17 -p0 -b .aarch64-async-unw-tables~
-%patch18 -p0 -b .aarch64-unwind-opt~
-%patch19 -p0 -b .pr63659~
+%patch12 -p0 -b .aarch64-async-unw-tables~
+%patch13 -p0 -b .libsanitize-aarch64-va42~
+
+pushd cloog-%{cloog_version}
+./autogen.sh
+popd
 
 %ifarch %{ix86} x86_64
 %if %{with mcode}
@@ -311,8 +313,6 @@ popd
 %patch104 -p0 -b .grtbuild
 #patch105 -p1 -b .grtadac
 %patch106 -p0 -b .ppc64abort
-
-%patch1100 -p0 -b .cloog-ppc64le-config~
 
 %if 0%{?fedora} >= 16 || 0%{?rhel} >= 7
 # Default to -gdwarf-4 -fno-debug-types-section rather than -gdwarf-2
@@ -357,7 +357,7 @@ export CONFIG_SITE=NONE
 %{__mkdir} obj-%{gcc_target_platform}
 pushd obj-%{gcc_target_platform}
 
-%if %{build_cloog}
+%if %{build_isl}
 mkdir isl-build isl-install
 %ifarch s390 s390x
 ISL_FLAG_PIC=-fPIC
@@ -379,7 +379,7 @@ cat >> ../../cloog-%{cloog_version}/source/isl/constraints.c << \EOF
 static void __attribute__((used)) *s1 = (void *) isl_union_map_compute_flow;
 static void __attribute__((used)) *s2 = (void *) isl_map_dump;
 EOF
-sed -i 's|libcloog|libgcc49privatecloog|g' \
+sed -i 's|libcloog|libgcc6privatecloog|g' \
   ../../cloog-%{cloog_version}/{,test/}Makefile.{am,in}
 isl_prefix=`cd ../isl-install; pwd` \
 ../../cloog-%{cloog_version}/configure --with-isl=system \
@@ -392,8 +392,8 @@ sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
 make %{?_smp_mflags}
 make %{?_smp_mflags} install
 cd ../cloog-install/lib
-rm libgcc49privatecloog-isl.so{,.4}
-mv libgcc49privatecloog-isl.so.4.0.0 libcloog-isl.so.4
+rm libgcc6privatecloog-isl.so{,.4}
+mv libgcc6privatecloog-isl.so.4.0.0 libcloog-isl.so.4
 ln -sf libcloog-isl.so.4 libcloog-isl.so
 ln -sf libcloog-isl.so.4 libcloog.so
 cd ../..
@@ -404,60 +404,55 @@ OPT_FLAGS=`echo %{optflags}|sed -e 's/\(-Wp,\)\?-D_FORTIFY_SOURCE=[12]//g'`
 OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-m64//g;s/-m32//g;s/-m31//g'`
 OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-mfpmath=sse/-mfpmath=sse -msse2/g'`
 OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/ -pipe / /g'`
-# for now
-OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/ -Werror=format-security / /g'`
 %ifarch sparc
 OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-mcpu=ultrasparc/-mtune=ultrasparc/g;s/-mcpu=v[78]//g'`
 %endif
 %ifarch %{ix86}
 OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-march=i.86//g'`
 %endif
-%ifarch sparc64
-cat > gcc64 <<"EOF"
-#!/bin/sh
-exec /usr/bin/gcc -m64 "$@"
-EOF
-chmod +x gcc64
-CC=`pwd`/gcc64
-%endif
-%ifarch ppc64
-if gcc -m64 -xc -S /dev/null -o - > /dev/null 2>&1; then
-  cat > gcc64 <<"EOF"
-#!/bin/sh
-exec /usr/bin/gcc -m64 "$@"
-EOF
-  chmod +x gcc64
-  CC=`pwd`/gcc64
-fi
-%endif
 OPT_FLAGS=`echo "$OPT_FLAGS" | sed -e 's/[[:blank:]]\+/ /g'`
 case "$OPT_FLAGS" in
   *-fasynchronous-unwind-tables*)
-    sed -i -e 's/-fno-exceptions /-fno-exceptions -fno-asynchronous-unwind-tables/' \
-      ../gcc/Makefile.in
+    sed -i -e 's/-fno-exceptions /-fno-exceptions -fno-asynchronous-unwind-tables /' \
+      ../libgcc/Makefile.in
     ;;
 esac
 
-CC="$CC" CFLAGS="$OPT_FLAGS" \
-	CXXFLAGS="`echo " $OPT_FLAGS " | sed 's/ -Wall / /g;s/ -fexceptions / /g'`" \
-	XCFLAGS="$OPT_FLAGS" TCFLAGS="$OPT_FLAGS" GCJFLAGS="$OPT_FLAGS" \
+CC="$CC" CXX="$CXX" CFLAGS="$OPT_FLAGS" \
+	CXXFLAGS="`echo " $OPT_FLAGS " | sed 's/ -Wall / /g;s/ -fexceptions / /g' \
+		  | sed 's/ -Werror=format-security / -Wformat -Werror=format-security /'`" \
+	XCFLAGS="$OPT_FLAGS" TCFLAGS="$OPT_FLAGS" \
 	../configure --prefix=%{_prefix} --mandir=%{_mandir} --infodir=%{_infodir} \
 	--with-bugurl=http://bugzilla.redhat.com/bugzilla --enable-bootstrap=no \
 	--enable-shared --enable-threads=posix --enable-checking=release \
+%ifarch ppc64le
+	--enable-targets=powerpcle-linux \
+%endif
 %ifarch ppc64le
         --disable-multilib \
 %else
         --enable-multilib \
 %endif
 	--with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions \
-	--enable-gnu-unique-object --enable-linker-build-id --with-linker-hash-style=gnu \
+	--enable-gnu-unique-object --enable-linker-build-id \
+%ifnarch %{mips}
+	--with-linker-hash-style=gnu \
+%endif
 	--enable-languages=vhdl \
 	--enable-plugin --enable-initfini-array \
 	--disable-libgcj \
-%if %{build_cloog}
+%if 0%{?fedora} >= 21 && 0%{?fedora} <= 22
+	--with-default-libstdcxx-abi=gcc4-compatible \
+%endif
+%if %{build_isl}
         --with-isl=`pwd`/isl-install --with-cloog=`pwd`/cloog-install \
 %else
         --without-isl --without-cloog \
+%endif
+%if %{build_libmpx}
+	--enable-libmpx \
+%else
+	--disable-libmpx \
 %endif
 %if 0%{?fedora} >= 21 || 0%{?rhel} >= 7
 %if %{attr_ifunc}
@@ -482,13 +477,16 @@ CC="$CC" CFLAGS="$OPT_FLAGS" \
 %ifarch sparc sparcv9
 	--host=%{gcc_target_platform} --build=%{gcc_target_platform} --target=%{gcc_target_platform} --with-cpu=v7
 %endif
-%ifarch ppc ppc64 ppc64le ppc64p7
+%ifarch ppc ppc64 ppc64p7
 %if 0%{?rhel} >= 7
 	--with-cpu-32=power7 --with-tune-32=power7 --with-cpu-64=power7 --with-tune-64=power7 \
 %endif
 %if 0%{?rhel} == 6
 	--with-cpu-32=power4 --with-tune-32=power6 --with-cpu-64=power4 --with-tune-64=power6 \
 %endif
+%endif
+%ifarch ppc64le
+	--with-cpu-32=power8 --with-tune-32=power8 --with-cpu-64=power8 --with-tune-64=power8 \
 %endif
 %ifarch ppc
 	--build=%{gcc_target_platform} --target=%{gcc_target_platform} --with-cpu=default32
@@ -513,17 +511,23 @@ CC="$CC" CFLAGS="$OPT_FLAGS" \
 %endif
 %ifarch s390 s390x
 %if 0%{?rhel} >= 7
-        --with-arch=z196 --with-tune=zEC12 --enable-decimal-float \
+	--with-arch=z196 --with-tune=zEC12 --enable-decimal-float \
 %else
-        --with-arch=z9-109 --with-tune=z10 --enable-decimal-float \
+	--with-arch=z9-109 --with-tune=z10 --enable-decimal-float \
 %endif
 %endif
 %ifarch armv7hl
-	--with-cpu=cortex-a8 --with-tune=cortex-a8 --with-arch=armv7-a \
+	--with-tune=cortex-a8 --with-arch=armv7-a \
 	--with-float=hard --with-fpu=vfpv3-d16 --with-abi=aapcs-linux \
 %endif
+%ifarch mips mipsel
+	--with-arch=mips32r2 --with-fp-32=xx \
+%endif
+%ifarch mips64 mips64el
+	--with-arch=mips64r2 --with-abi=64 \
+%endif
 %ifnarch sparc sparcv9 ppc
-	--build=%{gcc_target_platform}
+	--build=%{gcc_target_platform} \
 %endif
 
 
@@ -550,7 +554,7 @@ popd
 #%{__make} %{?_smp_mflags}
 %{__make}
 
-%if %{build_cloog}
+%if %{build_isl}
 cp -a cloog-install/lib/libcloog-isl.so.4 gcc/
 %endif
 
