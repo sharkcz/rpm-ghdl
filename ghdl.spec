@@ -61,6 +61,7 @@ Patch10: gcc6-no-add-needed.patch
 Patch11: gcc6-libgo-p224.patch
 Patch12: gcc6-aarch64-async-unw-tables.patch
 Patch13: gcc6-libsanitize-aarch64-va42.patch
+Patch90: gcc6-compile.patch
 Source100: ghdl%{ghdlgitrev}.tar.bz2
 Patch104: ghdl-grtbuild.patch
 Patch105: ghdl-grtadac.patch
@@ -274,6 +275,7 @@ that tracks signal updates and schedules processes.
 rm -f libgo/go/crypto/elliptic/p224{,_test}.go
 %patch12 -p0 -b .aarch64-async-unw-tables~
 %patch13 -p0 -b .libsanitize-aarch64-va42~
+%patch90 -p0 -b .compile~
 
 pushd cloog-%{cloog_version}
 ./autogen.sh
