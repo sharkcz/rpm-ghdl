@@ -420,7 +420,7 @@ esac
 
 CC="$CC" CXX="$CXX" CFLAGS="$OPT_FLAGS" \
 	CXXFLAGS="`echo " $OPT_FLAGS " | sed 's/ -Wall / /g;s/ -fexceptions / /g' \
-		  | sed 's/ -Werror=format-security / -Wformat -Werror=format-security /'`" \
+		  | sed 's/ -Werror=format-security /  /'`" \
 	XCFLAGS="$OPT_FLAGS" TCFLAGS="$OPT_FLAGS" \
 	../configure --prefix=%{_prefix} --mandir=%{_mandir} --infodir=%{_infodir} \
 	--with-bugurl=http://bugzilla.redhat.com/bugzilla --enable-bootstrap=no \
@@ -647,6 +647,9 @@ pushd %{buildroot}
 popd
 
 %{__mv} %{buildroot}%{_libdir}/ghdlvpi.so %{buildroot}%{_libdir}/libghdlvpi.so
+%{__install} -d %{buildroot}%{_includedir}/ghdl
+%{__mv} %{buildroot}%{_includedir}/vpi_user.h %{buildroot}%{_includedir}/ghdl
+%{__rm} %{buildroot}%{_bindir}/gcov-tool
 
 %clean
 %{__rm} -rf %{buildroot}
@@ -667,7 +670,7 @@ popd
 # %{gcc_target_platform}/%{gcc_version} subdirectory
 %{_libexecdir}/gcc/
 %{_mandir}/man1/*
-%{_includedir}/vpi_user.h
+%{_includedir}/ghdl/vpi_user.h
 %{_libdir}/libghdlvpi.so
 
 %files grt
