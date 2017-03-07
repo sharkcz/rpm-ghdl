@@ -172,6 +172,9 @@ ExclusiveArch: %{GNAT_arches}
 # the following arches are not supported by the base compiler:
 ExcludeArch: armv7hl
 
+# for some reason, GNAT fails on ppc64
+ExcludeArch: ppc64
+
 # Make sure we don't use clashing namespaces
 %global _vendor fedora_ghdl
 
