@@ -13,11 +13,11 @@
 #workaround for another compiler error
 #bcond_without llvm
 
-%ifarch %{ix86} x86_64 ppc ppc64 ppc64le ppc64p7
-%bcond_without llvm
-%else
+#%ifarch %{ix86} x86_64 ppc ppc64 ppc64le ppc64p7
+#%bcond_without llvm
+#%else
 %bcond_with llvm
-%endif
+#%endif
 
 %ifarch x86_64
 %bcond_with m32
@@ -171,9 +171,6 @@ ExclusiveArch: %{GNAT_arches}
 
 # the following arches are not supported by the base compiler:
 ExcludeArch: armv7hl
-
-# for some reason, GNAT fails on ppc64
-ExcludeArch: ppc64
 
 # Make sure we don't use clashing namespaces
 %global _vendor fedora_ghdl
