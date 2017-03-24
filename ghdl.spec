@@ -158,9 +158,9 @@ BuildRequires: libtool
 %if %{with llvm}
 BuildRequires: libedit-devel
 BuildRequires: clang
-BuildRequires: llvm
-BuildRequires: llvm-devel
-BuildRequires: llvm-static
+BuildRequires: llvm3.9
+BuildRequires: llvm3.9-devel
+BuildRequires: llvm3.9-static
 %endif
 
 Requires: ghdl-grt = %{version}-%{release}
@@ -715,7 +715,7 @@ popd
 
 %changelog
 * Fri Mar 24 2017 Igor Gnatenko <ignatenko@redhat.com> - 0.34dev-0.20170302git31f8e7a.1
-- Rebuild for LLVM4
+- Use LLVM 3.9
 
 * Thu Mar 02 2017 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.34dev-0.20170302git31f8e7a.0
 - update to 0.34dev (git31f8e7a)
