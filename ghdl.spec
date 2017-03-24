@@ -26,7 +26,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-Release: 0%{ghdlgitrev}.0%{?dist}
+Release: 0%{ghdlgitrev}.1%{?dist}
 License: GPLv2+
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -714,6 +714,9 @@ popd
 %endif
 
 %changelog
+* Fri Mar 24 2017 Igor Gnatenko <ignatenko@redhat.com> - 0.34dev-0.20170302git31f8e7a.1
+- Rebuild for LLVM4
+
 * Thu Mar 02 2017 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.34dev-0.20170302git31f8e7a.0
 - update to 0.34dev (git31f8e7a)
 
