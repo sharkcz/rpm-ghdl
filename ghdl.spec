@@ -2,7 +2,7 @@
 %global SVNREV 244565
 %global gcc_version 6.3.1
 %global ghdlver 0.34dev
-%global ghdlgitrev .20170302git31f8e7a
+%global ghdlgitrev .20170712git5783528
 
 %ifarch %{ix86} x86_64
 %bcond_without mcode
@@ -13,11 +13,11 @@
 #workaround for another compiler error
 #bcond_without llvm
 
-#%ifarch %{ix86} x86_64 ppc ppc64 ppc64le ppc64p7
-#%bcond_without llvm
-#%else
+%ifarch %{ix86} x86_64 ppc ppc64 ppc64le ppc64p7
+%bcond_without llvm
+%else
 %bcond_with llvm
-#%endif
+%endif
 
 %ifarch x86_64
 %bcond_with m32
@@ -26,17 +26,14 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-Release: 0%{ghdlgitrev}.1%{?dist}
+Release: 0%{ghdlgitrev}.0%{?dist}
 License: GPLv2+
 Group: Development/Languages
 URL: http://ghdl.free.fr/
 # HOWTO create source files from ghdl git at github.com
 # check out the git repo
 # git clone https://github.com/tgingold/ghdl.git
-
 # tar cvJf ghdl%{ghdlgitrev}.tar.bz2 --exclude-vcs ghdl
-# cd translate/gcc/
-# ./dist.sh sources
 #
 # The source for this package was pulled from upstream's vcs.  Use the
 # following commands to generate the tarball:
@@ -63,8 +60,6 @@ Patch12: gcc6-aarch64-async-unw-tables.patch
 Patch13: gcc6-libsanitize-aarch64-va42.patch
 Patch90: gcc6-compile.patch
 Source100: ghdl%{ghdlgitrev}.tar.bz2
-Patch104: ghdl-grtbuild.patch
-Patch105: ghdl-grtadac.patch
 # Both following patches have been sent to upstream mailing list:
 # From: Thomas Sailer <t.sailer@alumni.ethz.ch>
 # To: ghdl-discuss@gna.org
@@ -158,9 +153,9 @@ BuildRequires: libtool
 %if %{with llvm}
 BuildRequires: libedit-devel
 BuildRequires: clang
-BuildRequires: llvm3.9
-BuildRequires: llvm3.9-devel
-BuildRequires: llvm3.9-static
+BuildRequires: llvm
+BuildRequires: llvm-devel
+BuildRequires: llvm-static
 %endif
 
 Requires: ghdl-grt = %{version}-%{release}
@@ -315,8 +310,6 @@ pushd ghdl
 make copy-sources
 popd
 
-%patch104 -p0 -b .grtbuild
-#patch105 -p1 -b .grtadac
 %patch106 -p0 -b .ppc64abort
 
 %if 0%{?fedora} >= 16 || 0%{?rhel} >= 7
@@ -596,7 +589,7 @@ P32=%{buildroot}/%{_prefix}/lib/ghdl/32/
 pushd ghdl
 %ifarch x86_64
 %if %{with m32}
-make bindir=${PBINDIR} ANALYZE_OPTS="--GHDL1=${PBINDIR}/ghdl1 -m32" STD_GHDL_FLAGS="--GHDL1=${PBINDIR}/ghdl1 -m32" OPT_FLAGS="-g -m32" ghdllib
+make bindir=${PBINDIR} GHDL1_GCC_BIN="--GHDL1=${PBINDIR}/ghdl1 -m32" OPT_FLAGS="-g -m32" ghdllib
 make DESTDIR=%{buildroot} install
 %{__install} -d ${P32}
 %{__mv} ${PNATIVE}/grt.* ${PNATIVE}/lib* ${PNATIVE}/src ${PNATIVE}/v08 ${PNATIVE}/v87 ${PNATIVE}/v93 ${PNATIVE}/vendors ${P32}
@@ -604,7 +597,7 @@ make clean
 %endif
 %endif
 
-make bindir=${PBINDIR} ANALYZE_OPTS="--GHDL1=${PBINDIR}/ghdl1" STD_GHDL_FLAGS="--GHDL1=${PBINDIR}/ghdl1" ghdllib
+make bindir=${PBINDIR} GHDL1_GCC_BIN="--GHDL1=${PBINDIR}/ghdl1" ghdllib
 make DESTDIR=%{buildroot} install
 popd
 
@@ -714,6 +707,9 @@ popd
 %endif
 
 %changelog
+* Wed Jul 12 2017 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.34dev-0.20170712git5783528.0
+- update to 0.34dev (git5783528)
+
 * Fri Mar 24 2017 Igor Gnatenko <ignatenko@redhat.com> - 0.34dev-0.20170302git31f8e7a.1
 - Use LLVM 3.9
 
