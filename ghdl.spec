@@ -59,6 +59,7 @@ Patch11: gcc6-libgo-p224.patch
 Patch12: gcc6-aarch64-async-unw-tables.patch
 Patch13: gcc6-libsanitize-aarch64-va42.patch
 Patch90: gcc6-compile.patch
+Patch91: gcc6-ucontext.patch
 Source100: ghdl%{ghdlgitrev}.tar.bz2
 # Both following patches have been sent to upstream mailing list:
 # From: Thomas Sailer <t.sailer@alumni.ethz.ch>
@@ -271,6 +272,7 @@ rm -f libgo/go/crypto/elliptic/p224{,_test}.go
 %patch12 -p0 -b .aarch64-async-unw-tables~
 %patch13 -p0 -b .libsanitize-aarch64-va42~
 %patch90 -p0 -b .compile~
+%patch91 -p0 -b .ucontext~
 
 pushd cloog-%{cloog_version}
 ./autogen.sh
