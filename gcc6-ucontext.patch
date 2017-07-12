@@ -1,5 +1,5 @@
---- ./libgcc/config/i386/linux-unwind.h.x	2017-07-12 18:10:21.531812959 +0200
-+++ ./libgcc/config/i386/linux-unwind.h	2017-07-12 18:11:03.106011137 +0200
+--- libgcc/config/i386/linux-unwind.h.x	2017-07-12 18:10:21.531812959 +0200
++++ libgcc/config/i386/linux-unwind.h	2017-07-12 18:11:03.106011137 +0200
 @@ -58,7 +58,7 @@
    if (*(unsigned char *)(pc+0) == 0x48
        && *(unsigned long long *)(pc+1) == RT_SIGRETURN_SYSCALL)
@@ -18,3 +18,14 @@
        } *rt_ = context->cfa;
        /* The void * cast is necessary to avoid an aliasing warning.
           The aliasing warning is correct, but should not be a problem
+--- libgcc/config/aarch64/linux-unwind.h.x	2017-07-12 19:29:07.830098788 +0200
++++ libgcc/config/aarch64/linux-unwind.h	2017-07-12 19:29:28.772691533 +0200
+@@ -52,7 +52,7 @@
+   struct rt_sigframe
+   {
+     siginfo_t info;
+-    struct ucontext uc;
++    ucontext_t uc;
+   };
+ 
+   struct rt_sigframe *rt_;
