@@ -13,7 +13,8 @@
 #workaround for another compiler error
 #bcond_without llvm
 
-%ifarch %{ix86} x86_64 ppc ppc64 ppc64le ppc64p7
+#ifarch %{ix86} x86_64 ppc ppc64 ppc64le ppc64p7
+%ifarch x86_64 ppc ppc64 ppc64le ppc64p7
 %bcond_without llvm
 %else
 %bcond_with llvm
