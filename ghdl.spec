@@ -2,7 +2,7 @@
 %global SVNREV 244565
 %global gcc_version 6.3.1
 %global ghdlver 0.34dev
-%global ghdlgitrev .20170715gitc14fe80
+%global ghdlgitrev .20170815git0879429a
 
 %ifarch %{ix86} x86_64
 %bcond_without mcode
@@ -27,7 +27,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-Release: 2%{ghdlgitrev}.0%{?dist}
+Release: 0%{ghdlgitrev}.0%{?dist}
 License: GPLv2+
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -608,7 +608,7 @@ popd
 
 # Add additional libraries to link
 (
-%if 0%{?fedora} >= 25
+%if 0%{?fedora} >= 26
 echo "-lgnat-7"
 %else
 echo "-lgnat-6"
@@ -710,6 +710,9 @@ popd
 %endif
 
 %changelog
+* Tue Aug 15 2017 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.34dev-0.20170815git0879429a.0
+- update to 0.34dev (git0879429a)
+
 * Wed Aug 02 2017 Fedora Release Engineering <releng@fedoraproject.org> - 0.34dev-2.20170715gitc14fe80.0
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild
 
