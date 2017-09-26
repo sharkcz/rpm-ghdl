@@ -2,7 +2,7 @@
 %global SVNREV 244565
 %global gcc_version 6.3.1
 %global ghdlver 0.34dev
-%global ghdlgitrev .20170815git0879429a
+%global ghdlgitrev .20170926git685526e
 
 %ifarch %{ix86} x86_64
 %bcond_without mcode
@@ -69,6 +69,7 @@ Source100: ghdl%{ghdlgitrev}.tar.bz2
 # https://gna.org/bugs/index.php?13390
 Patch106: ghdl-ppc64abort.patch
 # http://gcc.gnu.org/ml/gcc-patches/2012-10/msg02505.html
+Patch200: upf.patch
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -274,6 +275,8 @@ rm -f libgo/go/crypto/elliptic/p224{,_test}.go
 %patch13 -p0 -b .libsanitize-aarch64-va42~
 %patch90 -p0 -b .compile~
 %patch91 -p0 -b .ucontext~
+
+%patch200 -p0 -b .upf
 
 pushd cloog-%{cloog_version}
 ./autogen.sh
@@ -710,6 +713,9 @@ popd
 %endif
 
 %changelog
+* Tue Sep 26 2017 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.34dev-0.20170926git685526e.0
+- update to 0.34dev (git685526e)
+
 * Tue Aug 15 2017 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.34dev-0.20170815git0879429a.0
 - update to 0.34dev (git0879429a)
 
