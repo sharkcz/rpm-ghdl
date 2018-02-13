@@ -70,7 +70,6 @@ Source100: ghdl%{ghdlgitrev}.tar.bz2
 Patch106: ghdl-ppc64abort.patch
 # http://gcc.gnu.org/ml/gcc-patches/2012-10/msg02505.html
 Patch200: upf.patch
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
 Requires: gcc
