@@ -658,9 +658,6 @@ popd
 %{__mv} %{buildroot}%{_includedir}/vpi_user.h %{buildroot}%{_includedir}/ghdl
 %{__rm} %{buildroot}%{_bindir}/gcov-tool
 
-%clean
-%{__rm} -rf %{buildroot}
-
 %post
 [ -f %{_infodir}/ghdl.info.gz ] && \
         /sbin/install-info %{_infodir}/ghdl.info.gz %{_infodir}/dir || :
