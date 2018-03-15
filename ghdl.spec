@@ -69,7 +69,6 @@ Source100: ghdl%{ghdlgitrev}.tar.bz2
 # https://gna.org/bugs/index.php?13390
 Patch106: ghdl-ppc64abort.patch
 # http://gcc.gnu.org/ml/gcc-patches/2012-10/msg02505.html
-Patch107: ghdl-gcc.patch
 Patch200: upf.patch
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -277,10 +276,6 @@ rm -f libgo/go/crypto/elliptic/p224{,_test}.go
 %patch91 -p0 -b .ucontext~
 
 %patch200 -p0 -b .upf
-
-pushd ghdl
-%patch107 -p1 -b .gcc
-popd
 
 pushd cloog-%{cloog_version}
 ./autogen.sh
