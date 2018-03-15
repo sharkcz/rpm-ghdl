@@ -2,7 +2,7 @@
 %global SVNREV 244565
 %global gcc_version 6.3.1
 %global ghdlver 0.34dev
-%global ghdlgitrev .20170926git685526e
+%global ghdlgitrev .20180311git46c5015
 
 %ifarch %{ix86} x86_64
 %bcond_without mcode
@@ -709,6 +709,9 @@ popd
 %endif
 
 %changelog
+* Thu Mar 15 2018 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.34dev-1.20180311git46c5015.0
+- update to 0.34dev (git46c5015)
+
 * Wed Feb 07 2018 Fedora Release Engineering <releng@fedoraproject.org> - 0.34dev-1.20170926git685526e.0
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
 
