@@ -345,7 +345,7 @@ cp -a libstdc++-v3/config/cpu/i{4,3}86/atomicity.h
 %ifarch %{ix86} x86_64
 %if %{with mcode}
 pushd ghdl-mcode
-./configure --prefix=/usr
+./configure --prefix=/usr --disable-werror
 make %{?_smp_mflags}
 popd
 %endif
@@ -353,7 +353,7 @@ popd
 
 %if %{with llvm}
 pushd ghdl-llvm
-./configure --prefix=/usr --with-llvm-config=/usr/bin/llvm-config
+./configure --prefix=/usr --disable-werror --with-llvm-config=/usr/bin/llvm-config
 make %{?_smp_mflags} LDFLAGS=-Wl,--build-id
 popd
 %endif
@@ -684,7 +684,6 @@ popd
 
 %files grt
 %defattr(-,root,root,-)
-%doc ghdl/COPYING
 # Need to own directory %{_libdir}/gcc even though we only want the
 # %{gcc_target_platform}/%{gcc_version} subdirectory
 %{_prefix}/lib/gcc/
@@ -696,7 +695,6 @@ popd
 %{_bindir}/ghdl-mcode
 
 %files mcode-grt
-%doc ghdl/COPYING
 %dir %{_libdir}/ghdl
 %{_libdir}/ghdl/mcode
 %endif
@@ -708,7 +706,6 @@ popd
 %{_bindir}/ghdl1-llvm
 
 %files llvm-grt
-%doc ghdl/COPYING
 %dir %{_libdir}/ghdl
 %{_libdir}/ghdl/llvm
 %endif

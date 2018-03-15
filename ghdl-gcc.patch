@@ -20,3 +20,67 @@ index 8cbfa70e..fbc27087 100644
        function Is_Bad_Unit_Name return Boolean is
        begin
           if Name'Length = 0 then
+diff --git a/src/ghdldrv/ghdlprint.adb b/src/ghdldrv/ghdlprint.adb
+index 5f13e39c..f95e266e 100644
+--- a/src/ghdldrv/ghdlprint.adb
++++ b/src/ghdldrv/ghdlprint.adb
+@@ -1183,10 +1183,6 @@ package body Ghdlprint is
+                              Files : Argument_List)
+    is
+       pragma Unreferenced (Cmd);
+-      use Scanner;
+-      use Tokens;
+-      use Files_Map;
+-      use Ada.Characters.Latin_1;
+ 
+       Id : Name_Id;
+       Fe : Source_File_Entry;
+diff --git a/src/ghdldrv/ghdlrun.adb b/src/ghdldrv/ghdlrun.adb
+index be461981..3e0c0aa2 100644
+--- a/src/ghdldrv/ghdlrun.adb
++++ b/src/ghdldrv/ghdlrun.adb
+@@ -231,7 +231,6 @@ package body Ghdlrun is
+ 
+    procedure Run
+    is
+-      use Interfaces;
+       --use Ortho_Code.Binary;
+ 
+       function Conv is new Ada.Unchecked_Conversion
+diff --git a/src/libraries.adb b/src/libraries.adb
+index ca961657..61f603b6 100644
+--- a/src/libraries.adb
++++ b/src/libraries.adb
+@@ -1523,7 +1523,6 @@ package body Libraries is
+       --  FIXME: It may fail if they aren't on the same filesystem, but we
+       --  could assume it doesn't happen (humm...)
+       declare
+-         use Files_Map;
+          File_Name: constant String := Image (Work_Directory)
+            & Library_To_File_Name (Library) & ASCII.NUL;
+          Delete_Success : Boolean;
+diff --git a/src/ortho/mcode/ortho_jit.adb b/src/ortho/mcode/ortho_jit.adb
+index 6f4fa376..a1979b08 100644
+--- a/src/ortho/mcode/ortho_jit.adb
++++ b/src/ortho/mcode/ortho_jit.adb
+@@ -23,7 +23,7 @@ with Ada.Text_IO;
+ 
+ with Binary_File; use Binary_File;
+ with Binary_File.Memory;
+-with Ortho_Mcode; use Ortho_Mcode;
++with Ortho_Mcode;
+ with Ortho_Mcode.Jit;
+ with Ortho_Code.Flags; use Ortho_Code.Flags;
+ with Ortho_Code.Debug;
+diff --git a/src/vhdl/disp_vhdl.adb b/src/vhdl/disp_vhdl.adb
+index f239eff1..b82abe60 100644
+--- a/src/vhdl/disp_vhdl.adb
++++ b/src/vhdl/disp_vhdl.adb
+@@ -3157,7 +3157,6 @@ package body Disp_Vhdl is
+    procedure Disp_PSL_NFA (N : PSL.Nodes.NFA)
+    is
+       use PSL.NFAs;
+-      use PSL.Nodes;
+ 
+       procedure Disp_State (S : NFA_State) is
+          Str : constant String := Int32'Image (Get_State_Label (S));
