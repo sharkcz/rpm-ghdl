@@ -545,7 +545,8 @@ gnatmake -c -aI%{_builddir}/gcc-%{gcc_version}-%{DATE}/gcc/vhdl ortho_gcc-main \
 %ifarch ppc64le
   -mcpu=power8 -mtune=power8 \
 %endif
-  -gnata -gnat05 -gnaty3befhkmr -gnatwae
+  -gnata -gnat05 -gnaty3befhkmr
+#-gnatwae
 popd
 
 #%ifarch %{arm} sparc sparcv9 sparc64
