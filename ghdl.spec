@@ -24,6 +24,8 @@
 %bcond_with m32
 %endif
 
+%bcond_with gnatwae
+
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
@@ -277,6 +279,10 @@ rm -f libgo/go/crypto/elliptic/p224{,_test}.go
 
 %patch200 -p0 -b .upf
 
+%if %{without gnatwae}
+perl -i -pe 's,-gnatwae,,' ghdl/dist/gcc/Make-lang.in
+%endif
+
 pushd cloog-%{cloog_version}
 ./autogen.sh
 popd
@@ -340,7 +346,11 @@ cp -a libstdc++-v3/config/cpu/i{4,3}86/atomicity.h
 %ifarch %{ix86} x86_64
 %if %{with mcode}
 pushd ghdl-mcode
-./configure --prefix=/usr --disable-werror
+./configure \
+%if %{without gnatwae}
+	--disable-werror \
+%endif
+	--prefix=/usr
 make %{?_smp_mflags}
 popd
 %endif
@@ -348,7 +358,11 @@ popd
 
 %if %{with llvm}
 pushd ghdl-llvm
-./configure --prefix=/usr --disable-werror --with-llvm-config=/usr/bin/llvm-config
+./configure --prefix=/usr \
+%if %{without gnatwae}
+	--disable-werror \
+%endif
+	--with-llvm-config=/usr/bin/llvm-config
 make %{?_smp_mflags} LDFLAGS=-Wl,--build-id
 popd
 %endif
