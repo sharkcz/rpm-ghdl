@@ -1,7 +1,7 @@
 %global DATE 20170118
 %global SVNREV 244565
 %global gcc_version 6.3.1
-%global ghdlver 0.34dev
+%global ghdlver 0.35dev
 %global ghdlgitrev .20180311git46c5015
 
 %ifarch %{ix86} x86_64
@@ -27,7 +27,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-Release: 1%{ghdlgitrev}.0%{?dist}
+Release: 0%{ghdlgitrev}.0%{?dist}
 License: GPLv2+
 Group: Development/Languages
 URL: http://ghdl.free.fr/
@@ -69,6 +69,7 @@ Source100: ghdl%{ghdlgitrev}.tar.bz2
 # https://gna.org/bugs/index.php?13390
 Patch106: ghdl-ppc64abort.patch
 # http://gcc.gnu.org/ml/gcc-patches/2012-10/msg02505.html
+Patch107: ghdl-gcc.patch
 Patch200: upf.patch
 Requires(post): /sbin/install-info
 Requires(preun): /sbin/install-info
@@ -276,6 +277,10 @@ rm -f libgo/go/crypto/elliptic/p224{,_test}.go
 %patch91 -p0 -b .ucontext~
 
 %patch200 -p0 -b .upf
+
+pushd ghdl
+%patch107 -p1 -b .gcc
+popd
 
 pushd cloog-%{cloog_version}
 ./autogen.sh
@@ -709,7 +714,7 @@ popd
 %endif
 
 %changelog
-* Thu Mar 15 2018 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.34dev-1.20180311git46c5015.0
+* Thu Mar 15 2018 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.35dev-0.20180311git46c5015.0
 - update to 0.34dev (git46c5015)
 
 * Wed Feb 07 2018 Fedora Release Engineering <releng@fedoraproject.org> - 0.34dev-1.20170926git685526e.0
