@@ -169,7 +169,7 @@ Provides: bundled(libiberty)
 ExclusiveArch: %{GNAT_arches}
 
 # the following arches are not supported by the base compiler:
-ExcludeArch: armv7hl
+ExcludeArch: armv7hl ppc64le
 
 # Make sure we don't use clashing namespaces
 %global _vendor fedora_ghdl
