@@ -424,6 +424,7 @@ OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/ -pipe / /g'`
 OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-mcet//g'`
 OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-fstack-clash-protection//g'`
 OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-fcf-protection//g'`
+OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-specs=/usr/lib/rpm/redhat/redhat-annobin-cc1//g'`
 %ifarch sparc
 OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-mcpu=ultrasparc/-mtune=ultrasparc/g;s/-mcpu=v[78]//g'`
 %endif
