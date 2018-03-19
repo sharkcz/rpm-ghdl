@@ -2,7 +2,7 @@
 %global SVNREV 244565
 %global gcc_version 6.3.1
 %global ghdlver 0.35dev
-%global ghdlgitrev .20180311git46c5015
+%global ghdlgitrev .20180315git0edf0a1
 
 %ifarch %{ix86} x86_64
 %bcond_without mcode
@@ -13,12 +13,12 @@
 #workaround for another compiler error
 #bcond_without llvm
 
-#ifarch %{ix86} x86_64 ppc ppc64 ppc64le ppc64p7
+%ifarch %{ix86} x86_64 ppc ppc64 ppc64le ppc64p7
 #ifarch x86_64 ppc ppc64 ppc64le ppc64p7
-#bcond_without llvm
-#else
+%bcond_without llvm
+%else
 %bcond_with llvm
-#endif
+%endif
 
 %ifarch x86_64
 %bcond_with m32
@@ -725,6 +725,9 @@ popd
 %endif
 
 %changelog
+* Thu Mar 15 2018 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.35dev-0.20180315git0edf0a1.0
+- update to 0.35dev (git0edf0a1)
+
 * Thu Mar 15 2018 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.35dev-0.20180311git46c5015.0
 - update to 0.34dev (git46c5015)
 
