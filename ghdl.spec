@@ -2,7 +2,7 @@
 %global SVNREV 244565
 %global gcc_version 6.3.1
 %global ghdlver 0.35dev
-%global ghdlgitrev .20180315git0edf0a1
+%global ghdlgitrev .20180520git66bb071
 
 %ifarch %{ix86} x86_64
 %bcond_without mcode
@@ -629,10 +629,14 @@ popd
 
 # Add additional libraries to link
 (
+%if 0%{?fedora} >= 28
+echo "-lgnat-8"
+%else
 %if 0%{?fedora} >= 26
 echo "-lgnat-7"
 %else
 echo "-lgnat-6"
+%endif
 %endif
 #%ifarch x86_64
 #echo "-ldl"
@@ -725,6 +729,9 @@ popd
 %endif
 
 %changelog
+* Sun May 20 2018 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.35dev-0.20180520git66bb071.0
+- update to 0.35dev (git66bb071)
+
 * Thu Mar 15 2018 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.35dev-0.20180315git0edf0a1.0
 - update to 0.35dev (git0edf0a1)
 
