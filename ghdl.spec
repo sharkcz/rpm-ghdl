@@ -690,7 +690,6 @@ popd
         /sbin/install-info --delete %{_infodir}/ghdl.info.gz %{_infodir}/dir || :
 
 %files
-%defattr(-,root,root,-)
 %{_bindir}/ghdl
 %{_infodir}/ghdl.info.gz
 # Need to own directory %{_libexecdir}/gcc even though we only want the
@@ -701,7 +700,6 @@ popd
 %{_libdir}/libghdlvpi.so
 
 %files grt
-%defattr(-,root,root,-)
 # Need to own directory %{_libdir}/gcc even though we only want the
 # %{gcc_target_platform}/%{gcc_version} subdirectory
 %{_prefix}/lib/gcc/
