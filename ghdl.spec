@@ -72,8 +72,6 @@ Source100: ghdl%{ghdlgitrev}.tar.bz2
 Patch106: ghdl-ppc64abort.patch
 # http://gcc.gnu.org/ml/gcc-patches/2012-10/msg02505.html
 Patch200: upf.patch
-Requires(post): /sbin/install-info
-Requires(preun): /sbin/install-info
 Requires: gcc
 # (Build)Requires from fc gcc41 package
 %global multilib_64_archs sparc64 ppc64 s390x x86_64
@@ -680,14 +678,6 @@ popd
 %{__install} -d %{buildroot}%{_includedir}/ghdl
 %{__mv} %{buildroot}%{_includedir}/vpi_user.h %{buildroot}%{_includedir}/ghdl
 %{__rm} %{buildroot}%{_bindir}/gcov-tool
-
-%post
-[ -f %{_infodir}/ghdl.info.gz ] && \
-        /sbin/install-info %{_infodir}/ghdl.info.gz %{_infodir}/dir || :
-
-%preun
-[ -f %{_infodir}/ghdl.info.gz ] && [ $1 = 0 ] && \
-        /sbin/install-info --delete %{_infodir}/ghdl.info.gz %{_infodir}/dir || :
 
 %files
 %{_bindir}/ghdl
