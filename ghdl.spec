@@ -31,7 +31,6 @@ Name: ghdl
 Version: %{ghdlver}
 Release: 1%{ghdlgitrev}.0%{?dist}
 License: GPLv2+
-Group: Development/Languages
 URL: http://ghdl.free.fr/
 # HOWTO create source files from ghdl git at github.com
 # check out the git repo
@@ -200,7 +199,6 @@ Ada95.
 
 %package grt
 Summary: GHDL runtime libraries
-Group: System Environment/Libraries
 # rhbz #316311
 Requires: zlib-devel, libgnat >= 4.3
 
@@ -213,7 +211,6 @@ that tracks signal updates and schedules processes.
 %if %{with mcode}
 %package mcode
 Summary: GHDL with mcode backend
-Group: Development/Languages
 Requires: ghdl-mcode-grt = %{version}-%{release}
 
 %description mcode
@@ -222,7 +219,6 @@ backend provides for faster compile time at the expense of longer run time.
 
 %package mcode-grt
 Summary: GHDL mcode runtime libraries
-Group: System Environment/Libraries
 
 %description mcode-grt
 This package contains the runtime libraries needed to link ghdl-mcode-compiled
@@ -234,7 +230,6 @@ that tracks signal updates and schedules processes.
 %if %{with llvm}
 %package llvm
 Summary: GHDL with LLVM backend
-Group: Development/Languages
 Requires: ghdl-llvm-grt = %{version}-%{release}
 
 %description llvm
@@ -243,7 +238,6 @@ backend is experimental.
 
 %package llvm-grt
 Summary: GHDL LLVM runtime libraries
-Group: System Environment/Libraries
 
 %description llvm-grt
 This package contains the runtime libraries needed to link ghdl-llvm-compiled
