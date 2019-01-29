@@ -1,6 +1,3 @@
-%global DATE 20170118
-%global SVNREV 244565
-%global gcc_version 6.3.1
 %global ghdlver 0.35dev
 %global ghdlgitrev .20190129git3c30e3b
 
@@ -26,42 +23,140 @@
 
 %bcond_with gnatwae
 
+%global DATE 20190109
+%global SVNREV 267776
+%global gcc_version 8.2.1
+%global gcc_major 8
+# Note, gcc_release must be integer, if you want to add suffixes to
+# %%{release}, append them after %%{gcc_release} on Release: line.
+%global gcc_release 7
+%global nvptx_tools_gitrev c28050f60193b3b95a18866a96f03334e874e78f
+%global nvptx_newlib_gitrev aadc8eb0ec43b7cd0dd2dfb484bae63c8b05ef24
+%global _unpackaged_files_terminate_build 0
+%global _performance_build 1
+# Hardening slows the compiler way too much.
+%undefine _hardened_build
+%if 0%{?fedora} > 27 || 0%{?rhel} > 7
+# Until annobin is fixed (#1519165).
+%undefine _annotated_build
+%endif
+%global multilib_64_archs sparc64 ppc64 ppc64p7 s390x x86_64
+%ifarch %{ix86} x86_64 ia64 ppc64le
+%global build_libquadmath 1
+%else
+%global build_libquadmath 0
+%endif
+%ifarch %{ix86} x86_64 ppc ppc64 ppc64le ppc64p7 s390 s390x %{arm} aarch64
+%global build_libasan 1
+%else
+%global build_libasan 0
+%endif
+%ifarch x86_64 ppc64 ppc64le aarch64
+%global build_libtsan 1
+%else
+%global build_libtsan 0
+%endif
+%ifarch x86_64 ppc64 ppc64le aarch64
+%global build_liblsan 1
+%else
+%global build_liblsan 0
+%endif
+%ifarch %{ix86} x86_64 ppc ppc64 ppc64le ppc64p7 s390 s390x %{arm} aarch64
+%global build_libubsan 1
+%else
+%global build_libubsan 0
+%endif
+%ifarch %{ix86} x86_64 ppc ppc64 ppc64le ppc64p7 s390 s390x %{arm} aarch64 %{mips}
+%global build_libatomic 1
+%else
+%global build_libatomic 0
+%endif
+%ifarch %{ix86} x86_64 %{arm} alpha ppc ppc64 ppc64le ppc64p7 s390 s390x aarch64
+%global build_libitm 1
+%else
+%global build_libitm 0
+%endif
+%if 0%{?rhel} > 7
+%global build_libmpx 0
+%else
+%ifarch %{ix86} x86_64
+%global build_libmpx 1
+%else
+%global build_libmpx 0
+%endif
+%endif
+%global build_isl 1
+%ifarch %{ix86} x86_64 ppc ppc64 ppc64le ppc64p7 s390 s390x %{arm} aarch64 %{mips}
+%global attr_ifunc 1
+%else
+%global attr_ifunc 0
+%endif
+%ifarch x86_64 ppc64le
+%global build_offload_nvptx 1
+%else
+%global build_offload_nvptx 0
+%endif
+%ifarch s390x
+%global multilib_32_arch s390
+%endif
+%ifarch sparc64
+%global multilib_32_arch sparcv9
+%endif
+%ifarch ppc64 ppc64p7
+%global multilib_32_arch ppc
+%endif
+%ifarch x86_64
+%global multilib_32_arch i686
+%endif
+
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
 Release: 1%{ghdlgitrev}.0%{?dist}
-License: GPLv2+
+License: GPLv2+ and GPLv3+ and GPLv3+ with exceptions and GPLv2+ with exceptions and LGPLv2+ and BSD
 URL: http://ghdl.free.fr/
+# The source for this package was pulled from upstream's vcs.  Use the
+# following commands to generate the tarball:
+# svn export svn://gcc.gnu.org/svn/gcc/branches/redhat/gcc-8-branch@%%{SVNREV} gcc-%%{version}-%%{DATE}
+# tar cf - gcc-%%{version}-%%{DATE} | xz -9e > gcc-%%{version}-%%{DATE}.tar.xz
+Source0: gcc-%{gcc_version}-%{DATE}.tar.xz
+# The source for nvptx-tools package was pulled from upstream's vcs.  Use the
+# following commands to generate the tarball:
+# git clone https://github.com/MentorEmbedded/nvptx-tools.git
+# cd nvptx-tools
+# git archive origin/master --prefix=nvptx-tools-%%{nvptx_tools_gitrev}/ | xz -9e > ../nvptx-tools-%%{nvptx_tools_gitrev}.tar.xz
+# cd ..; rm -rf nvptx-tools
+Source1: nvptx-tools-%{nvptx_tools_gitrev}.tar.xz
+# The source for nvptx-newlib package was pulled from upstream's vcs.  Use the
+# following commands to generate the tarball:
+# git clone https://github.com/MentorEmbedded/nvptx-newlib.git
+# cd nvptx-newlib
+# git archive origin/master --prefix=nvptx-newlib-%%{nvptx_newlib_gitrev}/ | xz -9 > ../nvptx-newlib-%%{nvptx_newlib_gitrev}.tar.xz
+# cd ..; rm -rf nvptx-newlib
+Source2: nvptx-newlib-%{nvptx_newlib_gitrev}.tar.xz
+%global isl_version 0.16.1
+
+Patch0: gcc8-hack.patch
+Patch2: gcc8-i386-libgomp.patch
+Patch3: gcc8-sparc-config-detection.patch
+Patch4: gcc8-libgomp-omp_h-multilib.patch
+Patch5: gcc8-libtool-no-rpath.patch
+Patch6: gcc8-isl-dl.patch
+Patch8: gcc8-no-add-needed.patch
+Patch9: gcc8-foffload-default.patch
+Patch10: gcc8-Wno-format-security.patch
+Patch11: gcc8-rh1512529-aarch64.patch
+Patch12: gcc8-mcet.patch
+Patch13: gcc8-rh1574936.patch
+
+Patch1000: nvptx-tools-no-ptxas.patch
+Patch1001: nvptx-tools-build.patch
+Patch1002: nvptx-tools-glibc.patch
+
 # HOWTO create source files from ghdl git at github.com
 # check out the git repo
 # git clone https://github.com/tgingold/ghdl.git
 # tar cvJf ghdl%{ghdlgitrev}.tar.bz2 --exclude-vcs ghdl
-#
-# The source for this package was pulled from upstream's vcs.  Use the
-# following commands to generate the tarball:
-# svn export svn://gcc.gnu.org/svn/gcc/branches/redhat/gcc-4_7-branch@%{SVNREV} gcc-%{version}-%{DATE}
-# tar cf - gcc-%{version}-%{DATE} | bzip2 -9 > gcc-%{version}-%{DATE}.tar.bz2
-Source0: gcc-%{gcc_version}-%{DATE}.tar.bz2
-%global isl_version 0.14
-Source1: ftp://gcc.gnu.org/pub/gcc/infrastructure/isl-%{isl_version}.tar.xz
-%global cloog_version 0.18.3
-Source2: ftp://gcc.gnu.org/pub/gcc/infrastructure/cloog-%{cloog_version}.tar.gz
-Patch0: gcc6-hack.patch
-Patch1: gcc6-java-nomulti.patch
-Patch2: gcc6-ppc32-retaddr.patch
-Patch3: gcc6-rh330771.patch
-Patch4: gcc6-i386-libgomp.patch
-Patch5: gcc6-sparc-config-detection.patch
-Patch6: gcc6-libgomp-omp_h-multilib.patch
-Patch7: gcc6-libtool-no-rpath.patch
-Patch8: gcc6-isl-dl.patch
-Patch9: gcc6-libstdc++-docs.patch
-Patch10: gcc6-no-add-needed.patch
-Patch11: gcc6-libgo-p224.patch
-Patch12: gcc6-aarch64-async-unw-tables.patch
-Patch13: gcc6-libsanitize-aarch64-va42.patch
-Patch90: gcc6-compile.patch
-Patch91: gcc6-ucontext.patch
 Source100: ghdl%{ghdlgitrev}.tar.bz2
 Patch100: ghdl-llvmflags.patch
 # Both following patches have been sent to upstream mailing list:
@@ -73,32 +168,7 @@ Patch106: ghdl-ppc64abort.patch
 # http://gcc.gnu.org/ml/gcc-patches/2012-10/msg02505.html
 Patch200: upf.patch
 Requires: gcc
-# (Build)Requires from fc gcc41 package
-%global multilib_64_archs sparc64 ppc64 s390x x86_64
-%ifarch s390x
-%global multilib_32_arch s390
-%endif
-%ifarch sparc64
-%global multilib_32_arch sparc
-%endif
-%ifarch ppc64
-%global multilib_32_arch ppc
-%endif
-%ifarch x86_64
-%global multilib_32_arch i386
-%endif
-#%ifarch %{ix86} x86_64
-#%global build_libmpx 1
-#%else
-%global build_libmpx 0
-#%endif
-%global build_isl 1
-%global build_libstdcxx_docs 1
-%ifarch %{ix86} x86_64 ppc ppc64 ppc64le ppc64p7 s390 s390x %{arm} aarch64 %{mips}
-%global attr_ifunc 1
-%else
-%global attr_ifunc 0
-%endif
+
 # Need binutils with -pie support >= 2.14.90.0.4-4
 # Need binutils which can omit dot symbols and overlap .opd on ppc64 >= 2.15.91.0.2-4
 # Need binutils which handle -msecure-plt on ppc >= 2.16.91.0.2-2
@@ -106,40 +176,37 @@ Requires: gcc
 # Need binutils which support --hash-style=gnu >= 2.17.50.0.2-7
 # Need binutils which support mffgpr and mftgpr >= 2.17.50.0.2-8
 # Need binutils which support --build-id >= 2.17.50.0.17-3
-# Need binutils which support %gnu_unique_object >= 2.19.51.0.14
+# Need binutils which support %%gnu_unique_object >= 2.19.51.0.14
 # Need binutils which support .cfi_sections >= 2.19.51.0.14-33
 # Need binutils which support --no-add-needed >= 2.20.51.0.2-12
 # Need binutils which support -plugin
+# Need binutils which support .loc view >= 2.30
+# Need binutils which support --generate-missing-build-notes=yes >= 2.31
+%if 0%{?fedora} >= 29 || 0%{?rhel} > 7
+BuildRequires: binutils >= 2.31
+%else
 BuildRequires: binutils >= 2.24
-BuildRequires: zlib-devel, gettext, bison, flex, sharutils, texinfo, texinfo-tex, gawk, /usr/bin/pod2man
+%endif
+# While gcc doesn't include statically linked binaries, during testing
+# -static is used several times.
+BuildRequires: glibc-static
+BuildRequires: zlib-devel, gettext, dejagnu, bison, flex, sharutils
+BuildRequires: texinfo, texinfo-tex, /usr/bin/pod2man
+BuildRequires: systemtap-sdt-devel >= 1.3
+BuildRequires: gmp-devel >= 4.1.2-8, mpfr-devel >= 2.2.1, libmpc-devel >= 0.8.1
+BuildRequires: python2-devel, python3-devel
+BuildRequires: gcc, gcc-c++
+# For VTA guality testing
+BuildRequires: gdb
 # Make sure pthread.h doesn't contain __thread tokens
 # Make sure glibc supports stack protector
+# Make sure glibc supports DT_GNU_HASH
 BuildRequires: glibc-devel >= 2.4.90-13
 BuildRequires: elfutils-devel >= 0.147
 BuildRequires: elfutils-libelf-devel >= 0.147
-%ifarch ppc ppc64 s390 s390x sparc sparcv9 alpha
+%ifarch ppc ppc64 ppc64le ppc64p7 s390 s390x sparc sparcv9 alpha
 # Make sure glibc supports TFmode long double
 BuildRequires: glibc >= 2.3.90-35
-%endif
-# GHDL requires Ada to build
-BuildRequires: gcc-gnat >= 4.3, libgnat-devel >= 4.3
-# GCC build requirements
-BuildRequires: gmp-devel >= 4.1.2-8, mpfr-devel >= 2.2.1, libmpc-devel >= 0.8.1
-BuildRequires: gcc-c++ >= 4.3
-# Need .eh_frame ld optimizations
-# Need proper visibility support
-# Need -pie support
-# Need --as-needed/--no-as-needed support
-# On ppc64, need omit dot symbols support and --non-overlapping-opd
-# Need binutils that owns /usr/bin/c++filt
-# Need binutils that support .weakref
-Requires: binutils >= 2.16.91.0.3-1
-# Make sure gdb will understand DW_FORM_strp
-Conflicts: gdb < 5.1-2
-Requires: glibc-devel >= 2.2.90-12
-%ifarch ppc ppc64 s390 s390x sparc sparcv9 alpha
-# Make sure glibc supports TFmode long double
-Requires: glibc >= 2.3.90-35
 %endif
 %ifarch %{multilib_64_archs} sparcv9 ppc
 # Ensure glibc{,-devel} is installed for both multilib arches
@@ -148,6 +215,39 @@ BuildRequires: /lib/libc.so.6 /usr/lib/libc.so /lib64/libc.so.6 /usr/lib64/libc.
 %ifarch ia64
 BuildRequires: libunwind >= 0.98
 %endif
+%if %{build_isl}
+BuildRequires: isl = %{isl_version}
+BuildRequires: isl-devel = %{isl_version}
+%if 0%{?__isa_bits} == 64
+Requires: libisl.so.15()(64bit)
+%else
+Requires: libisl.so.15
+%endif
+%endif
+# Need .eh_frame ld optimizations
+# Need proper visibility support
+# Need -pie support
+# Need --as-needed/--no-as-needed support
+# On ppc64, need omit dot symbols support and --non-overlapping-opd
+# Need binutils that owns /usr/bin/c++filt
+# Need binutils that support .weakref
+# Need binutils that supports --hash-style=gnu
+# Need binutils that support mffgpr/mftgpr
+# Need binutils that support --build-id
+# Need binutils that support %%gnu_unique_object
+# Need binutils that support .cfi_sections
+# Need binutils that support --no-add-needed
+# Need binutils that support -plugin
+# Need binutils that support .loc view >= 2.30
+# Need binutils which support --generate-missing-build-notes=yes >= 2.31
+%if 0%{?fedora} >= 29 || 0%{?rhel} > 7
+Requires: binutils >= 2.31
+%else
+Requires: binutils >= 2.24
+%endif
+Requires: libgcc >= %{version}-%{release}
+Requires: libgomp = %{version}-%{release}
+
 BuildRequires: autoconf
 BuildRequires: automake
 BuildRequires: libtool
@@ -247,28 +347,63 @@ that tracks signal updates and schedules processes.
 %endif
 
 %prep
-%setup -q -n gcc-%{gcc_version}-%{DATE} -a 1 -a 2 -a 100
+%setup -q -n gcc-%{version}-%{DATE} -a 1 -a 2 -a 100
 %patch0 -p0 -b .hack~
-%patch1 -p0 -b .java-nomulti~
-%patch2 -p0 -b .ppc32-retaddr~
-%patch3 -p0 -b .rh330771~
-%patch4 -p0 -b .i386-libgomp~
-%patch5 -p0 -b .sparc-config-detection~
-%patch6 -p0 -b .libgomp-omp_h-multilib~
-%patch7 -p0 -b .libtool-no-rpath~
+%patch2 -p0 -b .i386-libgomp~
+%patch3 -p0 -b .sparc-config-detection~
+%patch4 -p0 -b .libgomp-omp_h-multilib~
+%patch5 -p0 -b .libtool-no-rpath~
 %if %{build_isl}
-%patch8 -p0 -b .isl-dl~
+%patch6 -p0 -b .isl-dl~
 %endif
-%if %{build_libstdcxx_docs}
-%patch9 -p0 -b .libstdc++-docs~
+%patch8 -p0 -b .no-add-needed~
+%patch9 -p0 -b .foffload-default~
+%patch10 -p0 -b .Wno-format-security~
+%patch11 -p0 -b .rh1512529-aarch64~
+%if 0%{?fedora} == 28
+%patch12 -p0 -b .mcet~
 %endif
-%patch10 -p0 -b .no-add-needed~
-%patch11 -p0 -b .libgo-p224~
-rm -f libgo/go/crypto/elliptic/p224{,_test}.go
-%patch12 -p0 -b .aarch64-async-unw-tables~
-%patch13 -p0 -b .libsanitize-aarch64-va42~
-%patch90 -p0 -b .compile~
-%patch91 -p0 -b .ucontext~
+%if 0%{?fedora} >= 29 || 0%{?rhel} > 7
+%patch13 -p0 -b .rh1574936~
+%endif
+
+cd nvptx-tools-%{nvptx_tools_gitrev}
+%patch1000 -p1 -b .nvptx-tools-no-ptxas~
+%patch1001 -p1 -b .nvptx-tools-build~
+%patch1002 -p1 -b .nvptx-tools-glibc~
+cd ..
+
+echo 'Red Hat %{version}-%{gcc_release}' > gcc/DEV-PHASE
+
+cp -a libstdc++-v3/config/cpu/i{4,3}86/atomicity.h
+
+echo 'TM_H += $(srcdir)/config/rs6000/rs6000-modes.h' >> gcc/config/rs6000/t-rs6000
+
+./contrib/gcc_update --touch
+
+LC_ALL=C sed -i -e 's/\xa0/ /' gcc/doc/options.texi
+
+sed -i -e 's/Common Driver Var(flag_report_bug)/& Init(1)/' gcc/common.opt
+
+%ifarch ppc
+if [ -d libstdc++-v3/config/abi/post/powerpc64-linux-gnu ]; then
+  mkdir -p libstdc++-v3/config/abi/post/powerpc64-linux-gnu/64
+  mv libstdc++-v3/config/abi/post/powerpc64-linux-gnu/{,64/}baseline_symbols.txt
+  mv libstdc++-v3/config/abi/post/powerpc64-linux-gnu/{32/,}baseline_symbols.txt
+  rm -rf libstdc++-v3/config/abi/post/powerpc64-linux-gnu/32
+fi
+%endif
+%ifarch sparc
+if [ -d libstdc++-v3/config/abi/post/sparc64-linux-gnu ]; then
+  mkdir -p libstdc++-v3/config/abi/post/sparc64-linux-gnu/64
+  mv libstdc++-v3/config/abi/post/sparc64-linux-gnu/{,64/}baseline_symbols.txt
+  mv libstdc++-v3/config/abi/post/sparc64-linux-gnu/{32/,}baseline_symbols.txt
+  rm -rf libstdc++-v3/config/abi/post/sparc64-linux-gnu/32
+fi
+%endif
+
+# This test causes fork failures, because it spawns way too many threads
+rm -f gcc/testsuite/go.test/test/chan/goroutines.go
 
 %patch200 -p0 -b .upf~
 
@@ -365,61 +500,13 @@ popd
 # Undo the broken autoconf change in recent Fedora versions
 export CONFIG_SITE=NONE
 
-%{__rm} -fr obj-%{gcc_target_platform}
-%{__mkdir} obj-%{gcc_target_platform}
-pushd obj-%{gcc_target_platform}
-
-%if %{build_isl}
-mkdir isl-build isl-install
-%ifarch s390 s390x
-ISL_FLAG_PIC=-fPIC
-%else
-ISL_FLAG_PIC=-fpic
-%endif
-cd isl-build
-../../isl-%{isl_version}/configure --disable-shared \
-  CC=/usr/bin/gcc CXX=/usr/bin/g++ \
-  CFLAGS="${CFLAGS:-%optflags} $ISL_FLAG_PIC" --prefix=`cd ..; pwd`/isl-install
-make %{?_smp_mflags}
-make install
-cd ..
-
-mkdir cloog-build cloog-install
-cd cloog-build
-cat >> ../../cloog-%{cloog_version}/source/isl/constraints.c << \EOF
-#include <isl/flow.h>
-static void __attribute__((used)) *s1 = (void *) isl_union_map_compute_flow;
-static void __attribute__((used)) *s2 = (void *) isl_map_dump;
-EOF
-sed -i 's|libcloog|libgcc6privatecloog|g' \
-  ../../cloog-%{cloog_version}/{,test/}Makefile.{am,in}
-isl_prefix=`cd ../isl-install; pwd` \
-../../cloog-%{cloog_version}/configure --with-isl=system \
-  --with-isl-prefix=`cd ../isl-install; pwd` \
-  CC=/usr/bin/gcc CXX=/usr/bin/g++ \
-  CFLAGS="${CFLAGS:-%optflags}" CXXFLAGS="${CXXFLAGS:-%optflags}" \
-   --prefix=`cd ..; pwd`/cloog-install
-sed -i 's|^hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=""|g' libtool
-sed -i 's|^runpath_var=LD_RUN_PATH|runpath_var=DIE_RPATH_DIE|g' libtool
-make %{?_smp_mflags}
-make %{?_smp_mflags} install
-cd ../cloog-install/lib
-rm libgcc6privatecloog-isl.so{,.4}
-mv libgcc6privatecloog-isl.so.4.0.0 libcloog-isl.so.4
-ln -sf libcloog-isl.so.4 libcloog-isl.so
-ln -sf libcloog-isl.so.4 libcloog.so
-cd ../..
-%endif
-
 CC=gcc
+CXX=g++
 OPT_FLAGS=`echo %{optflags}|sed -e 's/\(-Wp,\)\?-D_FORTIFY_SOURCE=[12]//g'`
 OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-m64//g;s/-m32//g;s/-m31//g'`
 OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-mfpmath=sse/-mfpmath=sse -msse2/g'`
 OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/ -pipe / /g'`
-OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-mcet//g'`
-OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-fstack-clash-protection//g'`
-OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-fcf-protection//g'`
-OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's,-specs=/usr/lib/rpm/redhat/redhat-annobin-cc1,,g'`
+OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-Werror=format-security/-Wformat-security/g'`
 %ifarch sparc
 OPT_FLAGS=`echo $OPT_FLAGS|sed -e 's/-mcpu=ultrasparc/-mtune=ultrasparc/g;s/-mcpu=v[78]//g'`
 %endif
@@ -430,49 +517,84 @@ OPT_FLAGS=`echo "$OPT_FLAGS" | sed -e 's/[[:blank:]]\+/ /g'`
 case "$OPT_FLAGS" in
   *-fasynchronous-unwind-tables*)
     sed -i -e 's/-fno-exceptions /-fno-exceptions -fno-asynchronous-unwind-tables /' \
-      ../libgcc/Makefile.in
+      libgcc/Makefile.in
     ;;
 esac
 
+%if %{build_offload_nvptx}
+mkdir obji
+IROOT=`pwd`/obji
+cd nvptx-tools-%{nvptx_tools_gitrev}
+rm -rf obj-%{gcc_target_platform}
+mkdir obj-%{gcc_target_platform}
+cd obj-%{gcc_target_platform}
+CC="$CC" CXX="$CXX" CFLAGS="%{optflags}" CXXFLAGS="%{optflags}" \
+../configure --prefix=%{_prefix}
+make %{?_smp_mflags}
+make install prefix=${IROOT}%{_prefix}
+cd ../..
+
+ln -sf nvptx-newlib-%{nvptx_newlib_gitrev}/newlib newlib
+rm -rf obj-offload-nvptx-none
+mkdir obj-offload-nvptx-none
+
+cd obj-offload-nvptx-none
 CC="$CC" CXX="$CXX" CFLAGS="$OPT_FLAGS" \
 	CXXFLAGS="`echo " $OPT_FLAGS " | sed 's/ -Wall / /g;s/ -fexceptions / /g' \
-		  | sed 's/ -Werror=format-security /  /'`" \
+		  | sed 's/ -Wformat-security / -Wformat -Wformat-security /'`" \
 	XCFLAGS="$OPT_FLAGS" TCFLAGS="$OPT_FLAGS" \
-	../configure --prefix=%{_prefix} --mandir=%{_mandir} --infodir=%{_infodir} \
-	--with-bugurl=http://bugzilla.redhat.com/bugzilla --enable-bootstrap=no \
+	../configure --disable-bootstrap --disable-sjlj-exceptions \
+	--enable-newlib-io-long-long --with-build-time-tools=${IROOT}%{_prefix}/nvptx-none/bin \
+	--target nvptx-none --enable-as-accelerator-for=%{gcc_target_platform} \
+	--enable-languages=c,c++,fortran,lto \
+	--prefix=%{_prefix} --mandir=%{_mandir} --infodir=%{_infodir} \
+	--with-bugurl=http://bugzilla.redhat.com/bugzilla \
+	--enable-checking=release --with-system-zlib \
+	--with-gcc-major-version-only --without-isl
+make %{?_smp_mflags}
+cd ..
+rm -f newlib
+%endif
+
+rm -rf obj-%{gcc_target_platform}
+mkdir obj-%{gcc_target_platform}
+pushd obj-%{gcc_target_platform}
+
+CONFIGURE_OPTS="\
+	--prefix=%{_prefix} --mandir=%{_mandir} --infodir=%{_infodir} \
+	--with-bugurl=http://bugzilla.redhat.com/bugzilla \
 	--enable-shared --enable-threads=posix --enable-checking=release \
 %ifarch ppc64le
 	--enable-targets=powerpcle-linux \
 %endif
-%ifarch ppc64le
-        --disable-multilib \
+%ifarch ppc64le %{mips} riscv64
+	--disable-multilib \
 %else
-        --enable-multilib \
+	--enable-multilib \
 %endif
 	--with-system-zlib --enable-__cxa_atexit --disable-libunwind-exceptions \
-	--enable-gnu-unique-object --enable-linker-build-id \
+	--enable-gnu-unique-object --enable-linker-build-id --with-gcc-major-version-only \
 %ifnarch %{mips}
 	--with-linker-hash-style=gnu \
 %endif
-	--enable-languages=vhdl \
 	--enable-plugin --enable-initfini-array \
-	--disable-libgcj \
-%if 0%{?fedora} >= 21 && 0%{?fedora} <= 22
-	--with-default-libstdcxx-abi=gcc4-compatible \
-%endif
 %if %{build_isl}
-        --with-isl=`pwd`/isl-install --with-cloog=`pwd`/cloog-install \
+	--with-isl \
 %else
-        --without-isl --without-cloog \
+	--without-isl \
 %endif
 %if %{build_libmpx}
 	--enable-libmpx \
 %else
 	--disable-libmpx \
 %endif
+%if %{build_offload_nvptx}
+	--enable-offload-targets=nvptx-none \
+	--without-cuda-driver \
+%endif
 %if 0%{?fedora} >= 21 || 0%{?rhel} >= 7
 %if %{attr_ifunc}
-        --enable-gnu-indirect-function \
+	--enable-gnu-indirect-function \
 %endif
 %endif
 %ifarch %{arm}
@@ -508,6 +630,7 @@ CC="$CC" CXX="$CXX" CFLAGS="$OPT_FLAGS" \
 	--build=%{gcc_target_platform} --target=%{gcc_target_platform} --with-cpu=default32
 %endif
 %ifarch %{ix86} x86_64
+	--enable-cet \
 	--with-tune=generic \
 %endif
 %if 0%{?rhel} >= 7
@@ -527,13 +650,22 @@ CC="$CC" CXX="$CXX" CFLAGS="$OPT_FLAGS" \
 %endif
 %ifarch s390 s390x
 %if 0%{?rhel} >= 7
-	--with-arch=z196 --with-tune=zEC12 --enable-decimal-float \
+%if 0%{?rhel} > 7
+	--with-arch=zEC12 --with-tune=z13 \
 %else
-	--with-arch=z9-109 --with-tune=z10 --enable-decimal-float \
+	--with-arch=z196 --with-tune=zEC12 \
 %endif
+%else
+%if 0%{?fedora} >= 26
+	--with-arch=zEC12 --with-tune=z13 \
+%else
+	--with-arch=z9-109 --with-tune=z10 \
+%endif
+%endif
+	--enable-decimal-float \
 %endif
 %ifarch armv7hl
-	--with-tune=cortex-a8 --with-arch=armv7-a \
+	--with-tune=generic-armv7-a --with-arch=armv7-a \
 	--with-float=hard --with-fpu=vfpv3-d16 --with-abi=aapcs-linux \
 %endif
 %ifarch mips mipsel
@@ -545,7 +677,15 @@ CC="$CC" CXX="$CXX" CFLAGS="$OPT_FLAGS" \
 %ifnarch sparc sparcv9 ppc
 	--build=%{gcc_target_platform} \
 %endif
+	"
 
+CC="$CC" CXX="$CXX" CFLAGS="$OPT_FLAGS" \
+	CXXFLAGS="`echo " $OPT_FLAGS " | sed 's/ -Wall / /g;s/ -fexceptions / /g' \
+		  | sed 's/ -Wformat-security / -Wformat -Wformat-security /'`" \
+	XCFLAGS="$OPT_FLAGS" TCFLAGS="$OPT_FLAGS" \
+	../configure --enable-bootstrap=no \
+	--enable-languages=vhdl \
+	$CONFIGURE_OPTS
 
 # workaround for gcc gnat ICE on valid, do not compile trans-chap8 with optimization
 %{__make} || true
@@ -562,18 +702,14 @@ gnatmake -c -aI%{_builddir}/gcc-%{gcc_version}-%{DATE}/gcc/vhdl ortho_gcc-main \
 #-gnatwae
 popd
 
-#%ifarch %{arm} sparc sparcv9 sparc64
-#GCJFLAGS="$OPT_FLAGS" make %{?_smp_mflags} BOOT_CFLAGS="$OPT_FLAGS" bootstrap
+#%ifarch sparc sparcv9 sparc64
+#make %{?_smp_mflags} BOOT_CFLAGS="$OPT_FLAGS" bootstrap
 #%else
-#GCJFLAGS="$OPT_FLAGS" make %{?_smp_mflags} BOOT_CFLAGS="$OPT_FLAGS" profiledbootstrap
+#make %{?_smp_mflags} BOOT_CFLAGS="$OPT_FLAGS" profiledbootstrap
 #%endif
 
 #%{__make} %{?_smp_mflags}
 %{__make}
-
-%if %{build_isl}
-cp -a cloog-install/lib/libcloog-isl.so.4 gcc/
-%endif
 
 popd
 

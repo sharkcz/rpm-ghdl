@@ -1,6 +1,6 @@
 --- gcc/Makefile.in.jj	2015-06-06 10:00:25.000000000 +0200
 +++ gcc/Makefile.in	2015-11-04 14:56:02.643536437 +0100
-@@ -1013,7 +1013,7 @@ BUILD_LIBDEPS= $(BUILD_LIBIBERTY)
+@@ -1046,7 +1046,7 @@ BUILD_LIBDEPS= $(BUILD_LIBIBERTY)
  # and the system's installed libraries.
  LIBS = @LIBS@ libcommon.a $(CPPLIB) $(LIBINTL) $(LIBICONV) $(LIBBACKTRACE) \
  	$(LIBIBERTY) $(LIBDECNUMBER) $(HOST_LIBS)
@@ -9,7 +9,7 @@
  	$(ZLIB)
  # Any system libraries needed just for GNAT.
  SYSLIBS = @GNAT_LIBEXC@
-@@ -2058,6 +2058,15 @@ $(out_object_file): $(out_file)
+@@ -2196,6 +2196,15 @@ $(out_object_file): $(out_file)
  $(common_out_object_file): $(common_out_file)
  	$(COMPILE) $<
  	$(POSTCOMPILE)
@@ -27,25 +27,12 @@
  # and compile them.
 --- gcc/graphite.h.jj	2016-01-27 12:44:06.000000000 +0100
 +++ gcc/graphite.h	2016-01-27 13:26:38.309876856 +0100
-@@ -36,6 +36,7 @@ along with GCC; see the file COPYING3.
- #include <isl/ilp.h>
- #include <isl/schedule.h>
- #include <isl/ast_build.h>
+@@ -39,6 +39,590 @@ along with GCC; see the file COPYING3.
+ #include <isl/schedule_node.h>
+ #include <isl/id.h>
+ #include <isl/space.h>
++#include <isl/version.h>
 +#include <dlfcn.h>
- 
- #ifdef HAVE_ISL_OPTIONS_SET_SCHEDULE_SERIALIZE_SCCS
- /* isl 0.15 or later.  */
-@@ -47,6 +48,494 @@ along with GCC; see the file COPYING3.
- # define isl_stat_ok 0
- #endif
- 
-+#ifdef HAVE_ISL_OPTIONS_SET_SCHEDULE_SERIALIZE_SCCS
-+#define DYNSYM_SCHEDULE_FUSE DYNSYM (isl_options_set_schedule_serialize_sccs)
-+#define DYNSYM_SET_YAML_STYLE DYNSYM (isl_printer_set_yaml_style);
-+#else
-+#define DYNSYM_SCHEDULE_FUSE DYNSYM (isl_options_set_schedule_fuse)
-+#define DYNSYM_SET_YAML_STYLE
-+#endif
 +
 +#define DYNSYMS \
 +  DYNSYM (isl_aff_add_coefficient_si); \
@@ -109,8 +96,8 @@
 +  DYNSYM (isl_map_set_tuple_id); \
 +  DYNSYM (isl_map_universe); \
 +  DYNSYM (isl_options_set_on_error); \
-+  DYNSYM_SCHEDULE_FUSE; \
-+  DYNSYM_SET_YAML_STYLE \
++  DYNSYM (isl_options_set_schedule_serialize_sccs); \
++  DYNSYM (isl_printer_set_yaml_style); \
 +  DYNSYM (isl_options_set_schedule_max_constant_term); \
 +  DYNSYM (isl_options_set_schedule_maximize_band_depth); \
 +  DYNSYM (isl_printer_free); \
@@ -262,8 +249,6 @@
 +  DYNSYM (isl_val_add_ui); \
 +  DYNSYM (isl_val_copy); \
 +  DYNSYM (isl_val_free); \
-+  DYNSYM (isl_val_get_num_gmp); \
-+  DYNSYM (isl_val_int_from_gmp); \
 +  DYNSYM (isl_val_int_from_si); \
 +  DYNSYM (isl_val_int_from_ui); \
 +  DYNSYM (isl_val_mul); \
@@ -279,7 +264,62 @@
 +  DYNSYM (isl_map_coalesce); \
 +  DYNSYM (isl_printer_print_schedule); \
 +  DYNSYM (isl_set_set_dim_id); \
-+  DYNSYM (isl_union_map_coalesce);
++  DYNSYM (isl_union_map_coalesce); \
++  DYNSYM (isl_multi_val_set_val); \
++  DYNSYM (isl_multi_val_zero); \
++  DYNSYM (isl_options_set_schedule_max_coefficient); \
++  DYNSYM (isl_options_set_tile_scale_tile_loops); \
++  DYNSYM (isl_schedule_copy); \
++  DYNSYM (isl_schedule_get_map); \
++  DYNSYM (isl_schedule_map_schedule_node_bottom_up); \
++  DYNSYM (isl_schedule_node_band_get_permutable); \
++  DYNSYM (isl_schedule_node_band_get_space); \
++  DYNSYM (isl_schedule_node_band_tile); \
++  DYNSYM (isl_schedule_node_child); \
++  DYNSYM (isl_schedule_node_free); \
++  DYNSYM (isl_schedule_node_get_child); \
++  DYNSYM (isl_schedule_node_get_ctx); \
++  DYNSYM (isl_schedule_node_get_type); \
++  DYNSYM (isl_schedule_node_n_children); \
++  DYNSYM (isl_union_map_is_equal); \
++  DYNSYM (isl_union_access_info_compute_flow); \
++  DYNSYM (isl_union_access_info_from_sink); \
++  DYNSYM (isl_union_access_info_set_may_source); \
++  DYNSYM (isl_union_access_info_set_must_source); \
++  DYNSYM (isl_union_access_info_set_schedule); \
++  DYNSYM (isl_union_flow_free); \
++  DYNSYM (isl_union_flow_get_may_dependence); \
++  DYNSYM (isl_union_flow_get_must_dependence); \
++  DYNSYM (isl_aff_var_on_domain); \
++  DYNSYM (isl_multi_aff_from_aff); \
++  DYNSYM (isl_schedule_get_ctx); \
++  DYNSYM (isl_multi_aff_set_tuple_id); \
++  DYNSYM (isl_multi_aff_dim); \
++  DYNSYM (isl_schedule_get_domain); \
++  DYNSYM (isl_union_set_is_empty); \
++  DYNSYM (isl_union_set_get_space); \
++  DYNSYM (isl_union_pw_multi_aff_empty); \
++  DYNSYM (isl_union_set_foreach_set); \
++  DYNSYM (isl_union_set_free); \
++  DYNSYM (isl_multi_union_pw_aff_from_union_pw_multi_aff); \
++  DYNSYM (isl_multi_union_pw_aff_apply_multi_aff); \
++  DYNSYM (isl_schedule_insert_partial_schedule); \
++  DYNSYM (isl_union_pw_multi_aff_free); \
++  DYNSYM (isl_pw_multi_aff_project_out_map); \
++  DYNSYM (isl_union_pw_multi_aff_add_pw_multi_aff); \
++  DYNSYM (isl_schedule_from_domain); \
++  DYNSYM (isl_schedule_sequence); \
++  DYNSYM (isl_ast_build_node_from_schedule); \
++  DYNSYM (isl_ast_node_mark_get_node); \
++  DYNSYM (isl_schedule_node_band_member_get_ast_loop_type); \
++  DYNSYM (isl_schedule_node_band_member_set_ast_loop_type); \
++  DYNSYM (isl_val_n_abs_num_chunks); \
++  DYNSYM (isl_val_get_abs_num_chunks); \
++  DYNSYM (isl_val_int_from_chunks); \
++  DYNSYM (isl_val_is_neg); \
++  DYNSYM (isl_version); \
++  DYNSYM (isl_options_get_on_error); \
++  DYNSYM (isl_ctx_reset_error);
 +
 +extern struct isl_pointers_s__
 +{
@@ -351,12 +391,8 @@
 +#define isl_map_set_tuple_id (*isl_pointers__.p_isl_map_set_tuple_id)
 +#define isl_map_universe (*isl_pointers__.p_isl_map_universe)
 +#define isl_options_set_on_error (*isl_pointers__.p_isl_options_set_on_error)
-+#ifdef HAVE_ISL_OPTIONS_SET_SCHEDULE_SERIALIZE_SCCS
 +#define isl_options_set_schedule_serialize_sccs (*isl_pointers__.p_isl_options_set_schedule_serialize_sccs)
 +#define isl_printer_set_yaml_style (*isl_pointers__.p_isl_printer_set_yaml_style)
-+#else
-+#define isl_options_set_schedule_fuse (*isl_pointers__.p_isl_options_set_schedule_fuse)
-+#endif
 +#define isl_options_set_schedule_max_constant_term (*isl_pointers__.p_isl_options_set_schedule_max_constant_term)
 +#define isl_options_set_schedule_maximize_band_depth (*isl_pointers__.p_isl_options_set_schedule_maximize_band_depth)
 +#define isl_printer_free (*isl_pointers__.p_isl_printer_free)
@@ -508,8 +544,6 @@
 +#define isl_val_add_ui (*isl_pointers__.p_isl_val_add_ui)
 +#define isl_val_copy (*isl_pointers__.p_isl_val_copy)
 +#define isl_val_free (*isl_pointers__.p_isl_val_free)
-+#define isl_val_get_num_gmp (*isl_pointers__.p_isl_val_get_num_gmp)
-+#define isl_val_int_from_gmp (*isl_pointers__.p_isl_val_int_from_gmp)
 +#define isl_val_int_from_si (*isl_pointers__.p_isl_val_int_from_si)
 +#define isl_val_int_from_ui (*isl_pointers__.p_isl_val_int_from_ui)
 +#define isl_val_mul (*isl_pointers__.p_isl_val_mul)
@@ -526,14 +560,75 @@
 +#define isl_printer_print_schedule (*isl_pointers__.p_isl_printer_print_schedule)
 +#define isl_set_set_dim_id (*isl_pointers__.p_isl_set_set_dim_id)
 +#define isl_union_map_coalesce (*isl_pointers__.p_isl_union_map_coalesce)
-+
++#define isl_multi_val_set_val (*isl_pointers__.p_isl_multi_val_set_val)
++#define isl_multi_val_zero (*isl_pointers__.p_isl_multi_val_zero)
++#define isl_options_set_schedule_max_coefficient (*isl_pointers__.p_isl_options_set_schedule_max_coefficient)
++#define isl_options_set_tile_scale_tile_loops (*isl_pointers__.p_isl_options_set_tile_scale_tile_loops)
++#define isl_schedule_copy (*isl_pointers__.p_isl_schedule_copy)
++#define isl_schedule_get_map (*isl_pointers__.p_isl_schedule_get_map)
++#define isl_schedule_map_schedule_node_bottom_up (*isl_pointers__.p_isl_schedule_map_schedule_node_bottom_up)
++#define isl_schedule_node_band_get_permutable (*isl_pointers__.p_isl_schedule_node_band_get_permutable)
++#define isl_schedule_node_band_get_space (*isl_pointers__.p_isl_schedule_node_band_get_space)
++#define isl_schedule_node_band_tile (*isl_pointers__.p_isl_schedule_node_band_tile)
++#define isl_schedule_node_child (*isl_pointers__.p_isl_schedule_node_child)
++#define isl_schedule_node_free (*isl_pointers__.p_isl_schedule_node_free)
++#define isl_schedule_node_get_child (*isl_pointers__.p_isl_schedule_node_get_child)
++#define isl_schedule_node_get_ctx (*isl_pointers__.p_isl_schedule_node_get_ctx)
++#define isl_schedule_node_get_type (*isl_pointers__.p_isl_schedule_node_get_type)
++#define isl_schedule_node_n_children (*isl_pointers__.p_isl_schedule_node_n_children)
++#define isl_union_map_is_equal (*isl_pointers__.p_isl_union_map_is_equal)
++#define isl_union_access_info_compute_flow (*isl_pointers__.p_isl_union_access_info_compute_flow)
++#define isl_union_access_info_from_sink (*isl_pointers__.p_isl_union_access_info_from_sink)
++#define isl_union_access_info_set_may_source (*isl_pointers__.p_isl_union_access_info_set_may_source)
++#define isl_union_access_info_set_must_source (*isl_pointers__.p_isl_union_access_info_set_must_source)
++#define isl_union_access_info_set_schedule (*isl_pointers__.p_isl_union_access_info_set_schedule)
++#define isl_union_flow_free (*isl_pointers__.p_isl_union_flow_free)
++#define isl_union_flow_get_may_dependence (*isl_pointers__.p_isl_union_flow_get_may_dependence)
++#define isl_union_flow_get_must_dependence (*isl_pointers__.p_isl_union_flow_get_must_dependence)
++#define isl_aff_var_on_domain (*isl_pointers__.p_isl_aff_var_on_domain)
++#define isl_multi_aff_from_aff (*isl_pointers__.p_isl_multi_aff_from_aff)
++#define isl_schedule_get_ctx (*isl_pointers__.p_isl_schedule_get_ctx)
++#define isl_multi_aff_set_tuple_id (*isl_pointers__.p_isl_multi_aff_set_tuple_id)
++#define isl_multi_aff_dim (*isl_pointers__.p_isl_multi_aff_dim)
++#define isl_schedule_get_domain (*isl_pointers__.p_isl_schedule_get_domain)
++#define isl_union_set_is_empty (*isl_pointers__.p_isl_union_set_is_empty)
++#define isl_union_set_get_space (*isl_pointers__.p_isl_union_set_get_space)
++#define isl_union_pw_multi_aff_empty (*isl_pointers__.p_isl_union_pw_multi_aff_empty)
++#define isl_union_set_foreach_set (*isl_pointers__.p_isl_union_set_foreach_set)
++#define isl_union_set_free (*isl_pointers__.p_isl_union_set_free)
++#define isl_multi_union_pw_aff_from_union_pw_multi_aff (*isl_pointers__.p_isl_multi_union_pw_aff_from_union_pw_multi_aff)
++#define isl_multi_union_pw_aff_apply_multi_aff (*isl_pointers__.p_isl_multi_union_pw_aff_apply_multi_aff)
++#define isl_schedule_insert_partial_schedule (*isl_pointers__.p_isl_schedule_insert_partial_schedule)
++#define isl_union_pw_multi_aff_free (*isl_pointers__.p_isl_union_pw_multi_aff_free)
++#define isl_pw_multi_aff_project_out_map (*isl_pointers__.p_isl_pw_multi_aff_project_out_map)
++#define isl_union_pw_multi_aff_add_pw_multi_aff (*isl_pointers__.p_isl_union_pw_multi_aff_add_pw_multi_aff)
++#define isl_schedule_from_domain (*isl_pointers__.p_isl_schedule_from_domain)
++#define isl_schedule_sequence (*isl_pointers__.p_isl_schedule_sequence)
++#define isl_ast_build_node_from_schedule (*isl_pointers__.p_isl_ast_build_node_from_schedule)
++#define isl_ast_node_mark_get_node (*isl_pointers__.p_isl_ast_node_mark_get_node)
++#define isl_schedule_node_band_member_get_ast_loop_type (*isl_pointers__.p_isl_schedule_node_band_member_get_ast_loop_type)
++#define isl_schedule_node_band_member_set_ast_loop_type (*isl_pointers__.p_isl_schedule_node_band_member_set_ast_loop_type)
++#define isl_val_n_abs_num_chunks (*isl_pointers__.p_isl_val_n_abs_num_chunks)
++#define isl_val_get_abs_num_chunks (*isl_pointers__.p_isl_val_get_abs_num_chunks)
++#define isl_val_int_from_chunks (*isl_pointers__.p_isl_val_int_from_chunks)
++#define isl_val_is_neg (*isl_pointers__.p_isl_val_is_neg)
++#define isl_version (*isl_pointers__.p_isl_version)
++#define isl_options_get_on_error (*isl_pointers__.p_isl_options_get_on_error)
++#define isl_ctx_reset_error (*isl_pointers__.p_isl_ctx_reset_error)
+ 
  typedef struct poly_dr *poly_dr_p;
  
- typedef struct poly_bb *poly_bb_p;
+@@ -461,5 +1045,6 @@ extern void build_scops (vec<scop_p> *);
+ extern void dot_all_sese (FILE *, vec<sese_l> &);
+ extern void dot_sese (sese_l &);
+ extern void dot_cfg ();
++extern const char *get_isl_version (bool);
+ 
+ #endif
 --- gcc/graphite.c.jj	2015-11-04 14:15:32.000000000 +0100
 +++ gcc/graphite.c	2015-11-04 14:56:02.645536409 +0100
-@@ -54,6 +54,34 @@ along with GCC; see the file COPYING3.
- #include "tree-cfgcleanup.h"
+@@ -60,6 +60,35 @@ along with GCC; see the file COPYING3.
+ #include "tree-into-ssa.h"
  #include "graphite.h"
  
 +__typeof (isl_pointers__) isl_pointers__;
@@ -545,7 +640,7 @@
 +
 +  if (isl_pointers__.inited)
 +    return isl_pointers__.h != NULL;
-+  h = dlopen ("libisl.so.13", RTLD_LAZY);
++  h = dlopen ("libisl.so.15", RTLD_LAZY);
 +  isl_pointers__.h = h;
 +  if (h == NULL)
 +    return false;
@@ -561,13 +656,14 @@
 +  while (0)
 +  DYNSYMS
 +#undef DYNSYM
++  isl_pointers__.inited = true;
 +  return true;
 +}
 +
  /* Print global statistics to FILE.  */
  
  static void
-@@ -298,6 +326,15 @@ graphite_transform_loops (void)
+@@ -365,6 +394,15 @@ graphite_transform_loops (void)
    if (parallelized_function_p (cfun->decl))
      return;
  
@@ -580,6 +676,40 @@
 +      return;
 +    }
 +
-   ctx = isl_ctx_alloc ();
-   isl_options_set_on_error (ctx, ISL_ON_ERROR_ABORT);
-   if (!graphite_initialize (ctx))
+   calculate_dominance_info (CDI_DOMINATORS);
+ 
+   /* We rely on post-dominators during merging of SESE regions so those
+@@ -455,6 +493,14 @@ graphite_transform_loops (void)
+     }
+ }
+ 
++const char *
++get_isl_version (bool force)
++{
++  if (force)
++    init_isl_pointers ();
++  return (isl_pointers__.inited && isl_version) ? isl_version () : "none";
++}
++
+ #else /* If isl is not available: #ifndef HAVE_isl.  */
+ 
+ static void
+--- gcc/toplev.c.jj	2017-02-19 13:02:31.000000000 +0100
++++ gcc/toplev.c	2017-02-19 16:50:25.536301350 +0100
+@@ -94,6 +94,7 @@ along with GCC; see the file COPYING3.
+ 
+ #ifdef HAVE_isl
+ #include <isl/version.h>
++extern const char *get_isl_version (bool);
+ #endif
+ 
+ static void general_init (const char *, bool);
+@@ -683,7 +684,7 @@ print_version (FILE *file, const char *i
+ #ifndef HAVE_isl
+ 	   "none"
+ #else
+-	   isl_version ()
++	   get_isl_version (*indent == 0)
+ #endif
+ 	   );
+   if (strcmp (GCC_GMP_STRINGIFY_VERSION, gmp_version))
