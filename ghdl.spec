@@ -187,10 +187,7 @@ BuildRequires: binutils >= 2.31
 %else
 BuildRequires: binutils >= 2.24
 %endif
-# While gcc doesn't include statically linked binaries, during testing
-# -static is used several times.
-BuildRequires: glibc-static
-BuildRequires: zlib-devel, gettext, dejagnu, bison, flex, sharutils
+BuildRequires: zlib-devel, gettext, bison, flex, sharutils
 BuildRequires: texinfo, texinfo-tex, /usr/bin/pod2man
 BuildRequires: systemtap-sdt-devel >= 1.3
 BuildRequires: gmp-devel >= 4.1.2-8, mpfr-devel >= 2.2.1, libmpc-devel >= 0.8.1
@@ -347,7 +344,7 @@ that tracks signal updates and schedules processes.
 %endif
 
 %prep
-%setup -q -n gcc-%{version}-%{DATE} -a 1 -a 2 -a 100
+%setup -q -n gcc-%{gcc_version}-%{DATE} -a 1 -a 2 -a 100
 %patch0 -p0 -b .hack~
 %patch2 -p0 -b .i386-libgomp~
 %patch3 -p0 -b .sparc-config-detection~
@@ -412,10 +409,6 @@ rm -f gcc/testsuite/go.test/test/chan/goroutines.go
 %if %{without gnatwae}
 perl -i -pe 's,-gnatwae,,' ghdl/dist/gcc/Make-lang.in
 %endif
-
-pushd cloog-%{cloog_version}
-./autogen.sh
-popd
 
 %ifarch %{ix86} x86_64
 %if %{with mcode}
@@ -786,7 +779,7 @@ pushd %{buildroot}
         .%{_infodir}/{cpp,cppinternals,gcc,gccinstall,gccint}.info* \
         .%{_infodir}/{libgomp,libquadmath}.info* \
         .%{_datadir}/locale/*/LC_MESSAGES/{gcc,cpplib}.mo \
-        .%{_mandir}/man1/{cpp,gcc,gcov}.1* \
+        .%{_mandir}/man1/{cpp,gcc,gcov,gcov-dump,gcov-tool}.1* \
         .%{_mandir}/man7/{fsf-funding,gfdl,gpl}.7* \
         .%{_prefix}/lib/libgcc_s.* \
         .%{_prefix}/lib/libmudflap.* \
