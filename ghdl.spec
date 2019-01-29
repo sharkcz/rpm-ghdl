@@ -2,7 +2,7 @@
 %global SVNREV 244565
 %global gcc_version 6.3.1
 %global ghdlver 0.35dev
-%global ghdlgitrev .20180520git66bb071
+%global ghdlgitrev .20190129git3c30e3b
 
 %ifarch %{ix86} x86_64
 %bcond_without mcode
@@ -63,6 +63,7 @@ Patch13: gcc6-libsanitize-aarch64-va42.patch
 Patch90: gcc6-compile.patch
 Patch91: gcc6-ucontext.patch
 Source100: ghdl%{ghdlgitrev}.tar.bz2
+Patch100: ghdl-llvmflags.patch
 # Both following patches have been sent to upstream mailing list:
 # From: Thomas Sailer <t.sailer@alumni.ethz.ch>
 # To: ghdl-discuss@gna.org
@@ -269,7 +270,9 @@ rm -f libgo/go/crypto/elliptic/p224{,_test}.go
 %patch90 -p0 -b .compile~
 %patch91 -p0 -b .ucontext~
 
-%patch200 -p0 -b .upf
+%patch200 -p0 -b .upf~
+
+%patch100 -p0 -b .llvmflags~
 
 %if %{without gnatwae}
 perl -i -pe 's,-gnatwae,,' ghdl/dist/gcc/Make-lang.in
