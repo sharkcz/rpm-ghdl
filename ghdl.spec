@@ -112,7 +112,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-Release: 1%{ghdlgitrev}.0%{?dist}
+Release: 1%{ghdlgitrev}.1%{?dist}
 License: GPLv2+ and GPLv3+ and GPLv3+ with exceptions and GPLv2+ with exceptions and LGPLv2+ and BSD
 URL: http://ghdl.free.fr/
 # The source for this package was pulled from upstream's vcs.  Use the
@@ -242,8 +242,7 @@ Requires: binutils >= 2.31
 %else
 Requires: binutils >= 2.24
 %endif
-Requires: libgcc >= %{version}-%{release}
-Requires: libgomp = %{version}-%{release}
+Requires: libgcc >= %{gcc_version}-%{release}
 
 BuildRequires: autoconf
 BuildRequires: automake
