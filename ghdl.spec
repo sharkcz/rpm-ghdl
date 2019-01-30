@@ -843,7 +843,10 @@ popd
 %endif
 
 %changelog
-* Tue Jan 29 2019 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.35dev-0.20190129git3c30e3b.0
+* Wed Jan 30 2019 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.35dev-1.20190129git3c30e3b.1
+- update base gcc to 8.2.1
+
+* Tue Jan 29 2019 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.35dev-1.20190129git3c30e3b.0
 - update to 0.35dev (20190129git3c30e3b)
 
 * Fri Jul 13 2018 Fedora Release Engineering <releng@fedoraproject.org> - 0.35dev-1.20180520git66bb071.0
