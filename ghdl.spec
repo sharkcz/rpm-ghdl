@@ -247,6 +247,7 @@ Requires: libgcc >= %{gcc_version}-%{release}
 BuildRequires: autoconf
 BuildRequires: automake
 BuildRequires: libtool
+BuildRequires: gcc-gnat
 # for x86, we also build the mcode version; if on x86_64, we need some 32bit libraries
 %if %{with llvm}
 BuildRequires: libedit-devel
