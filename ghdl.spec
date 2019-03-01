@@ -112,7 +112,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-Release: 1%{ghdlgitrev}.0%{?dist}
+Release: 2%{ghdlgitrev}.0%{?dist}
 License: GPLv2+ and GPLv3+ and GPLv3+ with exceptions and GPLv2+ with exceptions and LGPLv2+ and BSD
 URL: http://ghdl.free.fr/
 # The source for this package was pulled from upstream's vcs.  Use the
@@ -843,8 +843,11 @@ popd
 %endif
 
 %changelog
-* Wed Jan 30 2019 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.35dev-1.20190301gita62344e.0
+* Fri Mar 01 2019 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.35dev-2.20190301gita62344e.0
 - update to 0.35dev (20190301gita62344e)
+
+* Thu Jan 31 2019 Fedora Release Engineering <releng@fedoraproject.org> - 0.35dev-2.20190129git3c30e3b.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
 
 * Wed Jan 30 2019 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.35dev-1.20190129git3c30e3b.1
 - update base gcc to 8.2.1
