@@ -1,5 +1,5 @@
 %global ghdlver 0.35dev
-%global ghdlgitrev .20190129git3c30e3b
+%global ghdlgitrev .20190301gita62344e
 
 %ifarch %{ix86} x86_64
 %bcond_without mcode
@@ -112,7 +112,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-Release: 1%{ghdlgitrev}.1%{?dist}
+Release: 1%{ghdlgitrev}.0%{?dist}
 License: GPLv2+ and GPLv3+ and GPLv3+ with exceptions and GPLv2+ with exceptions and LGPLv2+ and BSD
 URL: http://ghdl.free.fr/
 # The source for this package was pulled from upstream's vcs.  Use the
@@ -155,7 +155,7 @@ Patch1002: nvptx-tools-glibc.patch
 
 # HOWTO create source files from ghdl git at github.com
 # check out the git repo
-# git clone https://github.com/tgingold/ghdl.git
+# git clone https://github.com/ghdl/ghdl.git
 # tar cvJf ghdl%{ghdlgitrev}.tar.bz2 --exclude-vcs ghdl
 Source100: ghdl%{ghdlgitrev}.tar.bz2
 Patch100: ghdl-llvmflags.patch
@@ -843,6 +843,9 @@ popd
 %endif
 
 %changelog
+* Wed Jan 30 2019 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.35dev-1.20190301gita62344e.0
+- update to 0.35dev (20190301gita62344e)
+
 * Wed Jan 30 2019 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.35dev-1.20190129git3c30e3b.1
 - update base gcc to 8.2.1
 
