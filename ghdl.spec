@@ -159,13 +159,13 @@ Patch1002: nvptx-tools-glibc.patch
 # tar cvJf ghdl%{ghdlgitrev}.tar.bz2 --exclude-vcs ghdl
 Source100: ghdl%{ghdlgitrev}.tar.bz2
 Patch100: ghdl-llvmflags.patch
+Patch101: ghdl-llvm8.patch
 # Both following patches have been sent to upstream mailing list:
 # From: Thomas Sailer <t.sailer@alumni.ethz.ch>
 # To: ghdl-discuss@gna.org
 # Date: Thu, 02 Apr 2009 15:36:00 +0200
 # https://gna.org/bugs/index.php?13390
 Patch106: ghdl-ppc64abort.patch
-# http://gcc.gnu.org/ml/gcc-patches/2012-10/msg02505.html
 Patch200: upf.patch
 Requires: gcc
 
@@ -405,6 +405,7 @@ rm -f gcc/testsuite/go.test/test/chan/goroutines.go
 %patch200 -p0 -b .upf~
 
 %patch100 -p0 -b .llvmflags~
+%patch101 -p0 -b .llvm8~
 
 %if %{without gnatwae}
 perl -i -pe 's,-gnatwae,,' ghdl/dist/gcc/Make-lang.in
