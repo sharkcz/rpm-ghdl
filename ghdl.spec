@@ -112,7 +112,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-Release: 2%{ghdlgitrev}.0%{?dist}
+Release: 3%{ghdlgitrev}.0%{?dist}
 License: GPLv2+ and GPLv3+ and GPLv3+ with exceptions and GPLv2+ with exceptions and LGPLv2+ and BSD
 URL: http://ghdl.free.fr/
 # The source for this package was pulled from upstream's vcs.  Use the
@@ -808,7 +808,7 @@ popd
 
 %files
 %{_bindir}/ghdl
-%{_infodir}/ghdl.info.gz
+%{_infodir}/ghdl.info.*
 # Need to own directory %{_libexecdir}/gcc even though we only want the
 # %{gcc_target_platform}/%{gcc_version} subdirectory
 %{_libexecdir}/gcc/
@@ -844,6 +844,9 @@ popd
 %endif
 
 %changelog
+* Wed Apr 24 2019 Björn Esser <besser82@fedoraproject.org> - 0.35dev-3.20190301gita62344e.0
+- Remove hardcoded gzip suffix from GNU info pages
+
 * Fri Mar 01 2019 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.35dev-2.20190301gita62344e.0
 - update to 0.35dev (20190301gita62344e)
 
