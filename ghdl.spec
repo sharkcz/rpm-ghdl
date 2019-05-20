@@ -824,6 +824,10 @@ popd
 %endif
 
 %changelog
+* Mon May 20 2019 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.35dev-3.20190520git150116d2.0
+- update to 0.35dev (20190520git150116d2)
+- update gcc to 9.1.1
+
 * Wed Apr 24 2019 Björn Esser <besser82@fedoraproject.org> - 0.35dev-3.20190301gita62344e.0
 - Remove hardcoded gzip suffix from GNU info pages
 
