@@ -109,14 +109,14 @@ diff -urN ghdl/libraries/Makefile.inc ghdl/libraries/Makefile.inc
 +++ ghdl/libraries/Makefile.inc	2017-09-26 12:36:18.666917429 +0200
 @@ -54,7 +54,8 @@
  ifeq ($(enable_openieee),false)
- IEEE_SRCS := ieee/std_logic_1164.vhdl ieee/std_logic_1164_body.vhdl \
+ IEEE_SRCS := ieee/std_logic_1164.vhdl ieee/std_logic_1164-body.vhdl \
    ieee/numeric_bit.vhdl ieee/numeric_bit-body.vhdl \
 -  ieee/numeric_std.vhdl ieee/numeric_std-body.vhdl
 +  ieee/numeric_std.vhdl ieee/numeric_std-body.vhdl \
 +  ieee/upf.vhdl ieee/upf-body.vhdl
  MATH_SRCS := ieee/math_real.vhdl ieee/math_real-body.vhdl \
    ieee/math_complex.vhdl ieee/math_complex-body.vhdl
- VITAL95_BSRCS := vital95/vital_timing.vhdl vital95/vital_timing_body.vhdl \
+ VITAL95_BSRCS := vital95/vital_timing.vhdl vital95/vital_timing-body.vhdl \
 @@ -76,7 +77,8 @@
    ieee2008/fixed_pkg.vhdl \
    ieee2008/float_generic_pkg.vhdl ieee2008/float_generic_pkg-body.vhdl \
