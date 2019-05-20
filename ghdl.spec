@@ -1,5 +1,5 @@
 %global ghdlver 0.35dev
-%global ghdlgitrev .20190301gita62344e
+%global ghdlgitrev .20190520git150116d2
 
 %ifarch %{ix86} x86_64
 %bcond_without mcode
@@ -23,13 +23,13 @@
 
 %bcond_with gnatwae
 
-%global DATE 20190109
+%global DATE 20190503
 %global SVNREV 267776
-%global gcc_version 8.2.1
-%global gcc_major 8
+%global gcc_version 9.1.1
+%global gcc_major 9
 # Note, gcc_release must be integer, if you want to add suffixes to
 # %%{release}, append them after %%{gcc_release} on Release: line.
-%global gcc_release 7
+%global gcc_release 1
 %global nvptx_tools_gitrev c28050f60193b3b95a18866a96f03334e874e78f
 %global nvptx_newlib_gitrev aadc8eb0ec43b7cd0dd2dfb484bae63c8b05ef24
 %global _unpackaged_files_terminate_build 0
@@ -117,7 +117,7 @@ License: GPLv2+ and GPLv3+ and GPLv3+ with exceptions and GPLv2+ with exceptions
 URL: http://ghdl.free.fr/
 # The source for this package was pulled from upstream's vcs.  Use the
 # following commands to generate the tarball:
-# svn export svn://gcc.gnu.org/svn/gcc/branches/redhat/gcc-8-branch@%%{SVNREV} gcc-%%{version}-%%{DATE}
+# svn export svn://gcc.gnu.org/svn/gcc/branches/redhat/gcc-9-branch@%%{SVNREV} gcc-%%{version}-%%{DATE}
 # tar cf - gcc-%%{version}-%%{DATE} | xz -9e > gcc-%%{version}-%%{DATE}.tar.xz
 Source0: gcc-%{gcc_version}-%{DATE}.tar.xz
 # The source for nvptx-tools package was pulled from upstream's vcs.  Use the
@@ -136,18 +136,18 @@ Source1: nvptx-tools-%{nvptx_tools_gitrev}.tar.xz
 Source2: nvptx-newlib-%{nvptx_newlib_gitrev}.tar.xz
 %global isl_version 0.16.1
 
-Patch0: gcc8-hack.patch
-Patch2: gcc8-i386-libgomp.patch
-Patch3: gcc8-sparc-config-detection.patch
-Patch4: gcc8-libgomp-omp_h-multilib.patch
-Patch5: gcc8-libtool-no-rpath.patch
-Patch6: gcc8-isl-dl.patch
-Patch8: gcc8-no-add-needed.patch
-Patch9: gcc8-foffload-default.patch
-Patch10: gcc8-Wno-format-security.patch
-Patch11: gcc8-rh1512529-aarch64.patch
-Patch12: gcc8-mcet.patch
-Patch13: gcc8-rh1574936.patch
+Patch0: gcc9-hack.patch
+Patch1: gcc9-i386-libgomp.patch
+Patch2: gcc9-sparc-config-detection.patch
+Patch3: gcc9-libgomp-omp_h-multilib.patch
+Patch4: gcc9-libtool-no-rpath.patch
+Patch5: gcc9-isl-dl.patch
+Patch7: gcc9-no-add-needed.patch
+Patch8: gcc9-foffload-default.patch
+Patch9: gcc9-Wno-format-security.patch
+Patch10: gcc9-rh1574936.patch
+Patch11: gcc9-d-shared-libphobos.patch
+Patch12: gcc9-pr90303.patch
 
 Patch1000: nvptx-tools-no-ptxas.patch
 Patch1001: nvptx-tools-build.patch
@@ -346,23 +346,21 @@ that tracks signal updates and schedules processes.
 %prep
 %setup -q -n gcc-%{gcc_version}-%{DATE} -a 1 -a 2 -a 100
 %patch0 -p0 -b .hack~
-%patch2 -p0 -b .i386-libgomp~
-%patch3 -p0 -b .sparc-config-detection~
-%patch4 -p0 -b .libgomp-omp_h-multilib~
-%patch5 -p0 -b .libtool-no-rpath~
+%patch1 -p0 -b .i386-libgomp~
+%patch2 -p0 -b .sparc-config-detection~
+%patch3 -p0 -b .libgomp-omp_h-multilib~
+%patch4 -p0 -b .libtool-no-rpath~
 %if %{build_isl}
-%patch6 -p0 -b .isl-dl~
+%patch5 -p0 -b .isl-dl~
 %endif
-%patch8 -p0 -b .no-add-needed~
-%patch9 -p0 -b .foffload-default~
-%patch10 -p0 -b .Wno-format-security~
-%patch11 -p0 -b .rh1512529-aarch64~
-%if 0%{?fedora} == 28
-%patch12 -p0 -b .mcet~
-%endif
+%patch7 -p0 -b .no-add-needed~
+%patch8 -p0 -b .foffload-default~
+%patch9 -p0 -b .Wno-format-security~
 %if 0%{?fedora} >= 29 || 0%{?rhel} > 7
-%patch13 -p0 -b .rh1574936~
+%patch10 -p0 -b .rh1574936~
 %endif
+%patch11 -p0 -b .d-shared-libphobos~
+%patch12 -p0 -b .pr90303~
 
 cd nvptx-tools-%{nvptx_tools_gitrev}
 %patch1000 -p1 -b .nvptx-tools-no-ptxas~
@@ -373,8 +371,6 @@ cd ..
 echo 'Red Hat %{version}-%{gcc_release}' > gcc/DEV-PHASE
 
 cp -a libstdc++-v3/config/cpu/i{4,3}86/atomicity.h
-
-echo 'TM_H += $(srcdir)/config/rs6000/rs6000-modes.h' >> gcc/config/rs6000/t-rs6000
 
 ./contrib/gcc_update --touch
 
@@ -446,23 +442,6 @@ make copy-sources
 popd
 
 %patch106 -p0 -b .ppc64abort
-
-%if 0%{?fedora} >= 16 || 0%{?rhel} >= 7
-# Default to -gdwarf-4 -fno-debug-types-section rather than -gdwarf-2
-sed -i '/UInteger Var(dwarf_version)/s/Init(2)/Init(4)/' gcc/common.opt
-sed -i '/flag_debug_types_section/s/Init(1)/Init(0)/' gcc/common.opt
-sed -i '/dwarf_record_gcc_switches/s/Init(0)/Init(1)/' gcc/common.opt
-sed -i 's/\(may be either 2, 3 or 4; the default version is \)2\./\14./' gcc/doc/invoke.texi
-%else
-# Default to -gdwarf-3 rather than -gdwarf-2
-sed -i '/UInteger Var(dwarf_version)/s/Init(2)/Init(3)/' gcc/common.opt
-sed -i 's/\(may be either 2, 3 or 4; the default version is \)2\./\13./' gcc/doc/invoke.texi
-sed -i 's/#define[[:blank:]]*EMIT_ENTRY_VALUE[[:blank:]].*$/#define EMIT_ENTRY_VALUE 0/' gcc/{var-tracking,dwarf2out}.c
-sed -i 's/#define[[:blank:]]*EMIT_TYPED_DWARF_STACK[[:blank:]].*$/#define EMIT_TYPED_DWARF_STACK 0/' gcc/dwarf2out.c
-sed -i 's/#define[[:blank:]]*EMIT_DEBUG_MACRO[[:blank:]].*$/#define EMIT_DEBUG_MACRO 0/' gcc/dwarf2out.c
-%endif
-
-cp -a libstdc++-v3/config/cpu/i{4,3}86/atomicity.h
 
 %build
 
@@ -754,6 +733,9 @@ popd
 
 # Add additional libraries to link
 (
+%if 0%{?fedora} >= 30
+echo "-lgnat-9"
+%else
 %if 0%{?fedora} >= 28
 echo "-lgnat-8"
 %else
@@ -763,9 +745,7 @@ echo "-lgnat-7"
 echo "-lgnat-6"
 %endif
 %endif
-#%ifarch x86_64
-#echo "-ldl"
-#%endif
+%endif
 ) >> %{buildroot}%{_prefix}/lib/ghdl/grt.lst
 
 # Remove files not to be packaged
