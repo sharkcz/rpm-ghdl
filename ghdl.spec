@@ -1,5 +1,5 @@
 %global ghdlver 0.35dev
-%global ghdlgitrev .20190520git150116d2
+%global ghdlgitrev .20190528git3fafb135
 
 %ifarch %{ix86} x86_64
 %bcond_without mcode
@@ -242,7 +242,7 @@ Requires: binutils >= 2.31
 %else
 Requires: binutils >= 2.24
 %endif
-Requires: libgcc >= %{gcc_version}-%{release}
+Requires: libgcc >= %{gcc_version}-%{gcc_release}
 
 BuildRequires: autoconf
 BuildRequires: automake
