@@ -824,6 +824,10 @@ popd
 %endif
 
 %changelog
+* Tue May 28 2019 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.35dev-3.20190528git3fafb135.0
+- update to 0.35dev (20190528git3fafb135)
+- fix R: libgcc
+
 * Mon May 20 2019 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.35dev-3.20190520git150116d2.0
 - update to 0.35dev (20190520git150116d2)
 - update gcc to 9.1.1
