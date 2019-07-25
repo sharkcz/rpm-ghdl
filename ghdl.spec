@@ -112,7 +112,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-Release: 3%{ghdlgitrev}.0%{?dist}
+Release: 4%{ghdlgitrev}.0%{?dist}
 License: GPLv2+ and GPLv3+ and GPLv3+ with exceptions and GPLv2+ with exceptions and LGPLv2+ and BSD
 URL: http://ghdl.free.fr/
 # The source for this package was pulled from upstream's vcs.  Use the
@@ -824,6 +824,9 @@ popd
 %endif
 
 %changelog
+* Thu Jul 25 2019 Fedora Release Engineering <releng@fedoraproject.org> - 0.35dev-4.20190528git3fafb135.0
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
+
 * Tue May 28 2019 Thomas Sailer <t.sailer@alumni.ethz.ch> - 0.35dev-3.20190528git3fafb135.0
 - update to 0.35dev (20190528git3fafb135)
 - fix R: libgcc
