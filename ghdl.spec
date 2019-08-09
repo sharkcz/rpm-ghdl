@@ -1,4 +1,4 @@
-%global ghdlver 0.35dev
+%global ghdlver 0.37dev
 %global ghdlgitrev .20190528git3fafb135
 
 %ifarch %{ix86} x86_64
