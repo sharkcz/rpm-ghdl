@@ -159,7 +159,6 @@ Patch1002: nvptx-tools-glibc.patch
 # tar cvJf ghdl%{ghdlgitrev}.tar.bz2 --exclude-vcs ghdl
 Source100: ghdl%{ghdlgitrev}.tar.bz2
 Patch100: ghdl-llvmflags.patch
-Patch101: ghdl-llvm8.patch
 # Both following patches have been sent to upstream mailing list:
 # From: Thomas Sailer <t.sailer@alumni.ethz.ch>
 # To: ghdl-discuss@gna.org
@@ -401,7 +400,6 @@ rm -f gcc/testsuite/go.test/test/chan/goroutines.go
 %patch200 -p0 -b .upf~
 
 %patch100 -p0 -b .llvmflags~
-%patch101 -p0 -b .llvm8~
 
 %if %{without gnatwae}
 perl -i -pe 's,-gnatwae,,' ghdl/dist/gcc/Make-lang.in
