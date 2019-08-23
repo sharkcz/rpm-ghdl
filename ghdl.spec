@@ -112,7 +112,7 @@
 Summary: A VHDL simulator, using the GCC technology
 Name: ghdl
 Version: %{ghdlver}
-Release: 4%{ghdlgitrev}.0%{?dist}
+Release: 5%{ghdlgitrev}.0%{?dist}
 License: GPLv2+ and GPLv3+ and GPLv3+ with exceptions and GPLv2+ with exceptions and LGPLv2+ and BSD
 URL: http://ghdl.free.fr/
 # The source for this package was pulled from upstream's vcs.  Use the
@@ -264,7 +264,7 @@ Provides: bundled(libiberty)
 ExclusiveArch: %{GNAT_arches}
 
 # the following arches are not supported by the base compiler:
-ExcludeArch: armv7hl ppc64le
+ExcludeArch: armv7hl
 
 # Make sure we don't use clashing namespaces
 %global _vendor fedora_ghdl
@@ -824,6 +824,9 @@ popd
 %endif
 
 %changelog
+* Fri Aug 23 2019 Dan Horák <dan[at]danny.cz> - 0.35dev-5.20190528git3fafb135.0
+- enable ppc64le
+
 * Thu Jul 25 2019 Fedora Release Engineering <releng@fedoraproject.org> - 0.35dev-4.20190528git3fafb135.0
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_31_Mass_Rebuild
 
