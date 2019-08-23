@@ -1,5 +1,5 @@
 %global ghdlver 0.37dev
-%global ghdlgitrev .20190528git3fafb135
+%global ghdlgitrev .20190820gitf977ba0d
 
 %ifarch %{ix86} x86_64
 %bcond_without mcode
@@ -117,8 +117,9 @@ License: GPLv2+ and GPLv3+ and GPLv3+ with exceptions and GPLv2+ with exceptions
 URL: http://ghdl.free.fr/
 # The source for this package was pulled from upstream's vcs.  Use the
 # following commands to generate the tarball:
-# svn export svn://gcc.gnu.org/svn/gcc/branches/redhat/gcc-9-branch@%%{SVNREV} gcc-%%{version}-%%{DATE}
-# tar cf - gcc-%%{version}-%%{DATE} | xz -9e > gcc-%%{version}-%%{DATE}.tar.xz
+# GCC_TARNAME="gcc-%%{version}-%%{DATE}"
+# svn export svn://gcc.gnu.org/svn/gcc/branches/redhat/gcc-9-branch@%%{SVNREV} $GCC_TARNAME
+# tar cf - $GCC_TARNAME | xz -9e > $GCC_TARNAME.tar.xz
 Source0: gcc-%{gcc_version}-%{DATE}.tar.xz
 # The source for nvptx-tools package was pulled from upstream's vcs.  Use the
 # following commands to generate the tarball:
