@@ -1,0 +1,10 @@
+name: 'update'
+on: [push]
+jobs:
+  update:
+    strategy:
+      fail-fast: false
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - run: ./.github/actions/latest/run.sh
