@@ -165,7 +165,6 @@ Patch100: ghdl-llvmflags.patch
 # Date: Thu, 02 Apr 2009 15:36:00 +0200
 # https://gna.org/bugs/index.php?13390
 Patch106: ghdl-ppc64abort.patch
-Patch200: upf.patch
 Requires: gcc
 
 # Need binutils with -pie support >= 2.14.90.0.4-4
@@ -396,8 +395,6 @@ fi
 
 # This test causes fork failures, because it spawns way too many threads
 rm -f gcc/testsuite/go.test/test/chan/goroutines.go
-
-%patch200 -p0 -b .upf~
 
 %patch100 -p0 -b .llvmflags~
 
